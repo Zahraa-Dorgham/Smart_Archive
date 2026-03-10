@@ -36,15 +36,15 @@ Ce système gère le cycle de vie complet des documents (archives courantes, int
 
 ### Backend (Django)
 
-cd backend
-python -m venv venv
-source venv/bin/activate  # /.virtualenvs/backend-cb2btdbp/Scripts/Activate.ps1
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+- cd backend
+- python -m venv venv
+- source venv/bin/activate  # /.virtualenvs/backend-cb2btdbp/Scripts/Activate.ps1
+- pip install -r requirements.txt
+- python manage.py migrate
+- python manage.py runserver
 
 ---
 ### Frontend (Angular)
-cd frontend
-npm install
-ng serve
+- cd frontend
+- npm install
+- ng serve
