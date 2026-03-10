@@ -1,0 +1,29 @@
+.show-armoire-container {
+    padding: 20px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.search-field {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-field {
+    width: 200px;
+}
+
+.table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+}

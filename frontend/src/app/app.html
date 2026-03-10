@@ -1,0 +1,41 @@
+<mat-toolbar color="primary" class="app-toolbar">
+    <span>Archive Manager</span>
+    <span class="spacer"></span>
+    <button mat-button *ngIf="authService.isLoggedIn()" (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon> Déconnexion
+    </button>
+</mat-toolbar>
+
+<mat-sidenav-container>
+    <mat-sidenav #drawer mode="side" opened>
+        <mat-nav-list>
+            <a mat-list-item routerLink="/batiments" routerLinkActive="active">
+                <mat-icon matListItemIcon>business</mat-icon>
+                <span matListItemTitle>Bâtiments</span>
+            </a>
+            <a mat-list-item routerLink="/salles" routerLinkActive="active">
+                <mat-icon matListItemIcon>meeting_room</mat-icon>
+                <span matListItemTitle>Salles</span>
+            </a>
+            <a mat-list-item routerLink="/armoires" routerLinkActive="active">
+                <mat-icon matListItemIcon>cabinet</mat-icon>
+                <span matListItemTitle>Armoires</span>
+            </a>
+            <a mat-list-item routerLink="/etageres" routerLinkActive="active">
+                <mat-icon matListItemIcon>shelves</mat-icon>
+                <span matListItemTitle>Étagères</span>
+            </a>
+
+            <a mat-list-item routerLink="/phases" routerLinkActive="active">
+                <mat-icon matListItemIcon>timeline</mat-icon>
+                <span matListItemTitle>Phases d'archivage</span>
+            </a>
+        </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+        <div class="content">
+            <router-outlet></router-outlet>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

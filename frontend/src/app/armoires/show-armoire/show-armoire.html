@@ -1,0 +1,72 @@
+<div class="show-armoire-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Gestion des Armoires</mat-card-title>
+            <mat-card-subtitle>Liste des armoires d'archivage</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <div [formGroup]="filterForm" class="toolbar">
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Rechercher</mat-label>
+                    <input matInput formControlName="search" placeholder="Code, code-barres...">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Salle</mat-label>
+                    <mat-select formControlName="salle">
+                        <mat-option value="">Toutes</mat-option>
+                        <mat-option *ngFor="let s of salles" [value]="s.id">{{ s.nom }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" (click)="openAddDialog()">
+                    <mat-icon>add</mat-icon>
+                    Nouvelle armoire
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table mat-table [dataSource]="dataSource" matSort>
+                    <ng-container matColumnDef="code">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Code </th>
+                        <td mat-cell *matCellDef="let a"> {{a.code}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="type">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                        <td mat-cell *matCellDef="let a"> {{a.type_armoire}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="salle">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Salle </th>
+                        <td mat-cell *matCellDef="let a"> {{ a.salle_nom || 'N/A' }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="code_barres">
+                        <th mat-header-cell *matHeaderCellDef> Code-barres </th>
+                        <td mat-cell *matCellDef="let a"> {{a.code_barres}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let a">
+                            <button mat-icon-button color="primary" (click)="openEditDialog(a)" matTooltip="Modifier">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" (click)="deleteArmoire(a)" matTooltip="Supprimer">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+
+                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

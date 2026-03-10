@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une armoire</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+        <div class="form-grid">
+            <mat-form-field appearance="outline">
+                <mat-label>Code *</mat-label>
+                <input matInput formControlName="code" placeholder="ARM-001">
+                <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Type *</mat-label>
+                <mat-select formControlName="type_armoire">
+                    <mat-option value="METAL">Métallique</mat-option>
+                    <mat-option value="BOIS">Bois</mat-option>
+                    <mat-option value="COMPACT">Compact</mat-option>
+                    <mat-option value="MURAL">Mural</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Salle *</mat-label>
+                <mat-select formControlName="salle">
+                    <mat-option *ngFor="let s of salles" [value]="s.id">{{ s.nom }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.get('salle')?.hasError('required')">Requis</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Code-barres</mat-label>
+                <input matInput formControlName="code_barres">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Date d'installation</mat-label>
+                <input matInput type="date" formControlName="date_installation">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button type="button" mat-dialog-close>Annuler</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+        </button>
+    </mat-dialog-actions>
+</form>

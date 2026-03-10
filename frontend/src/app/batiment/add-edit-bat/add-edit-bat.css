@@ -1,0 +1,13 @@
+/* batiment/add-edit-bat/add-edit-bat.css */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 500px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 10px;
+}

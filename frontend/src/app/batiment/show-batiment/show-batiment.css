@@ -1,0 +1,25 @@
+/* batiment/show-batiment/show-batiment.css */
+.show-batiment-container {
+    padding: 20px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-field {
+    width: 300px;
+}
+
+.table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+}

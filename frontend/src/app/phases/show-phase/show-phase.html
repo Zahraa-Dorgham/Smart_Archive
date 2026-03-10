@@ -1,0 +1,76 @@
+<div class="show-phase-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Gestion des Phases d'Archivage</mat-card-title>
+            <mat-card-subtitle>Définition des phases du cycle de vie des documents</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <div class="toolbar">
+                <div [formGroup]="filterForm">
+                    <mat-form-field>
+                        <mat-label>Rechercher</mat-label>
+                        <input matInput formControlName="search" placeholder="Nom, code...">
+                        <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                </div>
+
+                <button mat-raised-button color="primary" (click)="openAddDialog()">
+                    <mat-icon>add</mat-icon>
+                    Nouvelle phase
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table mat-table [dataSource]="dataSource" matSort>
+                    <ng-container matColumnDef="nom">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nom </th>
+                        <td mat-cell *matCellDef="let p"> {{p.nom}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="code">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Code </th>
+                        <td mat-cell *matCellDef="let p"> {{p.code}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="type_phase">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                        <td mat-cell *matCellDef="let p"> {{p.type_phase}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="duree">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Durée (ans) </th>
+                        <td mat-cell *matCellDef="let p"> {{p.duree_conservation}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="action_finale">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Action finale </th>
+                        <td mat-cell *matCellDef="let p"> {{p.action_finale}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="ordre">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Ordre </th>
+                        <td mat-cell *matCellDef="let p"> {{p.ordre}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let p">
+                            <button mat-icon-button color="primary" (click)="openEditDialog(p)" matTooltip="Modifier">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" (click)="deletePhase(p)" matTooltip="Supprimer">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+
+                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

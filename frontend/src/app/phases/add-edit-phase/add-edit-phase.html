@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une phase</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+        <div class="form-grid">
+            <mat-form-field appearance="outline">
+                <mat-label>Nom *</mat-label>
+                <input matInput formControlName="nom">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Code</mat-label>
+                <input matInput formControlName="code">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Type *</mat-label>
+                <mat-select formControlName="type_phase">
+                    <mat-option value="COURANTE">Archive courante</mat-option>
+                    <mat-option value="INTERMEDIAIRE">Archive intermédiaire</mat-option>
+                    <mat-option value="DEFINITIVE">Archive définitive</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Durée de conservation (années) *</mat-label>
+                <input matInput type="number" formControlName="duree_conservation">
+                <mat-error *ngIf="form.get('duree_conservation')?.hasError('required')">Requis</mat-error>
+                <mat-error *ngIf="form.get('duree_conservation')?.hasError('min')">Doit être ≥ 1</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Action finale *</mat-label>
+                <mat-select formControlName="action_finale">
+                    <mat-option value="CONSERVER">Conserver définitivement</mat-option>
+                    <mat-option value="ELIMINER">Éliminer</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Ordre *</mat-label>
+                <input matInput type="number" formControlName="ordre">
+                <mat-error>Requis (≥ 0)</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button type="button" mat-dialog-close>Annuler</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+        </button>
+    </mat-dialog-actions>
+</form>

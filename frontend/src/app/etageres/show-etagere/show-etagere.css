@@ -1,0 +1,47 @@
+.show-etagere-container {
+    padding: 20px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-field {
+    flex: 1;
+    min-width: 250px;
+}
+
+.filter-field {
+    width: 200px;
+}
+
+.table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+}
+
+.taux-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.taux-value {
+    font-size: 12px;
+    min-width: 40px;
+}
+
+.mat-mdc-row:hover {
+    background-color: #f5f5f5;
+}
