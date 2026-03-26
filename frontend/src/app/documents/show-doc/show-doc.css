@@ -1,0 +1,24 @@
+.container {
+    padding: 20px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-field {
+    flex: 1;
+}
+
+.table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+}

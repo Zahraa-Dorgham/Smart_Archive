@@ -1,0 +1,16 @@
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 500px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.full-width {
+    width: 100%;
+}

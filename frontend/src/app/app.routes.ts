@@ -19,7 +19,7 @@ export const routes: Routes = [
     loadComponent: () => import('./salles/show-salle/show-salle').then(m => m.ShowSalleComponent)
   },
   {
-  path: 'armoires',   // <-- route pour les armoires
+  path: 'armoires',   
   canActivate: [authGuard],
   loadComponent: () => import('./armoires/show-armoire/show-armoire').then(m => m.ShowArmoireComponent)
   },
@@ -32,5 +32,20 @@ export const routes: Routes = [
     path: 'phases',
     canActivate: [authGuard],
     loadComponent: () => import('./phases/show-phase/show-phase').then(m => m.ShowPhaseComponent)
+  }, 
+  {
+    path: 'boitiers',
+    canActivate: [authGuard],
+    loadComponent: () => import('./boitiers/show-boitier/show-boitier').then(m => m.ShowBoitierComponent)
+  },
+  {
+    path: 'dossiers',
+    canActivate: [authGuard],
+    loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent)
+  },
+  {
+    path: 'documents',
+    canActivate: [authGuard],
+    loadComponent: () => import('./documents/show-doc/show-doc').then(m => m.ShowDocumentComponent)
   }
 ];

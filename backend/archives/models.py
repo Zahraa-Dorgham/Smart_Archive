@@ -41,9 +41,9 @@ class Batiment(models.Model):
 class Salle(models.Model):
     TYPE_SALLE = [
         ('ARCHIVE', "Salle d'archive"),
-        ('CONSULTATION', 'Salle de consultation'),
-        ('TRI', 'Salle de tri'),
-        ('NUMERISATION', 'Salle de numérisation'),
+        # ('CONSULTATION', 'Salle de consultation'),
+        # ('TRI', 'Salle de tri'),
+        # ('NUMERISATION', 'Salle de numérisation'),
     ]
     
     nom = models.CharField(max_length=100)

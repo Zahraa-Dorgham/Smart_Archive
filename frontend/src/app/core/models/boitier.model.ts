@@ -1,5 +1,3 @@
-import { Armoire } from './armoire.model';
-import { Etagere } from './etagere.model';
 import { BaseModel } from './base.model';
 
 export interface Boitier extends BaseModel {
@@ -7,11 +5,14 @@ export interface Boitier extends BaseModel {
     code_barre: string;
     titre: string;
     capacite: number;
-    armoire?: Armoire | string;
-    etagere?: Etagere | string;
+    armoire?: string;
+    armoire_nom?: string;
+    etagere?: string;
+    etagere_numero?: number;
     statut: string;
     description?: string;
-    taux_remplissage?: number; // calculé côté backend
+    localisation?: string;
+    taux_remplissage?: number;
 }
 
 export interface BoitierCreate {

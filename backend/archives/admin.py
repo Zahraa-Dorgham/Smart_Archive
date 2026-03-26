@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Armoire, Batiment, Role, Salle, Etagere, PhaseArchive
+from .models import Armoire, Batiment, Role, Salle, Etagere, PhaseArchive, Boitier, Document, Dossier
 
 @admin.register(Batiment)
 class BatimentAdmin(admin.ModelAdmin):
@@ -20,3 +20,6 @@ admin.site.register(Armoire)
 admin.site.register(Etagere)
 admin.site.register(PhaseArchive)
 admin.site.register(Role)
+admin.site.register(Boitier)
+admin.site.register(Dossier)
+admin.site.register(Document)

@@ -11,8 +11,11 @@ router.register(r'armoires', views.ArmoireViewSet)
 router.register(r'etageres', views.EtagereViewSet)
 router.register(r'phases-archive', views.PhaseArchiveViewSet)
 router.register(r'groups', views.GroupViewSet)
+router.register(r'boitiers', views.BoitierViewSet)
+router.register(r'dossiers', views.DossierViewSet)
+router.register(r'documents', views.DocumentViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/', include('archives.auth_urls')),  # Routes d'authentification
+    path('auth/', include('archives.auth_urls')), 
 ]

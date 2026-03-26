@@ -1,0 +1,82 @@
+<div class="container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Gestion des Documents</mat-card-title>
+            <mat-card-subtitle>Liste des documents d'archivage</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+        <div class="toolbar" [formGroup]="filterForm">
+            <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Rechercher</mat-label>
+                <input matInput formControlName="search" placeholder="Titre, référence...">
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            
+        </div>
+            <div class="table-container">
+                <table mat-table [dataSource]="dataSource" matSort>
+                    <ng-container matColumnDef="idDoc">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+                        <td mat-cell *matCellDef="let doc"> {{doc.idDoc}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="reference">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Référence </th>
+                        <td mat-cell *matCellDef="let doc"> {{doc.reference}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="titre">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Titre </th>
+                        <td mat-cell *matCellDef="let doc"> {{doc.titre}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="dossier">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Dossier </th>
+                        <td mat-cell *matCellDef="let doc"> {{getDossierReference(doc)}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="phase">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Phase </th>
+                        <td mat-cell *matCellDef="let doc"> {{getPhaseNom(doc)}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="date">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+                        <td mat-cell *matCellDef="let doc"> {{doc.date_creation | date}} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="confidentialite">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Niveau </th>
+                        <td mat-cell *matCellDef="let doc">
+                            <mat-chip [color]="getConfidentialiteColor(doc.niv_confidentialite)" selected>
+                                {{doc.niv_confidentialite}}
+                            </mat-chip>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let doc">
+                            <button mat-icon-button color="primary" (click)="openEditDialog(doc)" matTooltip="Modifier">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" (click)="deleteDocument(doc)" matTooltip="Supprimer">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                            <a mat-icon-button [href]="doc.fichier" target="_blank" *ngIf="doc.fichier"
+                                matTooltip="Télécharger">
+                                <mat-icon>download</mat-icon>
+                            </a>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+
+                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,0 +1,95 @@
+<div class="show-dossier-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Gestion des Dossiers</mat-card-title>
+            <mat-card-subtitle>Liste des dossiers d'archives</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div [formGroup]="filterForm" class="toolbar">
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Rechercher</mat-label>
+                    <input matInput formControlName="search" placeholder="Référence, titre...">
+                    <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Phase</mat-label>
+                    <mat-select formControlName="phase">
+                        <mat-option value="">Toutes</mat-option>
+                        <mat-option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Statut</mat-label>
+                    <mat-select formControlName="statut">
+                        <mat-option value="">Tous</mat-option>
+                        <mat-option value="ACTIF">Actif</mat-option>
+                        <mat-option value="CLOS">Clos</mat-option>
+                        <mat-option value="TRANSFERE">Transféré</mat-option>
+                        <mat-option value="DETRUIT">Détruit</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-raised-button color="primary" (click)="openAddDialog()">
+                    <mat-icon>add</mat-icon> Nouveau dossier
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table mat-table [dataSource]="dataSource" matSort>
+                    <ng-container matColumnDef="reference">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Référence </th>
+                        <td mat-cell *matCellDef="let d"> {{d.reference}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="titre">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Titre </th>
+                        <td mat-cell *matCellDef="let d"> {{d.titre}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="phase">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Phase </th>
+                        <td mat-cell *matCellDef="let d"> {{getPhaseNom(d)}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="boitier">
+                        <th mat-header-cell *matHeaderCellDef> Boîtier </th>
+                        <td mat-cell *matCellDef="let d"> {{getBoitierId(d)}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="statut">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Statut </th>
+                        <td mat-cell *matCellDef="let d">
+                            <mat-chip [color]="getStatutColor(d.statut)" selected>{{d.statut}}</mat-chip>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="confidentialite">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Confidentialité </th>
+                        <td mat-cell *matCellDef="let d">
+                            <mat-chip [color]="getConfidentialiteColor(d.niveau_confidentialite)" selected>
+                                {{d.niveau_confidentialite}}
+                            </mat-chip>
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="date_creation">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date création </th>
+                        <td mat-cell *matCellDef="let d"> {{d.date_creation | date}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="nb_docs">
+                        <th mat-header-cell *matHeaderCellDef> Nb docs </th>
+                        <td mat-cell *matCellDef="let d"> {{d.nombre_documents || 0}} </td>
+                    </ng-container>
+                    <ng-container matColumnDef="actions">
+                        <th mat-header-cell *matHeaderCellDef> Actions </th>
+                        <td mat-cell *matCellDef="let d">
+                            <button mat-icon-button color="primary" (click)="openEditDialog(d)" matTooltip="Modifier">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" (click)="deleteDossier(d)" matTooltip="Supprimer">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+                <mat-paginator [pageSizeOptions]="[5,10,20]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

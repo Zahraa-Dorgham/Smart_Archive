@@ -55,6 +55,18 @@ import { MatListModule } from '@angular/material/list';
                 <mat-icon matListItemIcon>timeline</mat-icon>
                 <span matListItemTitle>Phases d'archivage</span>
             </a>
+            <a mat-list-item routerLink="/boitiers" routerLinkActive="active">
+                <mat-icon matListItemIcon>inventory</mat-icon>
+                <span matListItemTitle>Boîtiers</span>
+            </a>
+            <a mat-list-item routerLink="/dossiers" routerLinkActive="active">
+                <mat-icon matListItemIcon>folder</mat-icon>
+                <span matListItemTitle>Dossiers</span>
+            </a>
+            <a mat-list-item routerLink="/documents" routerLinkActive="active">
+                <mat-icon matListItemIcon>description</mat-icon>
+                <span matListItemTitle>Documents</span>
+            </a>
         </mat-nav-list>
       </mat-sidenav>
 

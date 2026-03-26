@@ -1,0 +1,79 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un dossier</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+        <div class="form-grid">
+            <mat-form-field appearance="outline">
+                <mat-label>ID Dossier *</mat-label>
+                <input matInput formControlName="idDossier" placeholder="DOS-2024-001">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Référence *</mat-label>
+                <input matInput formControlName="reference">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Titre *</mat-label>
+                <input matInput formControlName="titre">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Phase *</mat-label>
+                <mat-select formControlName="phase_archive">
+                    <mat-option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</mat-option>
+                </mat-select>
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Boîtier</mat-label>
+                <mat-select formControlName="boitier">
+                    <mat-option value="">Aucun</mat-option>
+                    <mat-option *ngFor="let b of boitiers" [value]="b.id">{{ b.idboit }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Date création *</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="date_creation">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error>Requis</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Date clôture</mat-label>
+                    <input matInput [matDatepicker]="picker2" formControlName="date_cloture">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Statut *</mat-label>
+                <mat-select formControlName="statut">
+                    <mat-option value="ACTIF">Actif</mat-option>
+                    <mat-option value="CLOS">Clos</mat-option>
+                    <mat-option value="TRANSFERE">Transféré</mat-option>
+                    <mat-option value="DETRUIT">Détruit</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Confidentialité *</mat-label>
+                <mat-select formControlName="niveau_confidentialite">
+                    <mat-option value="PUBLIC">Public</mat-option>
+                    <mat-option value="INTERNE">Interne</mat-option>
+                    <mat-option value="CONFIDENTIEL">Confidentiel</mat-option>
+                    <mat-option value="SECRET">Secret</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button type="button" mat-dialog-close>Annuler</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+        </button>
+    </mat-dialog-actions>
+</form>

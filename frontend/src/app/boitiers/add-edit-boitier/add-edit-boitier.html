@@ -1,1 +1,61 @@
-<p>add-edit-boitier works!</p>
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un boîtier</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+        <div class="form-grid">
+            <mat-form-field appearance="outline">
+                <mat-label>ID Boîtier *</mat-label>
+                <input matInput formControlName="idboit" placeholder="BOX-2024-001">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Code-barres *</mat-label>
+                <input matInput formControlName="code_barre">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Titre *</mat-label>
+                <input matInput formControlName="titre">
+                <mat-error>Requis</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Capacité (nb dossiers) *</mat-label>
+                <input matInput type="number" formControlName="capacite">
+                <mat-error>Requis (≥ 1)</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Armoire</mat-label>
+                <mat-select formControlName="armoire">
+                    <mat-option value="">Aucune</mat-option>
+                    <mat-option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Étagère</mat-label>
+                <mat-select formControlName="etagere">
+                    <mat-option value="">Aucune</mat-option>
+                    <mat-option *ngFor="let e of etageres" [value]="e.id">Étagère {{ e.numero }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Statut *</mat-label>
+                <mat-select formControlName="statut">
+                    <mat-option value="ACTIF">Actif</mat-option>
+                    <mat-option value="PLEIN">Plein</mat-option>
+                    <mat-option value="ARCHIVE">Archivé</mat-option>
+                    <mat-option value="EN_TRANSFERT">En transfert</mat-option>
+                    <mat-option value="EN_PREPARATION">En préparation</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button type="button" mat-dialog-close>Annuler</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Modifier' : 'Créer' }}
+        </button>
+    </mat-dialog-actions>
+</form>

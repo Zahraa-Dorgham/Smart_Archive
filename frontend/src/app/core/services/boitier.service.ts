@@ -8,7 +8,7 @@ import { PaginatedResponse } from '../models/base.model';
     providedIn: 'root'
 })
 export class BoitierService {
-    private endpoint = '/api/boitiers/';
+    private endpoint = '/boitiers/';
 
     constructor(private api: ApiService) { }
 

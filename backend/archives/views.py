@@ -102,4 +102,56 @@ class PhaseArchiveViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
-    
+# archives/views.py
+from .models import Boitier, Dossier, Document
+from .serializers import BoitierSerializer, DossierSerializer, DocumentSerializer
+
+class BoitierViewSet(viewsets.ModelViewSet):
+    queryset = Boitier.objects.all().select_related('armoire', 'etagere')
+    serializer_class = BoitierSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['statut', 'armoire', 'etagere']
+    search_fields = ['idboit', 'code_barre', 'titre']
+    ordering_fields = ['idboit', 'date_creation', 'capacite']
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [EstEmploye]
+        else:
+            permission_classes = [EstArchiviste]
+        return [permission() for permission in permission_classes]
+     
+    def list(self, request, *args, **kwargs):
+        print("Utilisateur:", request.user)
+        print("Authentifié:", request.user.is_authenticated)
+        return super().list(request, *args, **kwargs)
+
+class DossierViewSet(viewsets.ModelViewSet):
+    queryset = Dossier.objects.all().select_related('boitier', 'phase_archive')
+    serializer_class = DossierSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['statut', 'phase_archive', 'boitier', 'niveau_confidentialite']
+    search_fields = ['idDossier', 'reference', 'titre']
+    ordering_fields = ['date_creation', 'reference']
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [EstEmploye]
+        else:
+            permission_classes = [EstArchiviste]
+        return [permission() for permission in permission_classes]
+
+class DocumentViewSet(viewsets.ModelViewSet):
+    queryset = Document.objects.all().select_related('dossier', 'phase_archive')
+    serializer_class = DocumentSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['phase_archive', 'dossier', 'type_document', 'niv_confidentialite']
+    search_fields = ['idDoc', 'reference', 'titre', 'auteur']
+    ordering_fields = ['date_creation', 'version']
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [EstEmploye]
+        else:
+            permission_classes = [EstArchiviste]
+        return [permission() for permission in permission_classes]

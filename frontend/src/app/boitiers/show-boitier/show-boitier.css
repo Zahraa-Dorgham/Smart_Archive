@@ -1,0 +1,30 @@
+.show-boitier-container {
+    padding: 20px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-field {
+    flex: 1;
+    min-width: 250px;
+}
+
+.filter-field {
+    width: 200px;
+}
+
+.table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+}
