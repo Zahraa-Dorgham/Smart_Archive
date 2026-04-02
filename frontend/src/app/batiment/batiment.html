@@ -1,1 +1,84 @@
-<p>batiment works!</p>
+<div class="show-batiment-container">
+    <!-- En-tête avec bouton retour -->
+    <div class="header-actions">
+        <button mat-icon-button color="primary" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>Détails du bâtiment</h1>
+        <button mat-raised-button color="primary" (click)="editBatiment()">
+            <mat-icon>edit</mat-icon>
+            Modifier
+        </button>
+    </div>
+
+    <!-- Carte d'informations générales -->
+    <mat-card class="info-card">
+        <mat-card-header>
+            <mat-icon mat-card-avatar>business</mat-icon>
+            <mat-card-title>{{ batiment?.nom }}</mat-card-title>
+            <mat-card-subtitle>Code : {{ batiment?.code || 'Non défini' }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Adresse :</span>
+                    <span class="value">{{ batiment?.adresse || 'Non renseignée' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Date de création :</span>
+                    <span class="value">{{ batiment?.date_creation | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="info-item full-width">
+                    <span class="label">Description :</span>
+                    <span class="value">{{ batiment?.description || 'Aucune description' }}</span>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Section Salles associées -->
+    <mat-card class="salles-card">
+        <mat-card-header>
+            <mat-icon mat-card-avatar>meeting_room</mat-icon>
+            <mat-card-title>Salles du bâtiment</mat-card-title>
+            <mat-card-subtitle>{{ salles.length }} salle(s) trouvée(s)</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="salles-list">
+                <mat-card *ngFor="let salle of salles" class="salle-item" (click)="viewSalle(salle.id)">
+                    <div class="salle-info">
+                        <mat-icon>door_front</mat-icon>
+                        <div>
+                            <div class="salle-nom">{{ salle.nom }}</div>
+                            <div class="salle-code">Code : {{ salle.code || 'N/A' }}</div>
+                        </div>
+                    </div>
+                    <div class="salle-badge">
+                        <span class="badge" [ngClass]="getTypeClass(salle.type_salle)">
+                            {{ getTypeLabel(salle.type_salle) }}
+                        </span>
+                    </div>
+                </mat-card>
+
+                <!-- Message si aucune salle -->
+                <div *ngIf="salles.length === 0" class="empty-state">
+                    <mat-icon>meeting_room</mat-icon>
+                    <p>Aucune salle n'est rattachée à ce bâtiment.</p>
+                    <button mat-stroked-button color="primary" (click)="addSalle()">
+                        <mat-icon>add</mat-icon> Ajouter une salle
+                    </button>
+                </div>
+            </div>
+        </mat-card-content>
+        <mat-card-actions *ngIf="salles.length > 0">
+            <button mat-button color="primary" (click)="addSalle()">
+                <mat-icon>add</mat-icon> Nouvelle salle
+            </button>
+        </mat-card-actions>
+    </mat-card>
+
+    <!-- Chargement / erreur -->
+    <div *ngIf="isLoading" class="loading-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
+</div>

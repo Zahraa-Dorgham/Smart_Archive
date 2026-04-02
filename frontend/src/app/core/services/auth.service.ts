@@ -74,7 +74,9 @@ export class AuthService {
     }
 
     isLoggedIn(): boolean {
-        return !!this.getToken();
+        const token = this.getToken();
+        console.log('isLoggedIn() called, token:', token);
+        return !!token;
     }
 
     getUserRoles(): string[] {

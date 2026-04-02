@@ -63,7 +63,7 @@ class ArmoireViewSet(viewsets.ModelViewSet):
     queryset = Armoire.objects.all()
     serializer_class = ArmoireSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['salle', 'type_armoire']
+    filterset_fields = ['salle']
     search_fields = ['code', 'code_barres']
     
     def get_permissions(self):

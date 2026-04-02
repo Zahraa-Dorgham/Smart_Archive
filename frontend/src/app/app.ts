@@ -53,7 +53,7 @@ import { MatListModule } from '@angular/material/list';
 
             <a mat-list-item routerLink="/phases" routerLinkActive="active">
                 <mat-icon matListItemIcon>timeline</mat-icon>
-                <span matListItemTitle>Phases d'archivage</span>
+                <span matListItemTitle>Calendrier</span>
             </a>
             <a mat-list-item routerLink="/boitiers" routerLinkActive="active">
                 <mat-icon matListItemIcon>inventory</mat-icon>

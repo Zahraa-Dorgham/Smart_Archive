@@ -4,7 +4,7 @@ import { BaseModel } from './base.model';
 
 export interface Armoire extends BaseModel {
     code: string;
-    type_armoire: string;
+    // type_armoire: string;
     salle: Salle | string;
     salle_nom?: Salle;
     code_barres?: string;
@@ -14,7 +14,7 @@ export interface Armoire extends BaseModel {
 
 export interface ArmoireCreate {
     code: string;
-    type_armoire: string;
+    // type_armoire: string;
     salle: string;
     code_barres?: string;
     description?: string;

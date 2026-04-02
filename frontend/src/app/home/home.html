@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="home-container">
+    <!-- Navbar -->
+    <nav class="navbar" [class.scrolled]="isScrolled">
+        <div class="logo">
+            <h1>SmartArchive</h1>
+        </div>
+        <ul class="nav-links" [class.active]="menuOpen">
+            <li><a href="#home" (click)="scrollTo('home'); menuOpen = false">Accueil</a></li>
+            <li><a href="#features" (click)="scrollTo('features'); menuOpen = false">Fonctionnalités</a></li>
+            <li><a href="#about" (click)="scrollTo('about'); menuOpen = false">À propos</a></li>
+            <li><a href="#contact" (click)="scrollTo('contact'); menuOpen = false">Contact</a></li>
+        </ul>
+        <div class="nav-buttons">
+            <button class="btn-login" routerLink="/login">Se connecter</button>
+            <div class="menu-icon" (click)="toggleMenu()">
+                <i class="fas" [class.fa-bars]="!menuOpen" [class.fa-times]="menuOpen"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="fade-up">Plateforme Intelligente d'Archivage</h1>
+            <p class="fade-up delay-1">Gérez vos documents physiques et numériques avec intelligence, conformité et
+                traçabilité.</p>
+            <button class="btn-primary fade-up delay-2" routerLink="/register">Découvrir <i
+                    class="fas fa-arrow-right"></i></button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Fonctionnalités clés</h2>
+            <div class="features-grid">
+                <div class="feature-card fade-up">
+                    <div class="icon"><i class="fas fa-file-alt"></i></div>
+                    <h3>Gestion du cycle de vie</h3>
+                    <p>Suivez vos documents des archives courantes jusqu'à la destruction ou la conservation définitive.
+                    </p>
+                </div>
+                <div class="feature-card fade-up delay-1">
+                    <div class="icon"><i class="fas fa-robot"></i></div>
+                    <h3>Intelligence Artificielle</h3>
+                    <p>OCR, classification automatique et extraction de métadonnées pour gagner du temps.</p>
+                </div>
+                <div class="feature-card fade-up delay-2">
+                    <div class="icon"><i class="fas fa-search"></i></div>
+                    <h3>Recherche avancée</h3>
+                    <p>Recherchez par métadonnées, contenu ou codes‑barres. Résultats instantanés.</p>
+                </div>
+                <div class="feature-card fade-up delay-3">
+                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Sécurité & Conformité</h3>
+                    <p>Respect des normes ISO 15489 et de la réglementation tunisienne. Traçabilité complète.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container about-grid">
+            <div class="about-content fade-right">
+                <h2 class="section-title">Notre solution</h2>
+                <p>
+                    ArchivIA est une plateforme moderne conçue pour répondre aux défis de la gestion documentaire.
+                    Elle intègre l'intelligence artificielle pour automatiser les tâches fastidieuses et garantir une
+                    conformité totale avec les normes en vigueur. Que vos documents soient physiques ou numériques,
+                    notre solution centralise, sécurise et optimise votre patrimoine documentaire.
+                </p>
+            </div>
+            <div class="about-image fade-left">
+                <img src="assets/about-illustration.svg" alt="Illustration archivage" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contactez‑nous</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <p>contact&#64;archivia.com</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <p>+216 70 000 000</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>Tunis, Tunisie</p>
+                </div>
+            </div>
+            <div class="social-links">
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 ArchivIA - Plateforme d'archivage intelligent</p>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

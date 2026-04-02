@@ -37,7 +37,7 @@ class ArmoireSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Armoire
-        fields = ['id', 'code', 'type_armoire', 'salle', 'salle_nom', 
+        fields = ['id', 'code', 'salle', 'salle_nom', 
                    
                   'code_barres', 'description', 'date_installation']
 

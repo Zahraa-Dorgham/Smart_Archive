@@ -1,7 +1,7 @@
 @import "@angular/material/prebuilt-themes/indigo-pink.css";
 
 
-.login-wrapper {
+.login-container {
     height: 100vh;
     display: flex;
     justify-content: center;

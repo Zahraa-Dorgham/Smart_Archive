@@ -1,0 +1,197 @@
+.show-batiment-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+
+        h1 {
+            flex: 1;
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        button {
+            white-space: nowrap;
+        }
+    }
+
+    .info-card {
+        margin-bottom: 32px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+
+            .info-item {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                &.full-width {
+                    grid-column: 1 / -1;
+                }
+
+                .label {
+                    font-size: 0.85rem;
+                    font-weight: 500;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .value {
+                    font-size: 1rem;
+                    color: #0f172a;
+                    word-break: break-word;
+                }
+            }
+        }
+    }
+
+    .salles-card {
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+        .salles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+
+            .salle-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: 1px solid #e2e8f0;
+                box-shadow: none;
+
+                &:hover {
+                    background-color: #f8fafc;
+                    border-color: #cbd5e1;
+                    transform: translateX(4px);
+                }
+
+                .salle-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+
+                    mat-icon {
+                        color: #475569;
+                    }
+
+                    .salle-nom {
+                        font-weight: 500;
+                        color: #0f172a;
+                    }
+
+                    .salle-code {
+                        font-size: 0.8rem;
+                        color: #64748b;
+                    }
+                }
+
+                .salle-badge {
+                    .badge {
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 0.75rem;
+                        font-weight: 500;
+                        background-color: #e2e8f0;
+                        color: #1e293b;
+
+                        &.archive {
+                            background-color: #dbeafe;
+                            color: #1e40af;
+                        }
+
+                        &.consultation {
+                            background-color: #dcfce7;
+                            color: #166534;
+                        }
+
+                        &.tri {
+                            background-color: #fff3cd;
+                            color: #856404;
+                        }
+
+                        &.numerisation {
+                            background-color: #f3e8ff;
+                            color: #6b21a5;
+                        }
+                    }
+                }
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 48px 24px;
+                background: #f9fafb;
+                border-radius: 12px;
+                color: #64748b;
+
+                mat-icon {
+                    font-size: 48px;
+                    width: 48px;
+                    height: 48px;
+                    margin-bottom: 16px;
+                    color: #94a3b8;
+                }
+
+                p {
+                    margin-bottom: 24px;
+                }
+            }
+        }
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+}
+
+/* // Responsive */
+@media (max-width: 768px) {
+    .show-batiment-container {
+        padding: 16px;
+
+        .header-actions {
+            flex-direction: column;
+            align-items: stretch;
+
+            button {
+                width: 100%;
+            }
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+}

@@ -1,7 +1,10 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { HomeComponent } from './home/home';
+// import { LoginComponent } from './auth/login.component';
 
 export const routes: Routes = [
+  { path: '', component: HomeComponent },
   { path: '', redirectTo: '/batiments', pathMatch: 'full' },
   {
     path: 'login',

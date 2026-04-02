@@ -75,16 +75,17 @@ class Salle(models.Model):
 class Armoire(models.Model):
     """Armoire de rangement contenant des étagères"""
     
-    TYPE_ARMOIRE = [
-        ('METAL', 'Métallique'),
-        ('BOIS', 'Bois'),
-        ('COMPACT', 'Compact à rayonnages mobiles'),
-        ('MURAL', 'Mural'),
-    ]
+    # TYPE_ARMOIRE = [
+    #     ('METAL', 'Métallique'),
+    #     ('BOIS', 'Bois'),
+    #     ('COMPACT', 'Compact à rayonnages mobiles'),
+    #     ('MURAL', 'Mural'),
+    # ]
     
     code = models.CharField(max_length=50, unique=True, 
                            help_text="Code unique de l'armoire (ex: ARM-001)")
-    type_armoire = models.CharField(max_length=20, choices=TYPE_ARMOIRE, default='METAL')
+    # type_armoire = models.CharField(max_length=20, choices=TYPE_ARMOIRE, default='METAL')
+    
     salle = models.ForeignKey(
         Salle,
         on_delete=models.CASCADE,
