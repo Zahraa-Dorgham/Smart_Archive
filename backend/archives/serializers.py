@@ -1,7 +1,7 @@
 # archives/serializers.py - Version avec uniquement les modèles existants
 from rest_framework import serializers
 from .models import (
-    Role, Batiment, Salle, Armoire, Etagere, PhaseArchive
+    DemandeConsultation, Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert
     # Retirez Boitier, Dossier, Document, Service s'ils n'existent pas
 )
 
@@ -128,3 +128,43 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name']
+
+
+
+class DemandeConsultationSerializer(serializers.ModelSerializer):
+    employe_nom = serializers.CharField(source='employe.username', read_only=True)
+    document_titre = serializers.CharField(source='document.titre', read_only=True)
+
+    class Meta:
+        model = DemandeConsultation
+        fields = '__all__'
+        read_only_fields = ['date_demande', 'statut']
+
+
+class TransfertSerializer(serializers.ModelSerializer):
+    demandeur_nom = serializers.CharField(source='demandeur.username', read_only=True)
+    validateur_nom = serializers.CharField(source='validateur.username', read_only=True)
+
+    class Meta:
+        model = Transfert
+        fields = '__all__'
+        read_only_fields = ['date_demande', 'statut', 'date_validation']
+
+
+
+
+
+
+
+
+
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+User = get_user_model()
+
+class UserSerializer(serializers.ModelSerializer):
+    groups = serializers.StringRelatedField(many=True, read_only=True)
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups']

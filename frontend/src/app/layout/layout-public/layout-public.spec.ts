@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowBatimentComponent } from './batiment';
+import { LayoutPublic } from './layout-public';
 
-describe('ShowBatimentComponent', () => {
-  let component: ShowBatimentComponent;
-  let fixture: ComponentFixture<ShowBatimentComponent>;
+describe('LayoutPublic', () => {
+  let component: LayoutPublic;
+  let fixture: ComponentFixture<LayoutPublic>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ShowBatimentComponent],
+      imports: [LayoutPublic],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ShowBatimentComponent);
+    fixture = TestBed.createComponent(LayoutPublic);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

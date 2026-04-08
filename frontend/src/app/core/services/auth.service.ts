@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
 
 export interface LoginCredentials {
     username: string;
@@ -31,9 +32,7 @@ export class AuthService {
     private currentUserSubject = new BehaviorSubject<any>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
-    constructor(private http: HttpClient) {
-        this.loadStoredUser();
-    }
+    constructor(private http: HttpClient, private router: Router) { }
 
     private loadStoredUser(): void {
         if (typeof window !== 'undefined') {
@@ -57,15 +56,14 @@ export class AuthService {
         );
     }
 
-    logout(): void {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user');
-        }
-        this.currentUserSubject.next(null);
-    }
 
+    logout() {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        this.currentUserSubject.next(null);
+        this.router.navigate(['/login']);   // ← redirection vers login
+    }
     getToken(): string | null {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('access_token');
@@ -74,10 +72,10 @@ export class AuthService {
     }
 
     isLoggedIn(): boolean {
-        const token = this.getToken();
-        console.log('isLoggedIn() called, token:', token);
-        return !!token;
-    }
+  const token = this.getToken();
+  console.log('isLoggedIn() called, token:', token);
+  return !!token;
+}
 
     getUserRoles(): string[] {
         const user = this.currentUserSubject.value;

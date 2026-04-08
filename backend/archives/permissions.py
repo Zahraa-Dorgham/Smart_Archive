@@ -17,8 +17,8 @@ class EstArchiviste(permissions.BasePermission):
     
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and (
-            request.user.groups.filter(name='Archiviste').exists() or
-            request.user.groups.filter(name='Administrateur').exists()
+            request.user.groups.filter(name='Archiviste').exists() #or
+            # request.user.groups.filter(name='Administrateur').exists()
         )
 
 class EstResponsable(permissions.BasePermission):
@@ -27,16 +27,24 @@ class EstResponsable(permissions.BasePermission):
     
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and (
-            request.user.groups.filter(name='Responsable').exists() or
-            request.user.groups.filter(name='Archiviste').exists() or
-            request.user.groups.filter(name='Administrateur').exists()
-        )
+            request.user.groups.filter(name='Responsable').exists()
+            )
 
-class EstEmploye(permissions.BasePermission):
-    """Permission pour les employés (lecture seule généralement)"""
+# class EstEmploye(permissions.BasePermission):
+#     """Permission pour les employés (lecture seule généralement)"""
     
+#     def has_permission(self, request, view):
+#         return request.user and request.user.is_authenticated
+class EstEmploye(permissions.BasePermission):
+    """
+    Réservé aux utilisateurs ayant uniquement le rôle Employé
+    (ni archiviste, ni administrateur, ni responsable)
+    """
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated
+        if not request.user.is_authenticated:
+            return False
+        # Vérifier que l'utilisateur appartient au groupe Employé
+        return request.user.groups.filter(name='Employé').exists()
 
 class PeutModifierDocument(permissions.BasePermission):
     """Permission basée sur l'objet (exemple pour les documents)"""
@@ -50,7 +58,7 @@ class PeutModifierDocument(permissions.BasePermission):
         user = request.user
         return (
             user.is_superuser or
-            user.groups.filter(name='Administrateur').exists() or
+            # user.groups.filter(name='Administrateur').exists() or
             user.groups.filter(name='Archiviste').exists()
         )
 
@@ -70,5 +78,20 @@ class EstProprietaireOuArchive(permissions.BasePermission):
         return (
             request.user.is_superuser or
             request.user.groups.filter(name='Administrateur').exists() or
-            request.user.groups.filter(name='Archiviste').exists()
+            request.user.groups.filter(name='Archiviste').exists() 
         )
+class EstLectureAutorisee(permissions.BasePermission):
+    """
+    Permet la lecture (GET) aux employés, archivistes, responsables et administrateurs.
+    """
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        # Pour les méthodes sûres seulement
+        if request.method in permissions.SAFE_METHODS:
+            return (
+                request.user.groups.filter(name__in=['Employé', 'Archiviste', 'Responsable', 'Administrateur']).exists() or
+                request.user.is_superuser
+            )
+        # Pour les écritures, cette permission n'est pas utilisée
+        return False

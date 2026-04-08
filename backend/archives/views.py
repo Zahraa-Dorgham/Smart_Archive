@@ -1,14 +1,18 @@
 from rest_framework import viewsets, filters, permissions
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Role, Batiment, Salle, Armoire, Etagere, PhaseArchive
+from .models import Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert
 from .serializers import (
     RoleSerializer, BatimentSerializer, SalleSerializer,
-    ArmoireSerializer, EtagereSerializer, PhaseArchiveSerializer
+    ArmoireSerializer, EtagereSerializer, PhaseArchiveSerializer, TransfertSerializer
 )
-from .permissions import EstAdministrateur, EstArchiviste, EstEmploye
+from .permissions import EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee
 from django.contrib.auth.models import Group
 from .serializers import GroupSerializer
 from .permissions import EstAdministrateur
+
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.utils import timezone
 
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
@@ -23,11 +27,11 @@ class RoleViewSet(viewsets.ModelViewSet):
     search_fields = ['nom', 'description']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
-        else:
-            permission_classes = [EstAdministrateur]
-        return [permission() for permission in permission_classes]
+     if self.action in ['list', 'retrieve']:
+        permission_classes = [EstLectureAutorisee]  
+     else:
+        permission_classes = [EstArchiviste]  
+     return [permission() for permission in permission_classes]
 
 
 class BatimentViewSet(viewsets.ModelViewSet):
@@ -38,7 +42,8 @@ class BatimentViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -53,7 +58,7 @@ class SalleViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -68,7 +73,7 @@ class ArmoireViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -83,7 +88,7 @@ class EtagereViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -98,7 +103,7 @@ class PhaseArchiveViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -116,7 +121,7 @@ class BoitierViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -136,7 +141,7 @@ class DossierViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+            permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
@@ -151,7 +156,53 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstEmploye]
+           permission_classes = [EstLectureAutorisee]
         else:
             permission_classes = [EstArchiviste]
         return [permission() for permission in permission_classes]
+    
+from .models import DemandeConsultation
+from .serializers import DemandeConsultationSerializer
+from .permissions import EstEmploye, EstResponsable 
+
+class DemandeConsultationViewSet(viewsets.ModelViewSet):
+    queryset = DemandeConsultation.objects.all()
+    serializer_class = DemandeConsultationSerializer
+
+    def get_permissions(self):
+        # Seul l'employé peut créer une demande
+        if self.action == 'create':
+            return [EstEmploye()]
+        return [EstEmploye()]  # ou une permission plus large
+    
+class TransfertViewSet(viewsets.ModelViewSet):
+    queryset = Transfert.objects.all()
+    serializer_class = TransfertSerializer
+    permission_classes = [EstResponsable]  # ou EstArchiviste selon votre logique
+
+    @action(detail=True, methods=['post'])
+    def valider(self, request, pk=None):
+        transfert = self.get_object()
+        transfert.statut = 'VALIDE'
+        transfert.validateur = request.user
+        transfert.date_validation = timezone.now()
+        transfert.save()
+        # Appliquer la logique métier (ex: déplacer le document, changer phase)
+        return Response({'status': 'validé'})
+
+
+
+
+
+# endpoints pour les utilisateurs 
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets
+from .serializers import UserSerializer
+from .permissions import EstAdministrateur
+
+User = get_user_model()
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [EstAdministrateur]  # seul un admin peut y accéder

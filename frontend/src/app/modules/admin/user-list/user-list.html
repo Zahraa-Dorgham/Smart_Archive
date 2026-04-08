@@ -1,0 +1,63 @@
+<div class="user-container">
+    <div class="header-actions">
+        <h2>Utilisateurs</h2>
+        <button class="btn-primary" (click)="openCreate()">+ Nouvel utilisateur</button>
+    </div>
+
+    <div class="search-bar">
+        <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher</mat-label>
+            <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilter()" placeholder="Nom ou email...">
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+    </div>
+
+    <div class="table-container">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Email</th>
+                    <th>Groupes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of filteredUsers | slice: (page-1)*pageSize : page*pageSize">
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email || '-' }}</td>
+                    <td>
+                        <span class="group-badge" *ngFor="let group of user.groups">
+                            {{ group.name || group }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-edit" (click)="edit(user)">Modifier</button>
+                        <button class="btn-delete" (click)="delete(user.id)">Supprimer</button>
+                    </td>
+                </tr>
+                <tr *ngIf="filteredUsers.length === 0">
+                    <td colspan="5" class="no-data">Aucun utilisateur trouvé</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination" *ngIf="filteredUsers.length > 0">
+        <div class="pagination-info">
+            Items per page:
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                <option [value]="5">5</option>
+                <option [value]="10">10</option>
+                <option [value]="25">25</option>
+            </select>
+        </div>
+        <div class="pagination-controls">
+            <button (click)="previousPage()" [disabled]="page === 1">‹ Précédent</button>
+            <span>Page {{ page }} sur {{ totalPages }}</span>
+            <button (click)="nextPage()" [disabled]="page === totalPages">Suivant ›</button>
+        </div>
+    </div>
+</div>

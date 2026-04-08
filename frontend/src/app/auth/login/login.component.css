@@ -1,13 +1,13 @@
 @import "@angular/material/prebuilt-themes/indigo-pink.css";
 
 
-.login-container {
+/* .login-container {
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+} */
 
 .login-card {
     width: 400px;

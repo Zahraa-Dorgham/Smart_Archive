@@ -1,0 +1,66 @@
+/* layout-authentifie.component.css */
+
+/* Conteneur principal de la sidenav */
+
+/* Toolbar */
+:host {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.app-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+mat-sidenav-container {
+    height: 100vh;
+    padding-top: 64px;
+    /* Hauteur de la toolbar */
+    background: #f8f9fc;
+}
+
+mat-sidenav {
+    width: 260px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+    position: fixed !important;
+    left: 0;
+    top: 64px;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+mat-sidenav-content {
+    margin-left: 260px !important;
+    padding: 24px;
+    overflow-y: auto;
+    height: calc(100vh - 64px);
+}
+
+/* Pour éviter le scroll horizontal */
+.content {
+    overflow-x: hidden;
+}
+
+/* Responsive : sur petits écrans */
+@media (max-width: 768px) {
+    mat-sidenav {
+        width: 200px;
+    }
+
+    mat-sidenav-content {
+        margin-left: 200px !important;
+    }
+}
+
+/* Optionnel : style du bouton de déconnexion dans la toolbar */
+button[mat-button] {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

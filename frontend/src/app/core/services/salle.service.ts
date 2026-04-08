@@ -32,4 +32,7 @@ export class SalleService {
     deleteSalle(id: string): Observable<void> {
         return this.api.delete<void>(`${this.endpoint}${id}/`);
     }
+    getSallesByBatiment(batimentId: string): Observable<any[]> {
+        return this.api.get<any[]>(`${this.endpoint}?batiment=${batimentId}`);
+    }
 }

@@ -70,7 +70,7 @@ app-root,
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(12px);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
-    position: sticky;
+    position: sticky !important;
     top: 0;
     z-index: 1000;
     transition: all 0.3s;
@@ -79,6 +79,7 @@ app-root,
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    
 }
 
 .logo h1 {
@@ -161,7 +162,7 @@ app-root,
     position: relative;
     min-height: 90vh;
     /* au lieu de height: 90vh, évite un débordement forcé */
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #b4b6ba 0%, #1e293b 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -172,7 +173,7 @@ app-root,
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 30% 40%, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle at 30% 40%, rgba(115, 123, 141, 0.1) 0%, transparent 70%);
     pointer-events: none;
 }
 

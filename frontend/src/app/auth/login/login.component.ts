@@ -107,6 +107,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     }
   `]
 })
+// src/app/auth/login/login.component.ts (extrait corrigé)
+
 export class LoginComponent {
   loginForm: FormGroup;
   hidePassword = true;
@@ -124,15 +126,28 @@ export class LoginComponent {
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) return;
+  // Propriété calculée pour récupérer les credentials du formulaire
+  get credentials() {
+    return this.loginForm.value;
+  }
 
+  onSubmit() {
+    if (this.loginForm.invalid) return;
     this.loading = true;
     this.errorMessage = '';
-
-    this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
-        this.router.navigate(['/batiments']);
+    this.authService.login(this.credentials).subscribe({
+      next: (res) => {
+        // Récupérer les groupes (soit 'groups' soit 'roles')
+        const groups = res.user?.roles || res.user?.roles || [];
+        if (groups.includes('Administrateur')) {
+          this.router.navigate(['/admin/users']);
+        } else if (groups.includes('Archiviste')) {
+          this.router.navigate(['/archiviste/batiments']);
+        } else if (groups.includes('Responsable')) {
+          this.router.navigate(['/responsable/transferts']);
+        } else {
+          this.router.navigate(['/employe/recherche']);
+        }
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;

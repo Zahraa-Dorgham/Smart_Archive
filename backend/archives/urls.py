@@ -14,6 +14,10 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'boitiers', views.BoitierViewSet)
 router.register(r'dossiers', views.DossierViewSet)
 router.register(r'documents', views.DocumentViewSet)
+router.register(r'demandes-consultation', views.DemandeConsultationViewSet)
+router.register(r'transferts', views.TransfertViewSet)
+router.register(r'users', views.UserViewSet) 
+
 
 urlpatterns = [
     path('', include(router.urls)),

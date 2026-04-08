@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 # definition des roles
 class Role(models.Model):
@@ -115,8 +116,8 @@ class Armoire(models.Model):
         verbose_name_plural = "Armoires"
         ordering = ['salle', 'code']
 
-    def __str__(self):
-        return f"{self.code} - {self.get_type_armoire_display()} - {self.salle.code}"
+    # def __str__(self):
+    #     return f"{self.code} - {self.get_type_armoire_display()} - {self.salle.code}"
 
     def nombre_etageres(self):
         """Retourne le nombre d'étagères dans cette armoire"""
@@ -542,11 +543,7 @@ import hashlib
 import os
 
 class Document(models.Model):
-    """
-    Document d'archive - unité documentaire de base
-    Correspond à l'entité 'Document' du diagramme
-    """
-    
+   
     NIV_CONFIDENTIALITE = [
         ('PUBLIC', 'Public'),
         ('INTERNE', 'Interne'),
@@ -799,3 +796,48 @@ class Document(models.Model):
                 return f"Transférer vers {self.phase_archive.phase_suivante.nom}"
             return self.phase_archive.action_finale
         return f"Conserver ({self.jours_restants()} jours restants)"
+    
+
+    
+#demande consultation employé 
+class DemandeConsultation(models.Model):
+    employe = models.ForeignKey(User, on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    date_demande = models.DateTimeField(auto_now_add=True)
+    statut = models.CharField(max_length=20, 
+                              choices=[
+                                  ('EN_ATTENTE', 'En attente'), 
+                                  ('ACCEPTEE', 'Acceptée'), 
+                                  ('REFUSEE', 'Refusée')], 
+                                  default='EN_ATTENTE')
+    message = models.TextField(blank=True)
+
+#gérer  les transferts et validation responsable
+
+class Transfert(models.Model):
+    TYPE_CHOICES = [
+        ('INTERNE', 'Transfert interne'),
+        ('ELIMINATION', 'Élimination'),
+    ]
+    code = models.CharField(max_length=50, unique=True)
+    date_demande = models.DateTimeField(auto_now_add=True)
+    type_transfert = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    document = models.ForeignKey('Document', on_delete=models.SET_NULL, null=True, blank=True)
+    dossier = models.ForeignKey('Dossier', on_delete=models.SET_NULL, null=True, blank=True)
+    demandeur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='transferts_demandes')
+    statut = models.CharField(max_length=20, choices=[('EN_ATTENTE','En attente'), ('VALIDE','Validé'), ('REJETE','Rejeté')], default='EN_ATTENTE')
+    validateur = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='transferts_valides')
+    date_validation = models.DateTimeField(null=True, blank=True)
+    commentaire = models.TextField(blank=True)
+
+
+
+
+
+
+
+
+class Service(models.Model):
+    nom = models.CharField(max_length=100)
+    responsable = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
+
