@@ -1,37 +1,237 @@
-@import "@angular/material/prebuilt-themes/indigo-pink.css";
+/* Reset and full height layout */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-
-/* .login-container {
-    height: 100vh;
+.login-wrapper {
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-} */
+    flex-direction: column;
+    background: linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%);
+    font-family: 'Roboto', sans-serif;
+}
 
-.login-card {
-    width: 400px;
-    padding: 30px 20px;
+.login-container {
+    flex: 1;
+    display: flex;
+    max-width: 1200px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-height: 600px;
+}
+
+/* Left panel styles */
+.welcome-panel {
+    flex: 1;
+    background: linear-gradient(145deg, #1e2a3a 0%, #0f1724 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-content {
+    max-width: 380px;
+    text-align: left;
+    z-index: 2;
+}
+
+.welcome-content h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.welcome-content p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+.decorative-dots {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.2) 2px, transparent 2px);
+    background-size: 20px 20px;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* Right panel styles */
+.form-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: white;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-container h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1e2a3a;
+}
+
+.subtitle {
+    color: #6c757d;
+    margin-bottom: 2rem;
+    font-size: 1rem;
 }
 
 .full-width {
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
 }
 
-.button-container {
+/* Prefix icons spacing */
+::ng-deep .mat-form-field-prefix {
+    margin-right: 8px;
+}
+
+.options-row {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0 1.5rem 0;
+}
+
+.forgot-link {
+    color: #3f51b5;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.sign-in-btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    background: #3f51b5;
+    transition: all 0.2s ease;
+}
+
+.sign-in-btn:hover {
+    background: #2c3e9e;
+    transform: translateY(-2px);
+}
+
+.sign-in-btn[disabled] {
+    opacity: 0.7;
+}
+
+.divider {
+    margin: 1.5rem 0;
+}
+
+.social-btn {
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    margin-top: 20px;
+    gap: 10px;
+    border-radius: 40px;
+    border: 1px solid #ddd;
+    background: white;
+    transition: background 0.2s;
+}
+
+.social-btn:hover {
+    background: #f8f9fa;
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.signup-prompt {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.signup-prompt a {
+    color: #3f51b5;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.signup-prompt a:hover {
+    text-decoration: underline;
 }
 
 .error-message {
-    color: #f44336;
+    color: #d32f2f;
     text-align: center;
     margin: 10px 0;
+    font-size: 0.85rem;
 }
 
-.spinner {
-    display: inline-block;
-    margin-left: 8px;
+.footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+    background: transparent;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        margin: 1rem;
+        border-radius: 24px;
+    }
+
+    .welcome-panel {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .welcome-content {
+        text-align: center;
+    }
+
+    .form-panel {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-container h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .options-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
 }

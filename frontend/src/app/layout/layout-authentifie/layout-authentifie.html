@@ -1,62 +1,54 @@
-<mat-toolbar color="primary" class="app-toolbar">
-    <span>Archive Manager</span>
-    <span class="spacer"></span>
-    <button mat-button *ngIf="authService.isLoggedIn()" (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon> Déconnexion
-    </button>
-</mat-toolbar>
 
-<mat-sidenav-container>
-    <mat-sidenav #drawer mode="side" opened>
-        <mat-nav-list>
-            <!-- Liens réservés à l'archiviste (et non à l'admin) -->
-            <ng-container *ngIf="authService.hasRole('Archiviste') ">
-            <a mat-list-item routerLink="/batiments" routerLinkActive="active">
-                <mat-icon matListItemIcon>business</mat-icon>
-                <span matListItemTitle>Bâtiments</span>
-            </a>
-            <a mat-list-item routerLink="/salles" routerLinkActive="active">
-                <mat-icon matListItemIcon>meeting_room</mat-icon>
-                <span matListItemTitle>Salles</span>
-            </a>
-            <a mat-list-item routerLink="/armoires" routerLinkActive="active">
-                <mat-icon matListItemIcon>cabinet</mat-icon>
-                <span matListItemTitle>Armoires</span>
-            </a>
-            <a mat-list-item routerLink="/etageres" routerLinkActive="active">
-                <mat-icon matListItemIcon>shelves</mat-icon>
-                <span matListItemTitle>Étagères</span>
-            </a>
-            <a mat-list-item routerLink="/phases" routerLinkActive="active">
-                <mat-icon matListItemIcon>timeline</mat-icon>
-                <span matListItemTitle>Calendrier</span>
-            </a>
-            <a mat-list-item routerLink="/boitiers" routerLinkActive="active">
-                <mat-icon matListItemIcon>inventory</mat-icon>
-                <span matListItemTitle>Boîtiers</span>
-            </a>
-            <a mat-list-item routerLink="/dossiers" routerLinkActive="active">
-                <mat-icon matListItemIcon>folder</mat-icon>
-                <span matListItemTitle>Dossiers</span>
-            </a>
-            <a mat-list-item routerLink="/documents" routerLinkActive="active">
-                <mat-icon matListItemIcon>description</mat-icon>
-                <span matListItemTitle>Documents</span>
-            </a>
+<div class="app-layout">
+    <!-- Sidebar fixe -->
+    <div class="sidebar">
+        <ul class="sidebar-nav">
+            <!-- Lien : Dashboard (exemple) -->
+            <!-- <li routerLink="/dashboard" routerLinkActive="active">
+                <i class="bi bi-speedometer2"></i>
+            </li> -->
+            <!-- Archiviste -->
+            <ng-container *ngIf="authService.hasRole('Archiviste')">
+                <li routerLink="/batiments" routerLinkActive="active">
+                    <i class="bi bi-building"></i>
+                </li>
+                <li routerLink="/salles" routerLinkActive="active">
+                    <i class="bi bi-door-closed"></i>
+                </li>
+                <li routerLink="/armoires" routerLinkActive="active">
+                    <i class="bi bi-server"></i>
+                </li>
+                <li routerLink="/etageres" routerLinkActive="active">
+                    <i class="bi bi-layout-three-columns"></i>
+                </li>
+                <li routerLink="/phases" routerLinkActive="active">
+                    <i class="bi bi-calendar-week"></i>
+                </li>
+                <li routerLink="/boitiers" routerLinkActive="active">
+                    <i class="bi bi-box-seam"></i>
+                </li>
+                <li routerLink="/dossiers" routerLinkActive="active">
+                    <i class="bi bi-folder"></i>
+                </li>
+                <li routerLink="/documents" routerLinkActive="active">
+                    <i class="bi bi-file-earmark-text"></i>
+                </li>
             </ng-container>
+            <!-- Administrateur -->
             <ng-container *ngIf="authService.hasRole('Administrateur')">
-                <a mat-list-item routerLink="/admin/users" routerLinkActive="active">
-                    <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
-                    <span matListItemTitle>Utilisateurs</span>
-                </a>
-                <!-- Ajoutez d'autres liens admin si besoin -->
+                <li routerLink="/admin/users" routerLinkActive="active">
+                    <i class="bi bi-person-badge"></i>
+                </li>
             </ng-container>
-        </mat-nav-list>
-    </mat-sidenav>
+            <!-- Déconnexion (optionnel) -->
+            <li class="logout" (click)="logout()">
+                <i class="bi bi-box-arrow-right"></i>
+            </li>
+        </ul>
+    </div>
 
-    <mat-sidenav-content>
-        <div class="content">
-            <router-outlet></router-outlet>
-        </div>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <router-outlet></router-outlet>
+    </div>
+</div>

@@ -2,22 +2,24 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { LayoutPublicComponent } from './layout/layout-public/layout-public';
-import { LayoutAuthentifieComponent } from './layout/layout-authentifie/layout-authentifie';
+import { LayoutComponent } from './layout/layout-authentifie/layout-authentifie';
 import { HomeComponent } from './home/home';
+import { LoginComponent } from './auth/login/login.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutPublicComponent,
+    
     children: [
-      { path: '', component: HomeComponent },
-      { path: 'home', loadComponent: () => import('./home/home').then(m => m.HomeComponent) },
+      { path: '', component: LoginComponent },
+      // { path: 'home', loadComponent: () => import('./home/home').then(m => m.HomeComponent) },
       { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) }
     ]
   },
   {
     path: '',
-    component: LayoutAuthentifieComponent,
+    component: LayoutComponent,
     canActivate: [authGuard],
     children: [
       // Routes admin
@@ -67,7 +69,7 @@ export const routes: Routes = [
           // { path: '', redirectTo: 'recherche', pathMatch: 'full' }
         ]
       },
-      // Redirections anciennes routes
+      // Redirections routes
       { path: 'batiments', redirectTo: '/archiviste/batiments' },
       { path: 'salles', redirectTo: '/archiviste/salles' },
       { path: 'armoires', redirectTo: '/archiviste/armoires' },

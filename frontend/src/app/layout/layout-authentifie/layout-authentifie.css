@@ -1,66 +1,95 @@
-/* layout-authentifie.component.css */
-
-/* Conteneur principal de la sidenav */
-
-/* Toolbar */
-:host {
-    display: block;
-    height: 100vh;
-    overflow: hidden;
+:root {
+    --primary-blue: #4e73df;
+    --bg-light: #f4f7fe;
 }
 
-.app-toolbar {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg-light);
+}
+
+.sidebar {
+    width: 50px !important;
+    background: #2d3748;
     position: fixed;
+    left: 0;
     top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-mat-sidenav-container {
     height: 100vh;
-    padding-top: 64px;
-    /* Hauteur de la toolbar */
-    background: #f8f9fc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-mat-sidenav {
-    width: 260px;
-    background: white;
-    border-right: 1px solid #e2e8f0;
-    position: fixed !important;
-    left: 0;
-    top: 64px;
-    bottom: 0;
-    overflow-y: auto;
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin-top: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-mat-sidenav-content {
-    margin-left: 260px !important;
-    padding: 24px;
-    overflow-y: auto;
-    height: calc(100vh - 64px);
+.sidebar-nav li {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 25px;
+    cursor: pointer;
+    color: #a0aec0;
+    font-size: 1.5rem;
+    transition: all 0.2s;
+    padding: 8px 0;
 }
 
-/* Pour éviter le scroll horizontal */
-.content {
-    overflow-x: hidden;
+.sidebar-nav li:hover,
+.sidebar-nav li.active {
+    color: white;
+    border-left: 3px solid var(--primary-blue);
+    background: rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive : sur petits écrans */
+.sidebar-nav li.logout {
+    margin-top: auto;
+    margin-bottom: 30px;
+    color: #ef4444;
+}
+
+.sidebar-nav li.logout:hover {
+    color: #ff6b6b;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 20px;
+    background: var(--bg-light);
+    min-height: 100vh;
+}
+
+/* Responsive : sur petit écran, la sidebar passe en bas ou se réduit ? */
 @media (max-width: 768px) {
-    mat-sidenav {
-        width: 200px;
+    .sidebar {
+        width: 55px;
     }
 
-    mat-sidenav-content {
-        margin-left: 200px !important;
+    .sidebar-nav li {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
     }
-}
 
-/* Optionnel : style du bouton de déconnexion dans la toolbar */
-button[mat-button] {
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    .main-content {
+        margin-left: 55px;
+        padding: 15px;
+    }
 }

@@ -1,34 +1,61 @@
-<!-- user-form.component.html -->
-<h2>{{ isEditMode ? 'Modifier' : 'Créer' }} un utilisateur</h2>
-
-<form (ngSubmit)="save()">
-    <div>
-        <label>Nom d'utilisateur :</label>
-        <input type="text" [(ngModel)]="user.username" name="username" required />
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h4 class="mb-0">{{ isEditMode ? 'Modifier' : 'Créer' }} un utilisateur</h4>
+        </div>
+        <div class="card-body">
+            <form (ngSubmit)="save()">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Prénom *</label>
+                        <input type="text" class="form-control" [(ngModel)]="user.first_name" name="first_name"
+                            required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nom *</label>
+                        <input type="text" class="form-control" [(ngModel)]="user.last_name" name="last_name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" [(ngModel)]="user.email" name="email" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Téléphone</label>
+                        <input type="text" class="form-control" [(ngModel)]="user.phone" name="phone">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Adresse</label>
+                        <textarea class="form-control" rows="2" [(ngModel)]="user.address" name="address"></textarea>
+                    </div>
+                    <div class="col-md-6 mb-3" *ngIf="!isEditMode">
+                        <label class="form-label">Mot de passe *</label>
+                        <input type="password" class="form-control" [(ngModel)]="user.password" name="password"
+                            required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Département</label>
+                        <input type="text" class="form-control" [(ngModel)]="user.department" name="department">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" [(ngModel)]="user.is_active"
+                                name="is_active">
+                            <label class="form-check-label">Compte actif</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Rôle(s)</label>
+                        <select multiple class="form-select" [(ngModel)]="selectedGroupIds" name="groups">
+                            <option *ngFor="let group of allGroups" [value]="group.id">{{ group.name }}</option>
+                        </select>
+                        <small class="text-muted">Maintenez Ctrl (Cmd) pour sélection multiple</small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div>
-        <label>Email :</label>
-        <input type="email" [(ngModel)]="user.email" name="email" />
-    </div>
-
-    <div *ngIf="!isEditMode">
-        <label>Mot de passe :</label>
-        <input type="password" [(ngModel)]="user.password" name="password" required />
-    </div>
-
-    <div>
-        <label>Groupes (rôles) :</label>
-        <select multiple [(ngModel)]="selectedGroupIds" name="groups">
-            <option *ngFor="let group of allGroups" [value]="group.id">
-                {{ group.name }}
-            </option>
-        </select>
-        <small>Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs groupes</small>
-    </div>
-
-    <div class="actions">
-        <button type="submit" class="btn-save"> Enregistrer</button>
-        <button type="button" class="btn-cancel" (click)="cancel()"> Annuler</button>
-    </div>
-</form>
+</div>

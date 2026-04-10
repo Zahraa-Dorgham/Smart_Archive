@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LayoutAuthentifieComponent } from './layout-authentifie';
+import { LayoutComponent } from './layout-authentifie';
 
 describe('LayoutAuthentifieComponent', () => {
-  let component: LayoutAuthentifieComponent;
-  let fixture: ComponentFixture<LayoutAuthentifieComponent>;
+  let component: LayoutComponent;
+  let fixture: ComponentFixture<LayoutComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LayoutAuthentifieComponent],
+      imports: [LayoutComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LayoutAuthentifieComponent);
+    fixture = TestBed.createComponent(LayoutComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

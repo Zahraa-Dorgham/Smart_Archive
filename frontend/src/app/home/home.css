@@ -162,7 +162,7 @@ app-root,
     position: relative;
     min-height: 90vh;
     /* au lieu de height: 90vh, évite un débordement forcé */
-    background: linear-gradient(135deg, #b4b6ba 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #84878f 0%, #1e293b 100%);
     display: flex;
     align-items: center;
     justify-content: center;

@@ -1,34 +1,83 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <!-- Left panel: Welcome message -->
+    <div class="welcome-panel">
+      <div class="welcome-content">
+        <h1>Nice to see you again</h1>
+        <p>Enter your details and start your journey with us.</p>
+        <div class="decorative-dots"></div>
+      </div>
+    </div>
 
+    <!-- Right panel: Login form -->
+    <div class="form-panel">
+      <div class="form-container">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to continue to ETAP.</p>
 
-<div class="login-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Connexion</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nom d'utilisateur</mat-label>
-          <input matInput formControlName="username">
-          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">Requis</mat-error>
-        </mat-form-field>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <!-- Username field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Enter username</mat-label>
+            <input matInput formControlName="username" placeholder="Username">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+              Username is required
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Mot de passe</mat-label>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          <!-- Password field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Enter password</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+            <mat-icon matPrefix>lock</mat-icon>
+            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              Password is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Remember me & Forgot password row -->
+          <div class="options-row">
+            <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
+            <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <!-- Error message -->
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Sign In button -->
+          <button mat-raised-button color="primary" type="submit" class="sign-in-btn"
+            [disabled]="loginForm.invalid || loading">
+            <span *ngIf="!loading">Sign In</span>
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
           </button>
-          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Requis</mat-error>
-        </mat-form-field>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid" class="full-width">
-          Se connecter
-        </button>
-      </form>
-    </mat-card-content>
-    <mat-card-actions>
-      <a mat-button routerLink="/register">Créer un compte</a>
-    </mat-card-actions>
-  </mat-card>
+          <!-- Divider -->
+          <mat-divider class="divider"></mat-divider>
+
+          <!-- Sign In with social button -->
+          <!-- <button mat-stroked-button type="button" class="social-btn" (click)="socialSignIn()">
+            <mat-icon>login</mat-icon>
+            Sign In with Google
+          </button> -->
+        </form>
+
+        <!-- Create account link -->
+        <div class="signup-prompt">
+          Don't have an account yet?
+          <a routerLink="/register">Create an account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer copyright -->
+  <div class="footer">
+    © 2026 ETAP. Crafted with ❤️ by ETAP Team
+  </div>
 </div>

@@ -1,33 +1,21 @@
 import { Component } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'app-layout-authentifie',
+  selector: 'app-layout',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './layout-authentifie.html',
   styleUrls: ['./layout-authentifie.css']
 })
-export class LayoutAuthentifieComponent {
+export class LayoutComponent {
   constructor(public authService: AuthService, private router: Router) { }
 
-  logout() {
-    this.authService.logout();
+  logout(): void {
+    // Exemple avec token JWT
+    localStorage.removeItem('access_token');
     this.router.navigate(['/login']);
   }
 }
