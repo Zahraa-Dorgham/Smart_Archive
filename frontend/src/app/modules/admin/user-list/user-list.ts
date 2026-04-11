@@ -39,7 +39,6 @@ export class UserListComponent implements OnInit {
       next: (data: any) => {
         const usersData = data.results || data;
         this.users = usersData.map((user: any) => {
-          // Gère les groupes : peut être un tableau d'objets ou de chaînes
           let groups = user.groups || [];
           if (groups.length > 0 && typeof groups[0] === 'object') {
             groups = groups.map((g: any) => g.name || g);
@@ -49,7 +48,7 @@ export class UserListComponent implements OnInit {
             first_name: user.first_name || user.username || '?',
             last_name: user.last_name || '',
             department: user.department || '—',
-            groups: groups,           // tableau de noms de rôles
+            groups: groups,
             role: groups[0] || 'employee',
             is_active: user.is_active === true,
             phone: user.phone || '—',
@@ -59,9 +58,9 @@ export class UserListComponent implements OnInit {
             role_permissions: user.role_permissions || []
           };
         });
+        console.log('Users chargés :', this.users); // Vérifie
         this.computeStats();
-        this.applyFilter();
-        if (this.filteredUsers.length > 0) this.selectUser(this.filteredUsers[0]);
+        this.applyFilter(); // ← important
       },
       error: (err) => console.error('Erreur chargement utilisateurs', err)
     });
@@ -82,19 +81,18 @@ export class UserListComponent implements OnInit {
 
   applyFilter(): void {
     const term = this.searchTerm.toLowerCase().trim();
-    this.filteredUsers = term ? this.users.filter(user =>
-      user.first_name?.toLowerCase().includes(term) ||
-      user.last_name?.toLowerCase().includes(term) ||
-      user.email?.toLowerCase().includes(term) ||
-      user.department?.toLowerCase().includes(term) ||
-      user.role?.toLowerCase().includes(term)
-    ) : [...this.users];
+    this.filteredUsers = term ? this.users.filter(user => {
+      return user.first_name.toLowerCase().includes(term) ||
+             user.last_name.toLowerCase().includes(term) ||
+             user.email.toLowerCase().includes(term) ||
+             user.department.toLowerCase().includes(term) ||
+             user.role.toLowerCase().includes(term);
+    }) : [...this.users];
     this.page = 1;
     this.updateTotalPages();
     if (this.filteredUsers.length > 0) this.selectUser(this.filteredUsers[0]);
     else this.selectedUser = null;
   }
-
   updateTotalPages(): void {
     this.totalPages = Math.ceil(this.filteredUsers.length / this.pageSize);
     if (this.totalPages === 0) this.totalPages = 1;
@@ -102,7 +100,9 @@ export class UserListComponent implements OnInit {
 
   get paginatedUsers(): any[] {
     const start = (this.page - 1) * this.pageSize;
-    return this.filteredUsers.slice(start, start + this.pageSize);
+    const sliced = this.filteredUsers.slice(start, start + this.pageSize);
+    console.log('paginatedUsers slice:', sliced);
+    return sliced;
   }
 
   onPageSizeChange(): void {

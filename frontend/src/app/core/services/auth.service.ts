@@ -82,11 +82,11 @@ export class AuthService {
         return user?.roles || [];
     }
 
-    hasRole(role: string | string[]): boolean {
-        const roles = this.getUserRoles();
-        if (Array.isArray(role)) {
-            return role.some(r => roles.includes(r));
+    hasRole(roles: string | string[]): boolean {
+        const userRoles = this.getUserRoles();
+        if (Array.isArray(roles)) {
+            return roles.some(role => userRoles.includes(role));
         }
-        return roles.includes(role);
+        return userRoles.includes(roles);
     }
 }

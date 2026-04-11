@@ -8,7 +8,8 @@
                 <i class="bi bi-speedometer2"></i>
             </li> -->
             <!-- Archiviste -->
-            <ng-container *ngIf="authService.hasRole('Archiviste')">
+            <ng-container *ngIf="authService.hasRole(['Archiviste', 'Administrateur'])">
+
                 <li routerLink="/batiments" routerLinkActive="active">
                     <i class="bi bi-building"></i>
                 </li>

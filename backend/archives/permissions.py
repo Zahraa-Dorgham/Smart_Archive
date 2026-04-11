@@ -17,8 +17,8 @@ class EstArchiviste(permissions.BasePermission):
     
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and (
-            request.user.groups.filter(name='Archiviste').exists() #or
-            # request.user.groups.filter(name='Administrateur').exists()
+            request.user.groups.filter(name='Archiviste').exists() or
+            request.user.groups.filter(name='Administrateur').exists()
         )
 
 class EstResponsable(permissions.BasePermission):
@@ -58,7 +58,7 @@ class PeutModifierDocument(permissions.BasePermission):
         user = request.user
         return (
             user.is_superuser or
-            # user.groups.filter(name='Administrateur').exists() or
+            user.groups.filter(name='Administrateur').exists() or
             user.groups.filter(name='Archiviste').exists()
         )
 

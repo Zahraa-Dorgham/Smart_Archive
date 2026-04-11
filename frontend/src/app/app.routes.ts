@@ -36,7 +36,7 @@ export const routes: Routes = [
       // Routes archiviste
       {
         path: 'archiviste',
-        canActivate: [() => roleGuard(['Archiviste', /*'Administrateur'*/])()],
+        canActivate: [() => roleGuard(['Archiviste', 'Administrateur'])()],
         children: [
           { path: 'batiments', loadComponent: () => import('./batiment/show-batiment/show-batiment').then(m => m.ShowBatimentComponent) },
           { path: 'salles', loadComponent: () => import('./salles/show-salle/show-salle').then(m => m.ShowSalleComponent) },
