@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
-
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-user-list',
   standalone: true,
@@ -28,8 +28,7 @@ export class UserListComponent implements OnInit {
   pageSize = 5;
   totalPages = 1;
 
-  constructor(private api: ApiService, private router: Router) { }
-
+  constructor(private api: ApiService, private router: Router, private cd: ChangeDetectorRef) { }
   ngOnInit(): void {
     this.loadUsers();
   }
@@ -38,6 +37,7 @@ export class UserListComponent implements OnInit {
     this.api.get('/users/').subscribe({
       next: (data: any) => {
         const usersData = data.results || data;
+        this.users = [...usersData];
         this.users = usersData.map((user: any) => {
           let groups = user.groups || [];
           if (groups.length > 0 && typeof groups[0] === 'object') {
@@ -60,7 +60,7 @@ export class UserListComponent implements OnInit {
         });
         console.log('Users chargés :', this.users); // Vérifie
         this.computeStats();
-        this.applyFilter(); // ← important
+        this.applyFilter(); 
       },
       error: (err) => console.error('Erreur chargement utilisateurs', err)
     });

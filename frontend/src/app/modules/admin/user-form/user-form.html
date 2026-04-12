@@ -1,59 +1,170 @@
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
-            <h4 class="mb-0">{{ isEditMode ? 'Modifier' : 'Créer' }} un utilisateur</h4>
+<div class="container py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-0 pt-4">
+            <h3 class="mb-0 fw-bold">Create New User</h3>
         </div>
+
         <div class="card-body">
-            <form (ngSubmit)="save()">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Prénom *</label>
-                        <input type="text" class="form-control" [(ngModel)]="user.first_name" name="first_name"
-                            required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Nom *</label>
-                        <input type="text" class="form-control" [(ngModel)]="user.last_name" name="last_name" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Email *</label>
-                        <input type="email" class="form-control" [(ngModel)]="user.email" name="email" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Téléphone</label>
-                        <input type="text" class="form-control" [(ngModel)]="user.phone" name="phone">
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label class="form-label">Adresse</label>
-                        <textarea class="form-control" rows="2" [(ngModel)]="user.address" name="address"></textarea>
-                    </div>
-                    <div class="col-md-6 mb-3" *ngIf="!isEditMode">
-                        <label class="form-label">Mot de passe *</label>
-                        <input type="password" class="form-control" [(ngModel)]="user.password" name="password"
-                            required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Département</label>
-                        <input type="text" class="form-control" [(ngModel)]="user.department" name="department">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" [(ngModel)]="user.is_active"
-                                name="is_active">
-                            <label class="form-check-label">Compte actif</label>
+            <!-- Stepper -->
+            <div class="stepper d-flex justify-content-between mb-5">
+                <div class="step" [class.active]="currentStep === 1" (click)="goToStep(1)">
+                    <div class="step-icon"><i class="fas fa-user"></i></div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="step" [class.active]="currentStep === 2" (click)="goToStep(2)">
+                    <div class="step-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="step-label">Role</div>
+                </div>
+                <div class="step" [class.active]="currentStep === 3" (click)="goToStep(3)">
+                    <div class="step-icon"><i class="fas fa-key"></i></div>
+                    <div class="step-label">Custom Permissions</div>
+                </div>
+            </div>
+
+            <form (ngSubmit)="onSubmit()">
+                <!-- ÉTAPE 1 : INFORMATIONS PERSONNELLES -->
+                <div *ngIf="currentStep === 1">
+                    <h4 class="fw-semibold">Personal Information</h4>
+                    <p class="text-muted">Enter the user's basic details</p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" class="form-control" [(ngModel)]="userData.first_name" name="first_name"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" [(ngModel)]="userData.last_name" name="last_name"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" [(ngModel)]="userData.email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" [(ngModel)]="userData.phone" name="phone">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" rows="2" [(ngModel)]="userData.address"
+                                name="address"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Password *</label>
+                            <input type="password" class="form-control" [(ngModel)]="userData.password" name="password"
+                                required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Account Status</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="userData.is_active"
+                                    name="is_active">
+                                <label class="form-check-label">{{ userData.is_active ? 'Active' : 'Archived' }}</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">3 Must Have Informations</label>
+                            <textarea class="form-control" rows="2" placeholder="Additional information..."
+                                [(ngModel)]="userData.must_have_info" name="must_have_info"></textarea>
                         </div>
                     </div>
-                    <div class="col-12 mb-3">
-                        <label class="form-label">Rôle(s)</label>
-                        <select multiple class="form-select" [(ngModel)]="selectedGroupIds" name="groups">
-                            <option *ngFor="let group of allGroups" [value]="group.id">{{ group.name }}</option>
-                        </select>
-                        <small class="text-muted">Maintenez Ctrl (Cmd) pour sélection multiple</small>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" class="btn btn-primary px-4" (click)="nextStep()">
+                            Next: Role Information <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+
+                <!-- ÉTAPE 2 : RÔLE -->
+                <div *ngIf="currentStep === 2">
+                    <h4 class="fw-semibold">Role Assignment</h4>
+                    <p class="text-muted">Select the user's role and permissions</p>
+
+                    <div class="mb-4">
+                        <label class="form-label">Select Role *</label>
+                        <select class="form-select w-50" [(ngModel)]="userData.role_id" name="role_id">
+                            <option [value]="null">-- Choose a role --</option>
+                            <option *ngFor="let role of roles" [value]="role.id">{{ role.name }}</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary px-4" (click)="prevStep()">
+                            <i class="fas fa-arrow-left me-1"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary px-4" (click)="nextStep()">
+                            Next: Custom Permissions <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ÉTAPE 3 : PERMISSIONS PERSONNALISÉES -->
+                <div *ngIf="currentStep === 3">
+                    <h4 class="fw-semibold">Custom Permissions</h4>
+                    <p class="text-muted">Add specific permissions for this user</p>
+
+                    <!-- Ajout d'une permission -->
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Module *</label>
+                            <input type="text" class="form-control" [(ngModel)]="newPermission.module"
+                                placeholder="e.g. Document">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Subject *</label>
+                            <input type="text" class="form-control" [(ngModel)]="newPermission.subject"
+                                placeholder="e.g. Boitier">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Action *</label>
+                            <input type="text" class="form-control" [(ngModel)]="newPermission.action"
+                                placeholder="e.g. create">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-success w-100" (click)="addPermission()">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Liste des permissions ajoutées -->
+                    <div *ngIf="customPermissions.length > 0" class="mt-4">
+                        <h5 class="fw-semibold">Custom Permissions</h5>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center"
+                                *ngFor="let perm of customPermissions; let i = index">
+                                <span><strong>Module:</strong> {{ perm.module }} | <strong>Subject:</strong> {{
+                                    perm.subject }} | <strong>Action:</strong> {{ perm.action }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                    (click)="removePermission(i)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton "Add Other Permissions" (optionnel, pourrait ouvrir un champ supplémentaire) -->
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addOtherPermission()">
+                            <i class="fas fa-plus-circle me-1"></i> Add Other Permissions
+                        </button>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary px-4" (click)="prevStep()">
+                            <i class="fas fa-arrow-left me-1"></i> Previous
+                        </button>
+                        <div>
+                            <button type="button" class="btn btn-secondary me-2 px-4" (click)="cancel()">Cancel</button>
+                            <button type="button" class="btn btn-info me-2 px-4" (click)="preview()">Preview</button>
+                            <button type="submit" class="btn btn-primary px-4" [disabled]="submitting">
+                                {{ submitting ? 'Creating...' : 'Create User' }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

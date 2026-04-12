@@ -29,7 +29,7 @@ export const routes: Routes = [
         children: [
           { path: 'users', loadComponent: () => import('./modules/admin/user-list/user-list').then(m => m.UserListComponent) },
           { path: 'users/new', loadComponent: () => import('./modules/admin/user-form/user-form').then(m => m.UserFormComponent) },
-          { path: 'users/:id/edit', loadComponent: () => import('./modules/admin/user-form/user-form').then(m => m.UserFormComponent) },
+          { path: 'users/:id/edit', loadComponent: () => import('./modules/admin/user-edit/user-edit').then(m => m.UserEditComponent) },          
           { path: '', redirectTo: 'users', pathMatch: 'full' }
         ]
       },
