@@ -19,6 +19,7 @@ export interface AuthResponse {
         first_name: string;
         last_name: string;
         roles: string[];
+        groups?: any[];
         is_staff: boolean;
         is_superuser: boolean;
     };
@@ -31,14 +32,28 @@ export class AuthService {
     private apiUrl = environment.apiUrl;
     private currentUserSubject = new BehaviorSubject<any>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
+    private authInitialized = false;
 
-    constructor(private http: HttpClient, private router: Router) { }
+    constructor(private http: HttpClient, private router: Router) {
+        // Initialize auth on service creation
+        this.loadStoredUser();
+    }
+
+    initializeAuth(): void {
+        this.loadStoredUser();
+        this.authInitialized = true;
+    }
 
     private loadStoredUser(): void {
         if (typeof window !== 'undefined') {
             const user = localStorage.getItem('user');
             if (user) {
-                this.currentUserSubject.next(JSON.parse(user));
+                try {
+                    this.currentUserSubject.next(JSON.parse(user));
+                } catch (e) {
+                    console.error('Failed to parse stored user', e);
+                    localStorage.removeItem('user');
+                }
             }
         }
     }
@@ -71,15 +86,28 @@ export class AuthService {
         return null;
     }
 
+    getCurrentUser(): any {
+        return this.currentUserSubject.value;
+    }
+
     isLoggedIn(): boolean {
-  const token = this.getToken();
-  console.log('isLoggedIn() called, token:', token);
-  return !!token;
-}
+        const token = this.getToken();
+        return !!token;
+    }
 
     getUserRoles(): string[] {
         const user = this.currentUserSubject.value;
-        return user?.roles || [];
+        let roles = user?.roles || [];
+        
+        // Handle both roles and groups from backend
+        if (!roles || roles.length === 0) {
+            const groups = user?.groups || [];
+            if (Array.isArray(groups)) {
+                roles = groups.map((g: any) => typeof g === 'object' ? g.name : g);
+            }
+        }
+        
+        return roles;
     }
 
     hasRole(roles: string | string[]): boolean {

@@ -14,8 +14,6 @@ export class LayoutComponent {
   constructor(public authService: AuthService, private router: Router) { }
 
   logout(): void {
-    // Exemple avec token JWT
-    localStorage.removeItem('access_token');
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

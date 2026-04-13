@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,17 +24,19 @@ export class UserEditComponent implements OnInit {
     allGroups: any[] = [];
     selectedGroupIds: number[] = [];
     submitting = false;
+    loading = true;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private api: ApiService
+        private api: ApiService,
+        private cd: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
         const idParam = this.route.snapshot.paramMap.get('id');
         this.userId = idParam ? +idParam : null;
-        if (!this.userId) {
+        if (this.userId === null || this.userId === 0) {
             this.router.navigate(['/admin/users']);
             return;
         }
@@ -46,8 +48,13 @@ export class UserEditComponent implements OnInit {
         this.api.get('/groups/').subscribe({
             next: (data: any) => {
                 this.allGroups = data.results || data;
+                this.cd.markForCheck();
             },
-            error: (err) => console.error('Erreur chargement groupes', err)
+            error: (err) => {
+                console.error('Erreur chargement groupes', err);
+                alert('Erreur lors du chargement des rôles');
+                this.cd.markForCheck();
+            }
         });
     }
 
@@ -64,10 +71,17 @@ export class UserEditComponent implements OnInit {
                 };
                 // Récupération des IDs des groupes
                 if (user.groups && Array.isArray(user.groups)) {
-                    this.selectedGroupIds = user.groups.map((g: any) => g.id);
+                    this.selectedGroupIds = user.groups.map((g: any) => typeof g === 'object' ? g.id : g);
                 }
+                this.loading = false;
+                this.cd.markForCheck();
             },
-            error: (err) => console.error('Erreur chargement utilisateur', err)
+            error: (err) => {
+                console.error('Erreur chargement utilisateur', err);
+                alert('Erreur lors du chargement de l\'utilisateur');
+                this.loading = false;
+                this.cd.markForCheck();
+            }
         });
     }
 
