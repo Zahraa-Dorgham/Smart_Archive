@@ -33,6 +33,10 @@ export const routes: Routes = [
           { path: '', redirectTo: 'users', pathMatch: 'full' }
         ]
       },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
       // Routes archiviste
       {
         path: 'archiviste',

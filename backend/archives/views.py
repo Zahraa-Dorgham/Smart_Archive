@@ -1,53 +1,70 @@
-from rest_framework import viewsets, filters, permissions
-from django_filters.rest_framework import DjangoFilterBackend
-from .models import Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert
-from .serializers import (
-    RoleSerializer, BatimentSerializer, SalleSerializer,
-    ArmoireSerializer, EtagereSerializer, PhaseArchiveSerializer, TransfertSerializer
-)
-from .permissions import EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee
-from django.contrib.auth.models import Group
-from .serializers import GroupSerializer
-from .permissions import EstAdministrateur
+# archives/views.py (version complète)
 
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 
+from .models import (
+    Role, Batiment, Salle, Armoire, Etagere, PhaseArchive,
+    ArchiveCourant, ArchiveIntermediaire, ArchiveDefinitive,
+    Boitier, Dossier, Document, Transfert,
+    Consultation, 
+    # DemandeConsultation, 
+    Bordereau
+)
+from .serializers import (
+    RoleSerializer, BatimentSerializer, SalleSerializer, ArmoireSerializer,
+    EtagereSerializer, PhaseArchiveSerializer, TransfertSerializer,
+    ArchiveCourantSerializer, ArchiveIntermediaireSerializer, ArchiveDefinitiveSerializer,
+    BoitierSerializer, DossierSerializer, DocumentSerializer,
+    ConsultationSerializer, 
+    # DemandeConsultationSerializer, 
+    BordereauSerializer,
+    GroupSerializer, UserSerializer
+)
+from .permissions import (
+    EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable
+)
+
+User = get_user_model()
+
+# ========== GROUPES ==========
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [EstAdministrateur]
 
-    
+# ========== UTILISATEURS ==========
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [EstAdministrateur]
+
+# ========== RÔLES ==========
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['nom', 'description']
-    
     def get_permissions(self):
-     if self.action in ['list', 'retrieve']:
-        permission_classes = [EstLectureAutorisee]  
-     else:
-        permission_classes = [EstArchiviste]  
-     return [permission() for permission in permission_classes]
+        if self.action in ['list', 'retrieve']:
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
-
+# ========== BÂTIMENTS, SALLES, ARMOIRES, ÉTAGÈRES ==========
 class BatimentViewSet(viewsets.ModelViewSet):
     queryset = Batiment.objects.all()
     serializer_class = BatimentSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['nom', 'code', 'adresse']
-    
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
-
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
 class SalleViewSet(viewsets.ModelViewSet):
     queryset = Salle.objects.all()
@@ -55,14 +72,10 @@ class SalleViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['batiment', 'etage']
     search_fields = ['nom', 'code']
-    
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
-
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
 class ArmoireViewSet(viewsets.ModelViewSet):
     queryset = Armoire.objects.all()
@@ -70,14 +83,10 @@ class ArmoireViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['salle']
     search_fields = ['code', 'code_barres']
-    
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
-
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
 class EtagereViewSet(viewsets.ModelViewSet):
     queryset = Etagere.objects.all()
@@ -85,32 +94,39 @@ class EtagereViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['armoire']
     search_fields = ['code_barres']
-    
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
-
+# ========== PHASES D'ARCHIVAGE (GÉNÉRIQUE + SPÉCIFIQUES) ==========
 class PhaseArchiveViewSet(viewsets.ModelViewSet):
     queryset = PhaseArchive.objects.all()
     serializer_class = PhaseArchiveSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['nom', 'code']
-    ordering_fields = ['ordre', 'nom']
-    
+    search_fields = ['nom']
+    ordering_fields = ['idphase', 'nom']
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
-# archives/views.py
-from .models import Boitier, Dossier, Document
-from .serializers import BoitierSerializer, DossierSerializer, DocumentSerializer
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
+class ArchiveCourantViewSet(viewsets.ModelViewSet):
+    queryset = ArchiveCourant.objects.all()
+    serializer_class = ArchiveCourantSerializer
+    permission_classes = [EstArchiviste]
+
+class ArchiveIntermediaireViewSet(viewsets.ModelViewSet):
+    queryset = ArchiveIntermediaire.objects.all()
+    serializer_class = ArchiveIntermediaireSerializer
+    permission_classes = [EstArchiviste]
+
+class ArchiveDefinitiveViewSet(viewsets.ModelViewSet):
+    queryset = ArchiveDefinitive.objects.all()
+    serializer_class = ArchiveDefinitiveSerializer
+    permission_classes = [EstArchiviste]
+
+# ========== BOÎTIERS ==========
 class BoitierViewSet(viewsets.ModelViewSet):
     queryset = Boitier.objects.all().select_related('armoire', 'etagere')
     serializer_class = BoitierSerializer
@@ -121,31 +137,76 @@ class BoitierViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
-     
-    def list(self, request, *args, **kwargs):
-        print("Utilisateur:", request.user)
-        print("Authentifié:", request.user.is_authenticated)
-        return super().list(request, *args, **kwargs)
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
+    @action(detail=True, methods=['post'])
+    def ajouter_dossier(self, request, pk=None):
+        boitier = self.get_object()
+        dossier_id = request.data.get('dossier_id')
+        try:
+            dossier = Dossier.objects.get(idDossier=dossier_id)
+            success, message = boitier.ajouter_dossier(dossier)
+            if success:
+                return Response({'message': message})
+            return Response({'error': message}, status=400)
+        except Dossier.DoesNotExist:
+            return Response({'error': 'Dossier non trouvé'}, status=404)
+
+    @action(detail=True, methods=['post'])
+    def retirer_dossier(self, request, pk=None):
+        boitier = self.get_object()
+        dossier_id = request.data.get('dossier_id')
+        try:
+            dossier = Dossier.objects.get(idDossier=dossier_id)
+            success, message = boitier.retirer_dossier(dossier)
+            if success:
+                return Response({'message': message})
+            return Response({'error': message}, status=400)
+        except Dossier.DoesNotExist:
+            return Response({'error': 'Dossier non trouvé'}, status=404)
+
+# ========== DOSSIERS ==========
 class DossierViewSet(viewsets.ModelViewSet):
-    queryset = Dossier.objects.all().select_related('boitier', 'phase_archive')
+    queryset = Dossier.objects.all().select_related('boitier', 'phaseArchive')
     serializer_class = DossierSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['statut', 'phase_archive', 'boitier', 'niveau_confidentialite']
-    search_fields = ['idDossier', 'reference', 'titre']
-    ordering_fields = ['date_creation', 'reference']
+    filterset_fields = ['phaseArchive', 'boitier']
+    search_fields = ['idDossier', 'description']
+    ordering_fields = ['date_creation']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
+    @action(detail=True, methods=['post'])
+    def ajouter_document(self, request, pk=None):
+        dossier = self.get_object()
+        doc_id = request.data.get('document_id')
+        try:
+            document = Document.objects.get(idDoc=doc_id)
+            success, message = dossier.ajouter_document(document)
+            if success:
+                return Response({'message': message})
+            return Response({'error': message}, status=400)
+        except Document.DoesNotExist:
+            return Response({'error': 'Document non trouvé'}, status=404)
+
+    @action(detail=True, methods=['post'])
+    def lier_boitier(self, request, pk=None):
+        dossier = self.get_object()
+        boitier_id = request.data.get('boitier_id')
+        try:
+            boitier = Boitier.objects.get(idboit=boitier_id)
+            success, message = dossier.lier_boitier(boitier)
+            if success:
+                return Response({'message': message})
+            return Response({'error': message}, status=400)
+        except Boitier.DoesNotExist:
+            return Response({'error': 'Boîtier non trouvé'}, status=404)
+
+# ========== DOCUMENTS ==========
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all().select_related('dossier', 'phase_archive')
     serializer_class = DocumentSerializer
@@ -156,53 +217,69 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-           permission_classes = [EstLectureAutorisee]
-        else:
-            permission_classes = [EstArchiviste]
-        return [permission() for permission in permission_classes]
-    
-from .models import DemandeConsultation
-from .serializers import DemandeConsultationSerializer
-from .permissions import EstEmploye, EstResponsable 
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
 
-class DemandeConsultationViewSet(viewsets.ModelViewSet):
-    queryset = DemandeConsultation.objects.all()
-    serializer_class = DemandeConsultationSerializer
+    @action(detail=True, methods=['post'])
+    def changer_phase(self, request, pk=None):
+        document = self.get_object()
+        phase_id = request.data.get('phase_id')
+        try:
+            nouvelle_phase = PhaseArchive.objects.get(idphase=phase_id)
+            success, message = document.changer_phase(nouvelle_phase)
+            if success:
+                return Response({'message': message})
+            return Response({'error': message}, status=400)
+        except PhaseArchive.DoesNotExist:
+            return Response({'error': 'Phase non trouvée'}, status=404)
+
+    @action(detail=True, methods=['post'])
+    def consulter(self, request, pk=None):
+        document = self.get_object()
+        document.consulter(utilisateur=request.user)
+        return Response({'message': 'Consultation enregistrée'})
+
+# ========== CONSULTATIONS (diagramme) ==========
+class ConsultationViewSet(viewsets.ModelViewSet):
+    queryset = Consultation.objects.all()
+    serializer_class = ConsultationSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['document', 'allitemsReturned']
+    search_fields = ['direction', 'poste']
 
     def get_permissions(self):
-        # Seul l'employé peut créer une demande
-        if self.action == 'create':
-            return [EstEmploye()]
-        return [EstEmploye()]  # ou une permission plus large
-    
+        if self.action in ['list', 'retrieve']:
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
+
+# ========== DEMANDES DE CONSULTATION (modèle existant) ==========
+# class DemandeConsultationViewSet(viewsets.ModelViewSet):
+#     queryset = DemandeConsultation.objects.all()
+#     serializer_class = DemandeConsultationSerializer
+#     def get_permissions(self):
+#         if self.action == 'create':
+#             return [EstEmploye()]
+#         return [EstEmploye()]  # à affiner selon vos besoins
+
+# ========== TRANSFERTS ==========
 class TransfertViewSet(viewsets.ModelViewSet):
     queryset = Transfert.objects.all()
     serializer_class = TransfertSerializer
-    permission_classes = [EstResponsable]  # ou EstArchiviste selon votre logique
+    permission_classes = [EstResponsable]  # ou EstArchiviste
 
     @action(detail=True, methods=['post'])
     def valider(self, request, pk=None):
         transfert = self.get_object()
         transfert.statut = 'VALIDE'
-        transfert.validateur = request.user
-        transfert.date_validation = timezone.now()
+        # Si vous avez un champ 'validateur', décommentez :
+        # transfert.validateur = request.user
+        transfert.date_execution = timezone.now()
         transfert.save()
-        # Appliquer la logique métier (ex: déplacer le document, changer phase)
+        # Logique métier supplémentaire (changement de phase, etc.)
         return Response({'status': 'validé'})
 
-
-
-
-
-# endpoints pour les utilisateurs 
-from django.contrib.auth import get_user_model
-from rest_framework import viewsets
-from .serializers import UserSerializer
-from .permissions import EstAdministrateur
-
-User = get_user_model()
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [EstAdministrateur]  
+# ========== BORDEREAUX ==========
+class BordereauViewSet(viewsets.ModelViewSet):
+    queryset = Bordereau.objects.all()
+    serializer_class = BordereauSerializer
+    permission_classes = [EstArchiviste]

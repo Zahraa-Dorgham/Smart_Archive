@@ -143,7 +143,10 @@
                             (click)="delete(user.id); $event.stopPropagation()"></i>
                     </td>
                 </tr>
-                <tr *ngIf="filteredUsers.length === 0">
+                <tr *ngIf="loadingUsers">
+                    <td colspan="7" class="text-center py-4 text-muted">Chargement des utilisateurs...</td>
+                </tr>
+                <tr *ngIf="!loadingUsers && filteredUsers.length === 0">
                     <td colspan="7" class="text-center py-4 text-muted">Aucun utilisateur trouvé</td>
                 </tr>
             </tbody>

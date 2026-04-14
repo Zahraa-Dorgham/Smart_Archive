@@ -22,6 +22,7 @@ export class UserListComponent implements OnInit {
   inactiveUsers = 0;
   totalRoles = 0;
   totalDepartments = 0;
+  loadingUsers = false;
 
   searchTerm = '';
   page = 1;
@@ -34,10 +35,15 @@ export class UserListComponent implements OnInit {
   }
 
   loadUsers(): void {
+    this.loadingUsers = true;
+    this.searchTerm = '';
+    this.page = 1;
+    this.selectedUser = null;
+    this.filteredUsers = [];
+
     this.api.get('/users/').subscribe({
       next: (data: any) => {
         const usersData = data.results || data;
-        this.users = [...usersData];
         this.users = usersData.map((user: any) => {
           let groups = user.groups || [];
           if (groups.length > 0 && typeof groups[0] === 'object') {
@@ -60,9 +66,13 @@ export class UserListComponent implements OnInit {
         });
         console.log('Users chargés :', this.users); // Vérifie
         this.computeStats();
-        this.applyFilter(); 
+        this.applyFilter();
+        this.loadingUsers = false;
       },
-      error: (err) => console.error('Erreur chargement utilisateurs', err)
+      error: (err) => {
+        console.error('Erreur chargement utilisateurs', err);
+        this.loadingUsers = false;
+      }
     });
   }
 

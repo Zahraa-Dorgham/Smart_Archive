@@ -54,7 +54,7 @@
 
                 <div class="d-flex justify-content-end mt-4 gap-2">
                     <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
-                    <button type="submit" class="btn btn-primary" [disabled]="submitting">
+                    <button type="submit" class="btn btn-primary" [disabled]="submitting" (click)="onSubmit()">
                         {{ submitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
                     </button>
                 </div>

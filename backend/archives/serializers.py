@@ -1,7 +1,7 @@
 # archives/serializers.py - Version avec uniquement les modèles existants
 from rest_framework import serializers
 from .models import (
-    DemandeConsultation, Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert
+    ArchiveDefinitive, ArchiveIntermediaire,ArchiveCourant, Bordereau,  Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert,Consultation
     # Retirez Boitier, Dossier, Document, Service s'ils n'existent pas
 )
 
@@ -9,7 +9,7 @@ from .models import (
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = ['id', 'nom', 'description']
+        fields = '__all__'
 
 # Serializer pour Batiment
 class BatimentSerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class SalleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Salle
-        fields = ['id', 'nom', 'code', 'batiment', 'batiment_nom', 'type_salle', 
+        fields = ['id', 'nom', 'code', 'batiment', 'batiment_nom', 
                   'etage', 'description']
 
 # Serializer pour Armoire
@@ -47,15 +47,34 @@ class EtagereSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Etagere
-        fields = ['id', 'armoire', 'armoire_code', 'numero', 'code_barres',
-                  'capacite_max_boites', 'occupation_actuelle', 'description']
+        fields = ['id', 'armoire', 'armoire_code', 'numero', 'code_barres', 'description']
 
 # Serializer pour PhaseArchive
 class PhaseArchiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhaseArchive
-        fields = ['id', 'nom', 'code', 'type_phase', 'duree_conservation',
-                  'description', 'action_finale', 'ordre']
+        fields = '__all__'
+
+class ArchiveCourantSerializer(serializers.ModelSerializer):
+    phase_detail = PhaseArchiveSerializer(source='phase', read_only=True)
+
+    class Meta:
+        model = ArchiveCourant
+        fields = '__all__'
+
+class ArchiveIntermediaireSerializer(serializers.ModelSerializer):
+    phase_detail = PhaseArchiveSerializer(source='phase', read_only=True)
+
+    class Meta:
+        model = ArchiveIntermediaire
+        fields = '__all__'
+
+class ArchiveDefinitiveSerializer(serializers.ModelSerializer):
+    phase_detail = PhaseArchiveSerializer(source='phase', read_only=True)
+
+    class Meta:
+        model = ArchiveDefinitive
+        fields = '__all__'
         
 # archives/serializers.py
 from rest_framework import serializers
@@ -80,18 +99,12 @@ class BoitierSerializer(serializers.ModelSerializer):
         return obj.localisation_complete()
 
 class DossierSerializer(serializers.ModelSerializer):
-    boitier_idboit = serializers.CharField(source='boitier.idboit', read_only=True)
-    phase_archive_nom = serializers.CharField(source='phase_archive.nom', read_only=True)
-    nombre_documents = serializers.IntegerField(read_only=True)  # méthode du modèle
+    nombre_documents = serializers.IntegerField(read_only=True)
+    volume_total = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Dossier
-        fields = [
-            'id', 'idDossier', 'reference', 'titre', 'description',
-            'boitier', 'boitier_idboit', 'phase_archive', 'phase_archive_nom',
-            'date_creation', 'date_cloture', 'statut', 'niveau_confidentialite',
-            'nombre_documents'
-        ]
+        fields = '__all__'
 
 class DocumentSerializer(serializers.ModelSerializer):
     dossier_reference = serializers.CharField(source='dossier.reference', read_only=True)
@@ -122,38 +135,44 @@ class DocumentSerializer(serializers.ModelSerializer):
 
 
 
+
+# class DemandeConsultationSerializer(serializers.ModelSerializer):
+#     employe_nom = serializers.CharField(source='employe.username', read_only=True)
+#     document_titre = serializers.CharField(source='document.titre', read_only=True)
+
+#     class Meta:
+#         model = DemandeConsultation
+#         fields = '__all__'
+#         read_only_fields = ['date_demande', 'statut']
+
+
+class ConsultationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Consultation
+        fields = '__all__'
+
+
+# --- Transfert ---
+class TransfertSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transfert
+        fields = '__all__'
+
+# --- Bordereau ---
+class BordereauSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bordereau
+        fields = '__all__'
+
+
+
+
 from django.contrib.auth.models import Group
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name']
-
-
-
-class DemandeConsultationSerializer(serializers.ModelSerializer):
-    employe_nom = serializers.CharField(source='employe.username', read_only=True)
-    document_titre = serializers.CharField(source='document.titre', read_only=True)
-
-    class Meta:
-        model = DemandeConsultation
-        fields = '__all__'
-        read_only_fields = ['date_demande', 'statut']
-
-
-class TransfertSerializer(serializers.ModelSerializer):
-    demandeur_nom = serializers.CharField(source='demandeur.username', read_only=True)
-    validateur_nom = serializers.CharField(source='validateur.username', read_only=True)
-
-    class Meta:
-        model = Transfert
-        fields = '__all__'
-        read_only_fields = ['date_demande', 'statut', 'date_validation']
-
-
-
-
-
 
 
 
@@ -168,3 +187,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups']
+		
+		
+		

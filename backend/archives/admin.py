@@ -7,12 +7,12 @@ from .models import Armoire, Batiment, Role, Salle, Etagere, PhaseArchive, Boiti
 class BatimentAdmin(admin.ModelAdmin):
     list_display = ('nom', 'code', 'adresse')  # Colonnes affichées
     search_fields = ('nom', 'code')            # Barre de recherche
-    list_filter = ('date_creation',) 
+    list_filter = ('date_creation', ) 
              
 @admin.register(Salle)
 class SalleAdmin(admin.ModelAdmin):
     list_display = ('nom', 'code', 'batiment', 'etage')
-    list_filter = ('batiment', 'type_salle')
+    list_filter = ('batiment',)
     search_fields = ('nom', 'code')
 
     

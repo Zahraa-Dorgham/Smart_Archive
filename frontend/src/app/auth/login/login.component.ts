@@ -78,16 +78,8 @@ export class LoginComponent {
           }
         }
 
-        // Redirection selon le rôle
-        if (userRoles.includes('Administrateur')) {
-          this.router.navigate(['/admin/users']);
-        } else if (userRoles.includes('Archiviste')) {
-          this.router.navigate(['/archiviste/batiments']);
-        } else if (userRoles.includes('Responsable')) {
-          this.router.navigate(['/responsable/transferts']);
-        } else {
-          this.router.navigate(['/employe/recherche']);
-        }
+        // Après connexion, rediriger vers le dashboard
+        this.router.navigate(['/dashboard']);
         this.loading = false;
       },
       error: (err) => {
