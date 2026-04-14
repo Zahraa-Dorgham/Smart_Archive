@@ -1,4 +1,4 @@
-.show-batiment-container {
+/* .show-batiment-container {
     padding: 24px;
     max-width: 1200px;
     margin: 0 auto;
@@ -174,10 +174,10 @@
         justify-content: center;
         z-index: 1000;
     }
-}
+} */
 
 /* // Responsive */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .show-batiment-container {
         padding: 16px;
 
@@ -194,4 +194,4 @@
             grid-template-columns: 1fr !important;
         }
     }
-}
+} */

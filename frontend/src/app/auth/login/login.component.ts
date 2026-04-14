@@ -57,36 +57,27 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    if (this.loginForm.invalid) {
-      return;
-    }
-    this.loading = true;
     this.authService.login(this.credentials).subscribe({
       next: (res) => {
-        // Stocker le token
+        // Stocker le token (ex: localStorage)
         localStorage.setItem('access_token', res.access);
         localStorage.setItem('refresh_token', res.refresh);
-        // Stocker les infos utilisateur
+        // Stocker les infos utilisateur (pour les rôles)
         localStorage.setItem('user', JSON.stringify(res.user));
 
-        // Déterminer le rôle - gérer à la fois roles et groups
-        let userRoles: string[] = res.user?.roles || [];
-        if (!userRoles || userRoles.length === 0) {
-          const groups = res.user?.groups || [];
-          if (Array.isArray(groups)) {
-            userRoles = groups.map((g: any) => typeof g === 'object' ? g.name : g);
-          }
+        // Redirection selon le rôle
+        const roles = res.user?.roles || [];
+        if (roles.includes('Administrateur')) {
+          this.router.navigate(['/admin/users']);
+        } else if (roles.includes('Archiviste')) {
+          this.router.navigate(['/archiviste/batiments']);
+        } else if (roles.includes('Responsable')) {
+          this.router.navigate(['/responsable/transferts']);
+        } else {
+          this.router.navigate(['/employe/recherche']);
         }
-
-        // Après connexion, rediriger vers le dashboard
-        this.router.navigate(['/dashboard']);
-        this.loading = false;
       },
-      error: (err) => {
-        console.error('Erreur de connexion:', err);
-        this.errorMessage = 'Nom d\'utilisateur ou mot de passe incorrect';
-        this.loading = false;
-      }
+      error: (err) => console.error(err)
     });
   }
 

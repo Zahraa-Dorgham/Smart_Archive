@@ -1,5 +1,4 @@
-<div class="show-batiment-container">
-    <!-- En-tête avec bouton retour -->
+<!-- <div class="show-batiment-container">
     <div class="header-actions">
         <button mat-icon-button color="primary" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
@@ -11,7 +10,6 @@
         </button>
     </div>
 
-    <!-- Carte d'informations générales -->
     <mat-card class="info-card">
         <mat-card-header>
             <mat-icon mat-card-avatar>business</mat-icon>
@@ -36,7 +34,6 @@
         </mat-card-content>
     </mat-card>
 
-    <!-- Section Salles associées -->
     <mat-card class="salles-card">
         <mat-card-header>
             <mat-icon mat-card-avatar>meeting_room</mat-icon>
@@ -60,7 +57,6 @@
                     </div>
                 </mat-card>
 
-                <!-- Message si aucune salle -->
                 <div *ngIf="salles.length === 0" class="empty-state">
                     <mat-icon>meeting_room</mat-icon>
                     <p>Aucune salle n'est rattachée à ce bâtiment.</p>
@@ -77,8 +73,7 @@
         </mat-card-actions>
     </mat-card>
 
-    <!-- Chargement / erreur -->
     <div *ngIf="isLoading" class="loading-overlay">
         <mat-spinner diameter="40"></mat-spinner>
     </div>
-</div>
+</div> -->

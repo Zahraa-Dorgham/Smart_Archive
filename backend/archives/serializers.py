@@ -39,7 +39,7 @@ class ArmoireSerializer(serializers.ModelSerializer):
         model = Armoire
         fields = ['id', 'code', 'salle', 'salle_nom', 
                    
-                  'code_barres', 'description', 'date_installation']
+                  'code_barres']
 
 # Serializer pour Etagere
 class EtagereSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class EtagereSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Etagere
-        fields = ['id', 'armoire', 'armoire_code', 'numero', 'code_barres', 'description']
+        fields = ['id', 'armoire', 'armoire_code', 'numero', 'code_barres']
 
 # Serializer pour PhaseArchive
 class PhaseArchiveSerializer(serializers.ModelSerializer):
@@ -91,7 +91,7 @@ class BoitierSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'idboit', 'code_barre', 'titre', 'capacite',
             'armoire', 'armoire_nom', 'etagere', 'etagere_numero',
-            'statut', 'description', 'date_creation', 'date_modification',
+            'statut', 'date_creation', 'date_modification',
             'localisation', 'taux_remplissage'
         ]
 

@@ -140,9 +140,9 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'archive_db',
-        'USER': 'archive_user',
-        'PASSWORD': 'password123',
+        'NAME': 'archives_db',
+        'USER': 'root',
+        'PASSWORD': 'root123',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
@@ -150,6 +150,7 @@ DATABASES = {
         }
     }
 }
+
 
 
 # Password validation

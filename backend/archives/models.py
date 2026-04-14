@@ -184,7 +184,7 @@ class Boitier(models.Model):
 # ========== DOSSIER (unique et complet) ==========
 class Dossier(models.Model):
     idDossier = models.AutoField(primary_key=True)
-    description = models.TextField()
+    nomDos = models.CharField(max_length=255, null=True, blank=True)
     date_creation = models.DateField()
     date_cloture = models.DateField(null=True, blank=True)
     boitier = models.ForeignKey(Boitier, on_delete=models.SET_NULL, null=True, blank=True, related_name='dossiers')
@@ -192,7 +192,7 @@ class Dossier(models.Model):
     phaseType = models.CharField(max_length=50, default="COURANTE")   # valeur par défaut
     dureeCourant = models.IntegerField(default=3)
     dureeIntermediaire = models.IntegerField(default=10)
-    anneeSecurite = models.IntegerField(null=True, blank=True)
+    dureeDefinitive = models.IntegerField(default=100)
 
     class Meta:
         verbose_name = "Dossier"
@@ -349,7 +349,7 @@ class Bordereau(models.Model):
     idBordereau = models.AutoField(primary_key=True)
     contenu = models.TextField()
     pdf_generé = models.FileField(upload_to='bordereaux/')
-    transfert = models.ForeignKey(Transfert, on_delete=models.CASCADE, related_name='bordereaux')
+   
 
     class Meta:
         verbose_name = "Bordereau"
