@@ -1,0 +1,37 @@
+<div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="navbar-header">
+        <ul class="nav navbar-nav flex-row">
+            <li class="nav-item mr-auto"><a class="navbar-brand" routerLink="/">
+                    <div class="brand-logo"><img class="logo" src="app-assets/images/logo/logo.png" /></div>
+                    <h2 class="brand-text mb-0">SmartArchive</h2>
+                </a></li>
+            <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i class="bx bx-x d-block d-xl-none font-medium-4 primary"></i><i class="toggle-icon bx bx-disc font-medium-4 d-none d-xl-block primary" data-ticon="bx-disc"></i></a></li>
+        </ul>
+    </div>
+    <div class="shadow-bottom"></div>
+    <div class="main-menu-content">
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation" data-icon-style="lines">
+            
+            <li class=" navigation-header"><span>Tableau de bord</span></li>
+            <li class="nav-item" routerLinkActive="active"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i><span class="menu-title">Dashboard</span></a></li>
+
+            <ng-container *ngIf="authService.hasRole(['Archiviste', 'Administrateur'])">
+                <li class=" navigation-header"><span>Archiviste</span></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/batiments"><i class="bx bx-building-house"></i><span class="menu-title">Bâtiments</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/salles"><i class="bx bx-door-open"></i><span class="menu-title">Salles</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/armoires"><i class="bx bx-server"></i><span class="menu-title">Armoires</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/etageres"><i class="bx bx-grid-alt"></i><span class="menu-title">Étagères</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/phases"><i class="bx bx-calendar"></i><span class="menu-title">Phases</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/boitiers"><i class="bx bx-box"></i><span class="menu-title">Boîtiers</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/dossiers"><i class="bx bx-folder"></i><span class="menu-title">Dossiers</span></a></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/documents"><i class="bx bx-file"></i><span class="menu-title">Documents</span></a></li>
+            </ng-container>
+
+            <ng-container *ngIf="authService.hasRole('Administrateur')">
+                <li class=" navigation-header"><span>Administration</span></li>
+                <li class="nav-item" routerLinkActive="active"><a routerLink="/admin/users"><i class="bx bx-user"></i><span class="menu-title">Utilisateurs</span></a></li>
+            </ng-container>
+
+        </ul>
+    </div>
+</div>

@@ -36,10 +36,7 @@ class EstResponsable(permissions.BasePermission):
 #     def has_permission(self, request, view):
 #         return request.user and request.user.is_authenticated
 class EstEmploye(permissions.BasePermission):
-    """
-    Réservé aux utilisateurs ayant uniquement le rôle Employé
-    (ni archiviste, ni administrateur, ni responsable)
-    """
+   
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
@@ -47,8 +44,7 @@ class EstEmploye(permissions.BasePermission):
         return request.user.groups.filter(name='Employé').exists()
 
 class PeutModifierDocument(permissions.BasePermission):
-    """Permission basée sur l'objet (exemple pour les documents)"""
-    
+    """Permission pour les documents - seuls les archivistes, responsables et administrateurs peuvent modifier"""    
     def has_object_permission(self, request, view, obj):
         # Lecture autorisée pour tous les employés
         if request.method in permissions.SAFE_METHODS:
@@ -70,7 +66,6 @@ class EstProprietaireOuArchive(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        # Vérifier si l'utilisateur est le propriétaire (si le document a un champ created_by)
         if hasattr(obj, 'created_by') and obj.created_by == request.user:
             return True
         

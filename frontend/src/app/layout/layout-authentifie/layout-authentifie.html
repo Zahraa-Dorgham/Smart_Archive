@@ -1,55 +1,19 @@
+<app-header></app-header>
+<app-sidebar></app-sidebar>
 
-<div class="app-layout">
-    <!-- Sidebar fixe -->
-    <div class="sidebar">
-        <ul class="sidebar-nav">
-            <!-- Lien : Dashboard (exemple) -->
-            <!-- <li routerLink="/dashboard" routerLinkActive="active">
-                <i class="bi bi-speedometer2"></i>
-            </li> -->
-            <!-- Archiviste -->
-            <ng-container *ngIf="authService.hasRole(['Archiviste', 'Administrateur'])">
-
-                <li routerLink="/batiments" routerLinkActive="active">
-                    <i class="bi bi-building"></i>
-                </li>
-                <li routerLink="/salles" routerLinkActive="active">
-                    <i class="bi bi-door-closed"></i>
-                </li>
-                <li routerLink="/armoires" routerLinkActive="active">
-                    <i class="bi bi-server"></i>
-                </li>
-                <li routerLink="/etageres" routerLinkActive="active">
-                    <i class="bi bi-layout-three-columns"></i>
-                </li>
-                <li routerLink="/phases" routerLinkActive="active">
-                    <i class="bi bi-calendar-week"></i>
-                </li>
-                <li routerLink="/boitiers" routerLinkActive="active">
-                    <i class="bi bi-box-seam"></i>
-                </li>
-                <li routerLink="/dossiers" routerLinkActive="active">
-                    <i class="bi bi-folder"></i>
-                </li>
-                <li routerLink="/documents" routerLinkActive="active">
-                    <i class="bi bi-file-earmark-text"></i>
-                </li>
-            </ng-container>
-            <!-- Administrateur -->
-            <ng-container *ngIf="authService.hasRole('Administrateur')">
-                <li routerLink="/admin/users" routerLinkActive="active">
-                    <i class="bi bi-person-badge"></i>
-                </li>
-            </ng-container>
-            <!-- Déconnexion (optionnel) -->
-            <li class="logout" (click)="logout()">
-                <i class="bi bi-box-arrow-right"></i>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Contenu principal -->
-    <div class="main-content">
-        <router-outlet></router-outlet>
+<!-- BEGIN: Content-->
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="content-wrapper">
+        <div class="content-header row"></div>
+        <div class="content-body">
+            <router-outlet></router-outlet>
+        </div>
     </div>
 </div>
+<!-- END: Content-->
+
+<div class="sidenav-overlay"></div>
+<div class="drag-target"></div>
+
+<app-footer></app-footer>
