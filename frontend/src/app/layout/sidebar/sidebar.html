@@ -1,41 +1,89 @@
 <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
-            <li class="nav-item mr-auto"><a class="navbar-brand" routerLink="/">
+            <li class="nav-item mr-auto">
+                <a class="navbar-brand" routerLink="/">
                     <div class="brand-logo"><img class="logo" src="app-assets/images/logo/logo.png" /></div>
                     <h2 class="brand-text mb-0">SmartArchive</h2>
-                </a></li>
-            <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i class="bx bx-x d-block d-xl-none font-medium-4 primary"></i><i class="toggle-icon bx bx-disc font-medium-4 d-none d-xl-block primary" data-ticon="bx-disc"></i></a></li>
+                </a>
+            </li>
+            <li class="nav-item nav-toggle">
+                <a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse">
+                    <i class="bx bx-x d-block d-xl-none font-medium-4 primary"></i>
+                    <i class="toggle-icon bx bx-disc font-medium-4 d-none d-xl-block primary" data-ticon="bx-disc"></i>
+                </a>
+            </li>
         </ul>
     </div>
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation" data-icon-style="lines">
             
-            <li class=" navigation-header"><span>Tableau de bord</span></li>
-            <li class="nav-item" routerLinkActive="active"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i><span class="menu-title">Dashboard</span></a></li>
+            <li class="navigation-header"><span>Tableau de bord</span></li>
+            <li class="nav-item" routerLinkActive="active">
+                <a routerLink="/dashboard"><i class="bx bx-home-alt"></i><span class="menu-title">Dashboard</span></a>
+            </li>
 
+            <!-- Section Administrateur visible par Archiviste et Administrateur -->
             <ng-container *ngIf="authService.hasRole(['Archiviste', 'Administrateur'])">
-                <li class=" navigation-header"><span>Administrateur</span></li>
+                <li class="navigation-header"><span>Administrateur</span></li>
                 
-                <li class="nav-item" routerLinkActive="active"><a routerLink="/phases"><i class="bx bx-calendar"></i><span class="menu-title">Calendrier</span></a></li>
-                <li class="nav-item" routerLinkActive="active"><a routerLink="/documents"><i class="bx bx-file"></i><span class="menu-title">Documents</span></a></li>
-                <li class="nav-item" routerLinkActive="active"><a routerLink="/dossiers"><i class="bx bx-folder"></i><span class="menu-title">Dossiers</span></a></li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/phases"><i class="bx bx-calendar"></i><span class="menu-title">Calendrier</span></a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/documents"><i class="bx bx-file"></i><span class="menu-title">Documents</span></a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/dossiers"><i class="bx bx-folder"></i><span class="menu-title">Dossiers</span></a>
+                </li>
 
-                <li class="nav-item has-sub">
-                    <a href="javascript:void(0)"><i class="bx bx-map"></i><span class="menu-title">Emplacement</span></a>
+                <!-- MENU EMPLACEMENT AVEC SOUS-MENUS -->
+                <li class="nav-item has-sub" routerLinkActive="open">
+                    <a href="javascript:void(0)">
+                        <i class="bx bx-map"></i>
+                        <span class="menu-title">Emplacement</span>
+                    </a>
                     <ul class="menu-content">
-                        <li routerLinkActive="active"><a routerLink="/batiments"><i class="bx bx-right-arrow-alt"></i><span class="menu-item">Bâtiments</span></a></li>
-                        <li routerLinkActive="active"><a routerLink="/salles"><i class="bx bx-right-arrow-alt"></i><span class="menu-item">Salles</span></a></li>
-                        <li routerLinkActive="active"><a routerLink="/armoires"><i class="bx bx-right-arrow-alt"></i><span class="menu-item">Armoires</span></a></li>
-                        <li routerLinkActive="active"><a routerLink="/etageres"><i class="bx bx-right-arrow-alt"></i><span class="menu-item">Étagères</span></a></li>
-                        <li routerLinkActive="active"><a routerLink="/boitiers"><i class="bx bx-right-arrow-alt"></i><span class="menu-item">Boîtiers</span></a></li>
+                        <li routerLinkActive="active">
+                            <a routerLink="/batiments">
+                                <i class="bx bx-right-arrow-alt"></i>
+                                <span class="menu-item">Bâtiments</span>
+                            </a>
+                        </li>
+                        <li routerLinkActive="active">
+                            <a routerLink="/salles">
+                                <i class="bx bx-right-arrow-alt"></i>
+                                <span class="menu-item">Salles</span>
+                            </a>
+                        </li>
+                        <li routerLinkActive="active">
+                            <a routerLink="/armoires">
+                                <i class="bx bx-right-arrow-alt"></i>
+                                <span class="menu-item">Armoires</span>
+                            </a>
+                        </li>
+                        <li routerLinkActive="active">
+                            <a routerLink="/etageres">
+                                <i class="bx bx-right-arrow-alt"></i>
+                                <span class="menu-item">Étagères</span>
+                            </a>
+                        </li>
+                        <li routerLinkActive="active">
+                            <a routerLink="/boitiers">
+                                <i class="bx bx-right-arrow-alt"></i>
+                                <span class="menu-item">Boîtiers</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
-                <!-- Utilisateurs déplacé ici, juste sous Emplacement -->
+                <!-- Gestion des Utilisateurs -->
                 <li class="nav-item" *ngIf="authService.hasRole('Administrateur')" routerLinkActive="active">
-                    <a routerLink="/admin/users"><i class="bx bx-user"></i><span class="menu-title">Utilisateurs</span></a>
+                    <a routerLink="/admin/users">
+                        <i class="bx bx-user"></i>
+                        <span class="menu-title">Utilisateurs</span>
+                    </a>
                 </li>
             </ng-container>
 
