@@ -1,83 +1,103 @@
-<div class="login-wrapper">
-  <div class="login-container">
-    <!-- Left panel: Welcome message -->
-    <div class="welcome-panel">
-      <div class="welcome-content">
-        <h1>Nice to see you again</h1>
-        <p>Enter your details and start your journey with us.</p>
-        <div class="decorative-dots"></div>
-      </div>
-    </div>
+<div class="app-content content">
+    <div class="content-wrapper">
+        <div class="content-body">
+            <section id="auth-login" class="flexbox-container">
+                <div class="col-xl-10 col-12">
+                    <div class="card bg-authentication mb-0">
+                        <div class="row m-0">
 
-    <!-- Right panel: Login form -->
-    <div class="form-panel">
-      <div class="form-container">
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Sign in to continue to ETAP.</p>
+                            <div class="col-md-6 col-12 px-0 bg-white">
+                                <div class="card-body p-3 h-100 d-flex flex-column justify-content-center">
+                                    <div class="card-title mb-2">
+                                        <h4 class="text-center font-weight-bold mb-0">Welcome Back</h4>
+                                        <p class="text-center text-muted font-small-3">Sign in to continue to ETAP.</p>
+                                    </div>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <!-- Username field -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Enter username</mat-label>
-            <input matInput formControlName="username" placeholder="Username">
-            <mat-icon matPrefix>person</mat-icon>
-            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
-              Username is required
-            </mat-error>
-          </mat-form-field>
+                                    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                                        <div class="form-group mb-1">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="bx bx-user"></i></span>
+                                                </div>
+                                                <input type="text" formControlName="username" class="form-control"
+                                                    placeholder="Enter username">
+                                            </div>
+                                        </div>
 
-          <!-- Password field -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Enter password</mat-label>
-            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
-            <mat-icon matPrefix>lock</mat-icon>
-            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-              Password is required
-            </mat-error>
-          </mat-form-field>
+                                        <div class="form-group mb-1">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="bx bx-lock"></i></span>
+                                                </div>
+                                                <input [type]="hidePassword ? 'password' : 'text'"
+                                                    formControlName="password" class="form-control"
+                                                    placeholder="Enter password">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text cursor-pointer"
+                                                        (click)="hidePassword = !hidePassword">
+                                                        <i class="bx"
+                                                            [ngClass]="hidePassword ? 'bx-show' : 'bx-hide'"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-          <!-- Remember me & Forgot password row -->
-          <div class="options-row">
-            <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
-            <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
-          </div>
+                                        <div class="form-group d-flex justify-content-between align-items-center mb-2">
+                                            <div class="checkbox checkbox-sm">
+                                                <input type="checkbox" formControlName="rememberMe" id="rememberMe">
+                                                <label for="rememberMe"><small>Remember me</small></label>
+                                            </div>
+                                            <a routerLink="/forgot-password" class="card-link"><small>Forgot
+                                                    password?</small></a>
+                                        </div>
 
-          <!-- Error message -->
-          <div class="error-message" *ngIf="errorMessage">
-            {{ errorMessage }}
-          </div>
+                                        <button type="submit" class="btn btn-primary glow w-100"
+                                            [disabled]="loginForm.invalid || loading">
+                                            <span *ngIf="!loading">Sign In</span>
+                                            <span *ngIf="loading" class="spinner-border spinner-border-sm"
+                                                role="status"></span>
+                                        </button>
+                                    </form>
 
-          <!-- Sign In button -->
-          <button mat-raised-button color="primary" type="submit" class="sign-in-btn"
-            [disabled]="loginForm.invalid || loading">
-            <span *ngIf="!loading">Sign In</span>
-            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
-          </button>
+                                    <div class="divider">
+                                        <div class="divider-text text-uppercase text-muted"><small>Sign In with</small>
+                                        </div>
+                                    </div>
 
-          <!-- Divider -->
-          <mat-divider class="divider"></mat-divider>
+                                    <div class="d-flex justify-content-center social-buttons">
+                                        <a href="javascript:void(0)" class="btn btn-icon btn-light-secondary mr-1"><i
+                                                class="bx bxl-github"></i></a>
+                                        <a href="javascript:void(0)" class="btn btn-icon btn-light-info"><i
+                                                class="bx bxl-twitter"></i></a>
+                                    </div>
 
-          <!-- Sign In with social button -->
-          <!-- <button mat-stroked-button type="button" class="social-btn" (click)="socialSignIn()">
-            <mat-icon>login</mat-icon>
-            Sign In with Google
-          </button> -->
-        </form>
+                                    <div class="text-center mt-2">
+                                        <small>Don't have an account yet? </small>
+                                        <a routerLink="/register"><small>Create an account</small></a>
+                                    </div>
+                                </div>
+                            </div>
 
-        <!-- Create account link -->
-        <div class="signup-prompt">
-          Don't have an account yet?
-          <a routerLink="/register">Create an account</a>
+                            <div
+                                class="col-md-6 d-md-flex d-none text-center align-items-center justify-content-center p-3 right-section">
+                                <div class="card-content w-100">
+                                    <h4 class="font-weight-bold">Nice to see you again</h4>
+                                    <p class="text-muted mb-2">Enter your details and start your journey with us.</p>
+
+                                    <div class="image-container mb-3">
+                                        <img class="img-fluid rounded shadow-sm" src="https://radioexpressfm.com/wp-content/uploads/2024/06/ETAP.jpg" alt="oil rig">
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <p class="text-muted font-small-2">© 2026 ETAP. Crafted with ❤️ by ETAP Team</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-      </div>
     </div>
-  </div>
-
-  <!-- Footer copyright -->
-  <div class="footer">
-    © 2026 ETAP. Crafted with ❤️ by ETAP Team
-  </div>
 </div>
