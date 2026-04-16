@@ -19,23 +19,27 @@ export class LayoutComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.renderer.addClass(document.body, 'vertical-layout');
     this.renderer.addClass(document.body, 'vertical-menu-modern');
+    this.renderer.addClass(document.body, 'semi-dark-layout');
     this.renderer.addClass(document.body, '2-columns');
     this.renderer.addClass(document.body, 'navbar-sticky');
     this.renderer.addClass(document.body, 'footer-static');
     this.renderer.setAttribute(document.body, 'data-open', 'click');
     this.renderer.setAttribute(document.body, 'data-menu', 'vertical-menu-modern');
     this.renderer.setAttribute(document.body, 'data-col', '2-columns');
+    this.renderer.setAttribute(document.body, 'data-layout', 'semi-dark-layout');
   }
 
   ngOnDestroy() {
     this.renderer.removeClass(document.body, 'vertical-layout');
     this.renderer.removeClass(document.body, 'vertical-menu-modern');
+    this.renderer.removeClass(document.body, 'semi-dark-layout');
     this.renderer.removeClass(document.body, '2-columns');
     this.renderer.removeClass(document.body, 'navbar-sticky');
     this.renderer.removeClass(document.body, 'footer-static');
     this.renderer.removeAttribute(document.body, 'data-open');
     this.renderer.removeAttribute(document.body, 'data-menu');
     this.renderer.removeAttribute(document.body, 'data-col');
+    this.renderer.removeAttribute(document.body, 'data-layout');
   }
 
   logout(): void {
