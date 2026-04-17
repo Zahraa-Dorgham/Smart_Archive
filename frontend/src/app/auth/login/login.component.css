@@ -11,6 +11,16 @@
     justify-content: center;
     min-height: 100vh;
 }
+/* Ensure the section with id="auth-login" is always centered */
+#auth-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    width: 100%;
+}
 
 .bg-authentication {
     background-color: transparent;
@@ -135,11 +145,6 @@
     }
 }
 
-
-/* 1. On augmente la hauteur minimale du container blanc */
-.bg-authentication {
-    min-height: 700px; /* Augmenté de 550px à 700px */
-}
 
 /* 2. On augmente la taille des textes pour suivre l'agrandissement */
 .card-title h4 {
