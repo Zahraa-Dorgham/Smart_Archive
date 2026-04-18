@@ -21,6 +21,7 @@ from django.conf import settings
 from archives.spa_views import serve_spa_file
 
 urlpatterns = [
+    path('api/calendrier/', include('calendrier.urls')),
     path('api/', include('archives.urls')),
     path('admin/', admin.site.urls),
     
