@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
 from .models import (
-    Role, Batiment, Salle, Armoire, Etagere, PhaseArchive,
+    Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive,
     ArchiveCourant, ArchiveIntermediaire, ArchiveDefinitive,
     Boitier, Dossier, Document, Transfert,
     Consultation, 
@@ -17,7 +17,7 @@ from .models import (
     Bordereau
 )
 from .serializers import (
-    RoleSerializer, BatimentSerializer, SalleSerializer, ArmoireSerializer,
+    RoleSerializer, DirectionSerializer, BatimentSerializer, SalleSerializer, ArmoireSerializer,
     EtagereSerializer, PhaseArchiveSerializer, TransfertSerializer,
     ArchiveCourantSerializer, ArchiveIntermediaireSerializer, ArchiveDefinitiveSerializer,
     BoitierSerializer, DossierSerializer, DocumentSerializer,
@@ -50,6 +50,18 @@ class RoleViewSet(viewsets.ModelViewSet):
     serializer_class = RoleSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['nom', 'description']
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [EstLectureAutorisee()]
+        return [EstArchiviste()]
+
+
+# ========== DIRECTIONS ==========
+class DirectionViewSet(viewsets.ModelViewSet):
+    queryset = Direction.objects.all()
+    serializer_class = DirectionSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['nom', 'code']
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]

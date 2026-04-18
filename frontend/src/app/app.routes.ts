@@ -43,6 +43,7 @@ export const routes: Routes = [
         canActivate: [() => roleGuard(['Archiviste', 'Administrateur'])()],
         children: [
           { path: 'batiments', loadComponent: () => import('./batiment/show-batiment/show-batiment').then(m => m.ShowBatimentComponent) },
+          { path: 'directions', loadComponent: () => import('./direction/show-direction/show-direction').then(m => m.ShowDirectionComponent) },
           { path: 'salles', loadComponent: () => import('./salles/show-salle/show-salle').then(m => m.ShowSalleComponent) },
           { path: 'armoires', loadComponent: () => import('./armoires/show-armoire/show-armoire').then(m => m.ShowArmoireComponent) },
           { path: 'etageres', loadComponent: () => import('./etageres/show-etagere/show-etagere').then(m => m.ShowEtagereComponent) },
@@ -82,6 +83,7 @@ export const routes: Routes = [
       { path: 'boitiers', redirectTo: '/archiviste/boitiers' },
       { path: 'dossiers', redirectTo: '/archiviste/dossiers' },
       { path: 'documents', redirectTo: '/archiviste/documents' }
+      ,{ path: 'directions', redirectTo: '/archiviste/directions' }
     ]
   },
   { path: '**', redirectTo: '/' }

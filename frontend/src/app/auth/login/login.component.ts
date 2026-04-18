@@ -59,7 +59,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.loading = false;
         localStorage.setItem('access_token', res.access);
         localStorage.setItem('refresh_token', res.refresh);
-        localStorage.setItem('user', JSON.stringify(res.user));
+            localStorage.setItem('user', JSON.stringify(res.user));
+            // Store login timestamp for display in the topnav
+            localStorage.setItem('login_date', new Date().toISOString());
 
         const roles = res.user?.roles || [];
         if (roles.includes('Administrateur')) {

@@ -1,0 +1,47 @@
+<div class="dashboard container">
+  <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Dashboard</h2>
+      <small class="text-muted">Welcome back, <strong>{{ userName }}</strong></small>
+    </div>
+    <div class="text-right">
+      <div class="small text-muted">Role: <strong>{{ (userRoles && userRoles.length) ? (userRoles.join(', ')) : '—' }}</strong></div>
+      <div class="small text-muted" *ngIf="loginDate">Last login: {{ loginDate | date:'short' }}</div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="stat-card card p-3 text-center">
+         <div class="stat-number h3">{{ stats.documents }}</div>
+         <div class="stat-label text-muted">Documents</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card card p-3 text-center">
+         <div class="stat-number h3">{{ stats.dossiers }}</div>
+         <div class="stat-label text-muted">Dossiers</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card card p-3 text-center">
+         <div class="stat-number h3">{{ stats.archives }}</div>
+         <div class="stat-label text-muted">Archives</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Recent activity</h5>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>When</th><th>Actor</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Today</td><td>System</td><td>Indexed 12 new documents</td></tr>
+          <tr><td>Yesterday</td><td>Admin</td><td>Created new user 'john'</td></tr>
+          <tr><td>2 days ago</td><td>Archivist</td><td>Archived dossier #42</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un bâtiment</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une direction</h2>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <mat-dialog-content>
@@ -11,27 +11,10 @@
 
             <mat-form-field appearance="outline">
                 <mat-label>Code *</mat-label>
-                <input matInput formControlName="code" placeholder="ex: B001">
+                <input matInput formControlName="code" placeholder="ex: D001">
                 <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
             </mat-form-field>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Adresse *</mat-label>
-                <input matInput formControlName="adresse">
-                <mat-error *ngIf="form.get('adresse')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-                <mat-label>Ville</mat-label>
-                <input matInput formControlName="ville">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
-
-            
         </div>
     </mat-dialog-content>
 

@@ -1,7 +1,7 @@
 # archives/serializers.py - Version avec uniquement les modèles existants
 from rest_framework import serializers
 from .models import (
-    ArchiveDefinitive, ArchiveIntermediaire,ArchiveCourant, Bordereau,  Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert,Consultation
+    ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, Consultation
     # Retirez Boitier, Dossier, Document, Service s'ils n'existent pas
 )
 
@@ -10,6 +10,13 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
+
+
+# Serializer pour Direction
+class DirectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Direction
+        fields = ['id', 'nom', 'code']
 
 # Serializer pour Batiment
 class BatimentSerializer(serializers.ModelSerializer):

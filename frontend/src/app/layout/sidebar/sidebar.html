@@ -85,6 +85,12 @@
                         <span class="menu-title">Utilisateurs</span>
                     </a>
                 </li>
+                <li class="nav-item" *ngIf="authService.hasRole('Administrateur')" routerLinkActive="active">
+                    <a routerLink="/archiviste/directions">
+                        <i class="bx bx-directions"></i>
+                        <span class="menu-title">Directions</span>
+                    </a>
+                </li>
             </ng-container>
 
         </ul>

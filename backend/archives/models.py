@@ -55,6 +55,19 @@ class Salle(models.Model):
     def __str__(self):
         return f"{self.code} - {self.nom}" if self.code else f"{self.nom} - {self.batiment.nom}"
 
+# ========== DIRECTION ==========
+class Direction(models.Model):
+    nom = models.CharField(max_length=200)
+    code = models.CharField(max_length=10, unique=True)
+
+    class Meta:
+        verbose_name = "Direction"
+        verbose_name_plural = "Directions"
+        ordering = ['nom']
+
+    def __str__(self):
+        return f"{self.code} - {self.nom}" if self.code else self.nom
+
 # ========== ARMOIRE ==========
 class Armoire(models.Model):
     code = models.CharField(max_length=50, unique=True)

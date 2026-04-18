@@ -7,16 +7,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
-import { BatimentService } from '../../core/services/batiment.service';
-import { Batiment } from '../../core/models/batiment.model';
+import { DirectionService } from '../../../app/core/services/direction.service';
+import { Direction, DirectionCreate } from '../../core/models/direction.model';
 
 export interface DialogData {
   mode: 'add' | 'edit';
-  batiment?: Batiment;
+  direction?: Direction;
 }
 
 @Component({
-  selector: 'app-add-edit-bat',
+  selector: 'app-add-edit-direction',
   standalone: true,
   imports: [
     CommonModule,
@@ -27,46 +27,41 @@ export interface DialogData {
     MatFormFieldModule,
     MatSnackBarModule
   ],
-  templateUrl: './add-edit-bat.html',
-  styleUrls: ['./add-edit-bat.css']
+  templateUrl: './add-edit-direction.html',
+  styleUrls: ['./add-edit-direction.css']
 })
-export class AddEditBatComponent implements OnInit {
+export class AddEditDirectionComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
-  
 
   constructor(
     private fb: FormBuilder,
-    private batimentService: BatimentService,
-    public dialogRef: MatDialogRef<AddEditBatComponent>, // juste public
+    private directionService: DirectionService,
+    public dialogRef: MatDialogRef<AddEditDirectionComponent>,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) { 
+  ) {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
       nom: ['', Validators.required],
-      code: ['', Validators.required],
-      adresse: ['', Validators.required],
-      description: [''],
-      ville: ['']
-     
+      code: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    if (this.isEditMode && this.data.batiment) {
-      this.form.patchValue(this.data.batiment);
+    if (this.isEditMode && this.data.direction) {
+      this.form.patchValue(this.data.direction);
     }
   }
 
   onSubmit(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.value;
-    if (this.isEditMode && this.data.batiment) {
-      this.batimentService.updateBatiment(this.data.batiment.id, formValue).subscribe({
+    const formValue = this.form.value as DirectionCreate;
+    if (this.isEditMode && this.data.direction) {
+      this.directionService.updateDirection(this.data.direction.id, formValue).subscribe({
         next: () => {
-          this.snackBar.open('Bâtiment modifié', 'Fermer', { duration: 3000 });
+          this.snackBar.open('Direction modifiée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
         error: () => {
@@ -74,9 +69,9 @@ export class AddEditBatComponent implements OnInit {
         }
       });
     } else {
-      this.batimentService.createBatiment(formValue).subscribe({
+      this.directionService.createDirection(formValue).subscribe({
         next: () => {
-          this.snackBar.open('Bâtiment créé', 'Fermer', { duration: 3000 });
+          this.snackBar.open('Direction créée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
         error: () => {
