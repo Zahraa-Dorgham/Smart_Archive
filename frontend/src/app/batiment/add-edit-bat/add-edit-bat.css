@@ -1,13 +1,62 @@
-/* batiment/add-edit-bat/add-edit-bat.css */
-.form-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    min-width: 500px;
+/* add-edit-bat.css */
+.modal-header {
+    border-bottom: 1px solid #dfe3e7;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
-.row {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 10px;
+.bg-light-primary {
+    background-color: #e2ecff !important;
+    color: #5a8dee !important;
+}
+
+.btn-close-custom {
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    color: #475f7b;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    color: #475f7b;
+    margin-bottom: 0.4rem;
+}
+
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #dfe3e7;
+    padding: 0.6rem 0.8rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    border-color: #5a8dee;
+    box-shadow: 0 3px 8px rgba(90, 141, 238, 0.15);
+}
+
+.has-icon-left .form-control {
+    padding-left: 35px;
+}
+
+.form-control-position {
+    position: absolute;
+    top: 38px; /* Adjusted for label */
+    left: 10px;
+    color: #828d99;
+    z-index: 2;
+}
+
+.btn-primary.glow {
+    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.4);
+}
+
+.btn-light-secondary {
+    background-color: #f2f4f4;
+    color: #475f7b;
+    border: none;
+}
+
+.btn-light-secondary:hover {
+    background-color: #e2e4e4;
 }

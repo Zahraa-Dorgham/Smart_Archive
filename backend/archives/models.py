@@ -45,6 +45,8 @@ class Salle(models.Model):
     batiment = models.ForeignKey(Batiment, on_delete=models.CASCADE, related_name='salles')
     etage = models.IntegerField(default=0)
     description = models.TextField(blank=True)
+    dimensions = models.CharField(max_length=100, blank=True, null=True)
+    volume = models.FloatField(default=0.0)
 
     class Meta:
         verbose_name = "Salle"

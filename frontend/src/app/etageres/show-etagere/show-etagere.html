@@ -1,87 +1,96 @@
-<div class="show-etagere-container">
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title>Gestion des Étagères</mat-card-title>
-            <mat-card-subtitle>Liste des étagères d'archivage</mat-card-subtitle>
-        </mat-card-header>
+<div class="content-header row">
+    <div class="content-header-left col-12 mb-2 mt-1">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h5 class="content-header-title float-left pr-1 mb-0">Niveaux de Rangement</h5>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb p-0 mb-0">
+                        <li class="breadcrumb-item"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item active">Étagères d'archivage</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <mat-card-content>
-            <div [formGroup]="filterForm" class="toolbar">
-                <mat-form-field appearance="outline" class="search-field">
-                    <mat-label>Rechercher</mat-label>
-                    <input matInput formControlName="search" placeholder="Numéro, code-barres...">
-                    <mat-icon matSuffix>search</mat-icon>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class="filter-field">
-                    <mat-label>Armoire</mat-label>
-                    <mat-select formControlName="armoire">
-                        <mat-option value="">Toutes</mat-option>
-                        <mat-option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-
-                <button mat-raised-button color="primary" (click)="openAddDialog()">
-                    <mat-icon>add</mat-icon>
-                    Nouvelle étagère
+<section class="users-list-wrapper">
+    <div class="users-list-filter px-1">
+        <form [formGroup]="filterForm" class="row border rounded py-2 mb-2 bg-white shadow-sm mx-0">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="font-weight-bold">Filtrer</label>
+                <fieldset class="form-group position-relative has-icon-left mb-0">
+                    <input type="text" class="form-control" formControlName="search" placeholder="Numéro ou code-barres...">
+                    <div class="form-control-position"><i class="bx bx-search"></i></div>
+                </fieldset>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="font-weight-bold">Armoire</label>
+                <fieldset class="form-group mb-0">
+                    <select class="form-control" formControlName="armoire">
+                        <option value="">Toutes les armoires</option>
+                        <option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</option>
+                    </select>
+                </fieldset>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-6 d-flex align-items-center justify-content-end mt-sm-0 mt-1">
+                <button type="button" class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
+                    <i class="bx bx-plus-circle mr-50"></i> Nouvelle Étagère
                 </button>
             </div>
+        </form>
+    </div>
 
-            <div class="table-container">
-                <table mat-table [dataSource]="dataSource" matSort>
-                    <ng-container matColumnDef="numero">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> N° </th>
-                        <td mat-cell *matCellDef="let e"> {{e.numero}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="armoire">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Armoire </th>
-                        <td mat-cell *matCellDef="let e"> {{getArmoireCode(e)}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="code_barres">
-                        <th mat-header-cell *matHeaderCellDef> Code-barres </th>
-                        <td mat-cell *matCellDef="let e"> {{e.code_barres}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="capacite">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Capacité </th>
-                        <td mat-cell *matCellDef="let e"> {{e.capacite_max_boites}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="occupation">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Occupée </th>
-                        <td mat-cell *matCellDef="let e"> {{e.occupation_actuelle}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="taux">
-                        <th mat-header-cell *matHeaderCellDef> Taux </th>
-                        <td mat-cell *matCellDef="let e">
-                            <div class="taux-container">
-                                <mat-progress-bar mode="determinate" [value]="getTauxOccupation(e)"></mat-progress-bar>
-                                <span class="taux-value">{{getTauxOccupation(e) | number:'1.0-0'}}%</span>
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef> Actions </th>
-                        <td mat-cell *matCellDef="let e">
-                            <button mat-icon-button color="primary" (click)="openEditDialog(e)" matTooltip="Modifier">
-                                <mat-icon>edit</mat-icon>
-                            </button>
-                            <button mat-icon-button color="warn" (click)="deleteEtagere(e)" matTooltip="Supprimer">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                </table>
-
-                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    <div class="users-list-table">
+        <div class="card shadow-sm border-0">
+            <div class="card-content">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="py-2">Indice Étagère</th>
+                                    <th class="py-2">Armoire Parente</th>
+                                    <th class="py-2">Identifiant (Code-barres)</th>
+                                    <th class="py-2 text-right px-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let e of dataSource.filteredData">
+                                    <td class="py-2">
+                                        <div class="badge badge-light-primary px-1">
+                                            <i class="bx bx-list-ol mr-25"></i> Niveau {{e.numero}}
+                                        </div>
+                                    </td>
+                                    <td class="py-2">
+                                        <div class="font-weight-bold text-primary">
+                                            <i class="bx bx-cabinet mr-25"></i> {{getArmoireCode(e)}}
+                                        </div>
+                                    </td>
+                                    <td class="py-2">
+                                        <small class="text-muted"><i class="bx bx-barcode-reader mr-25"></i> {{e.code_barres || 'Non défini'}}</small>
+                                    </td>
+                                    <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(e)" title="Modifier">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-icon btn-light-danger" (click)="deleteEtagere(e)" title="Supprimer">
+                                            <i class="bx bx-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="dataSource.filteredData.length === 0">
+                                    <td colspan="4" class="text-center py-4 text-muted">Aucune étagère à afficher.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-2 d-flex justify-content-between align-items-center border-top">
+                        <small class="text-muted">Total: {{dataSource.filteredData.length}}</small>
+                        <mat-paginator [pageSizeOptions]="[5, 10, 15]" class="custom-paginator"></mat-paginator>
+                    </div>
+                </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-</div>
+        </div>
+    </div>
+</section>

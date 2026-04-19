@@ -77,7 +77,16 @@ export class AuthService {
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         this.currentUserSubject.next(null);
-        this.router.navigate(['/login']);   // ← redirection vers login
+        this.router.navigate(['/login']);
+    }
+
+    refreshToken(): Observable<any> {
+        const refresh = localStorage.getItem('refresh_token');
+        return this.http.post<any>(`${this.apiUrl}/auth/refresh/`, { refresh }).pipe(
+            tap(response => {
+                localStorage.setItem('access_token', response.access);
+            })
+        );
     }
     getToken(): string | null {
         if (typeof window !== 'undefined') {

@@ -1,18 +1,48 @@
-.show-salle-container {
-    padding: 20px;
+/* show-salle.css */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
-.filters-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 15px;
-    margin-bottom: 20px;
+.table thead th {
+    background-color: #f8f9fb;
+    border-top: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #475f7b;
 }
 
-.table-container {
-    overflow: auto;
+.has-icon-left .form-control {
+    padding-left: 35px;
+    border-radius: 8px;
 }
 
-table {
-    width: 100%;
+.form-control-position {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #828d99;
+}
+
+.badge-light-primary {
+    background-color: #e2ecff;
+    color: #5a8dee;
+}
+
+.badge-light-secondary {
+    background-color: #f2f4f4;
+    color: #475f7b;
+}
+
+::ng-deep .custom-paginator {
+    background: transparent !important;
 }

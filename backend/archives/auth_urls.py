@@ -7,6 +7,7 @@ from .auth_views import CustomTokenObtainPairView
 urlpatterns = [
     path('register/', auth_views.RegisterView.as_view(), name='register'),
     path('login/', CustomTokenObtainPairView.as_view(), name='login'),
+    path('refresh/', auth_views.TokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('profile/', auth_views.UserProfileView.as_view(), name='profile'),
     path('change-password/', auth_views.ChangePasswordView.as_view(), name='change-password'),

@@ -1,51 +1,76 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une salle</h2>
+<div class="modal-header bg-light-primary py-1">
+    <h5 class="modal-title font-weight-bold">
+        <i class="bx" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modification salle' : 'Nouvelle salle d\'archivage' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-4"></i>
+    </button>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content>
-        <div class="form-grid">
-            <mat-form-field appearance="outline">
-                <mat-label>Nom *</mat-label>
-                <input matInput formControlName="nom">
-            </mat-form-field>
+    <mat-dialog-content class="pt-2">
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Nom de la Salle <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="nom" placeholder="ex: Salle Nord A">
+                    <div class="form-control-position"><i class="bx bx-layout"></i></div>
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Code *</mat-label>
-                <input matInput formControlName="code">
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Code Salle <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="code" placeholder="ex: SL-01">
+                    <div class="form-control-position"><i class="bx bx-hash"></i></div>
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Bâtiment *</mat-label>
-                <mat-select formControlName="batiment">
-                    <mat-option *ngFor="let b of data.batiments" [value]="b.id">{{ b.nom }}</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Bâtiment <span class="text-danger">*</span></label>
+                <fieldset class="form-group position-relative has-icon-left mb-0">
+                    <select class="form-control" formControlName="batiment">
+                        <option [value]="null" disabled selected>Choisir un bâtiment...</option>
+                        <option *ngFor="let b of data.batiments" [value]="b.id">{{ b.nom }}</option>
+                    </select>
+                    <div class="form-control-position"><i class="bx bx-buildings"></i></div>
+                </fieldset>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Type *</mat-label>
-                <mat-select formControlName="type_salle">
-                    <mat-option value="ARCHIVE">Salle d'archive</mat-option>
-                    <mat-option value="CONSULTATION">Salle de consultation</mat-option>
-                    <mat-option value="TRI">Salle de tri</mat-option>
-                    <mat-option value="NUMERISATION">Salle de numérisation</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Niveau (Étage) <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="number" class="form-control" formControlName="etage" placeholder="0">
+                    <div class="form-control-position"><i class="bx bx-layer"></i></div>
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Étage *</mat-label>
-                <input matInput type="number" formControlName="etage">
-            </mat-form-field>
+            <div class="col-md-12 mb-1">
+                <label class="form-label font-weight-bold">Usage de la Salle</label>
+                <fieldset class="form-group mb-0">
+                    <select class="form-control" formControlName="type_salle">
+                        <option value="ARCHIVE">Stockage d'Archives</option>
+                        <option value="CONSULTATION">Espace Consultation</option>
+                        <option value="TRI">Zone de Tri</option>
+                        <option value="NUMERISATION">Atelier Numérisation</option>
+                    </select>
+                </fieldset>
+            </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
+            <div class="col-12 mb-1">
+                <label class="form-label font-weight-bold">Observations</label>
+                <textarea class="form-control" formControlName="description" rows="3" placeholder="Particularités de la salle..."></textarea>
+            </div>
         </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+    <mat-dialog-actions class="px-2 pb-2 justify-content-end">
+        <button class="btn btn-light-secondary mr-1" type="button" mat-dialog-close>
+            <i class="bx bx-x mr-25"></i> Fermer
+        </button>
+        <button class="btn btn-primary glow shadow" type="submit" [disabled]="form.invalid">
+            <i class="bx bx-check-circle mr-25"></i> {{ isEditMode ? 'Mettre à jour' : 'Créer la salle' }}
         </button>
     </mat-dialog-actions>
 </form>

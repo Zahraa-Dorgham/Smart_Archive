@@ -47,9 +47,10 @@ import { LoadingService } from '../../core/services/loading.service';
 export class ShowBatimentComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  
 
   dataSource = new MatTableDataSource<Batiment>([]);
-  displayedColumns: string[] = ['nom', 'adresse', 'ville', 'nombre_salles', 'actions'];
+  displayedColumns: string[] = ['nom', 'code','adresse', 'ville', 'nombre_salles', 'actions'];
   filterForm: FormGroup;
 
   constructor(

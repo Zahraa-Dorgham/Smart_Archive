@@ -1,29 +1,51 @@
-.show-armoire-container {
-    padding: 20px;
+/* show-armoire.css */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
 }
 
-.toolbar {
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
-.search-field {
-    flex: 1;
-    min-width: 200px;
+.bg-light-info {
+    background-color: #d2f1ff !important;
+    color: #00cfdd !important;
 }
 
-.filter-field {
-    width: 200px;
+.table thead th {
+    background-color: #f8f9fb;
+    border-top: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #475f7b;
 }
 
-.table-container {
-    position: relative;
-    min-height: 200px;
-    overflow: auto;
+.has-icon-left .form-control {
+    padding-left: 35px;
+    border-radius: 8px;
 }
 
-table {
-    width: 100%;
+.form-control-position {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #828d99;
+}
+
+::ng-deep .custom-paginator {
+    background: transparent !important;
 }

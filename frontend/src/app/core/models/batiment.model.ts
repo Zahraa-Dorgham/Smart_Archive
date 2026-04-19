@@ -5,21 +5,21 @@ export interface Batiment extends BaseModel {
     nom: string;
     adresse: string;
     description?: string;
-    
+    code?: string;
     ville?: string;
     pays?: string;
-    
-    
-    nombre_salles?: number; 
+
+
+    nombre_salles?: number;
 }
 
 export interface BatimentCreate {
     nom: string;
     adresse: string;
     description?: string;
-    
+
     ville?: string;
-   
+
 }
 
 export interface BatimentUpdate extends Partial<BatimentCreate> {

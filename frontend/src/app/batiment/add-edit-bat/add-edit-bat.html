@@ -1,42 +1,64 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un bâtiment</h2>
+<div class="modal-header bg-light-primary py-1">
+    <h5 class="modal-title font-weight-bold">
+        <i class="bx" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modification bâtiment' : 'Nouveau bâtiment' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-4"></i>
+    </button>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content>
-        <div class="form-grid">
-            <mat-form-field appearance="outline">
-                <mat-label>Nom *</mat-label>
-                <input matInput formControlName="nom">
-                <mat-error *ngIf="form.get('nom')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
+    <mat-dialog-content class="pt-2">
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Nom du Bâtiment <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="nom" placeholder="ex: Siège Social">
+                    <div class="form-control-position"><i class="bx bx-building"></i></div>
+                </div>
+                <small class="text-danger" *ngIf="form.get('nom')?.touched && form.get('nom')?.hasError('required')">
+                    Le nom est obligatoire
+                </small>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Code *</mat-label>
-                <input matInput formControlName="code" placeholder="ex: B001">
-                <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Code / Réf <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="code" placeholder="ex: BAT-01">
+                    <div class="form-control-position"><i class="bx bx-hash"></i></div>
+                </div>
+                <small class="text-danger" *ngIf="form.get('code')?.touched && form.get('code')?.hasError('required')">
+                    Le code est obligatoire
+                </small>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Adresse *</mat-label>
-                <input matInput formControlName="adresse">
-                <mat-error *ngIf="form.get('adresse')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
+            <div class="col-12 mb-1">
+                <label class="form-label font-weight-bold">Adresse Complète <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="adresse" placeholder="ex: 12 Rue des Archives">
+                    <div class="form-control-position"><i class="bx bx-map"></i></div>
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Ville</mat-label>
-                <input matInput formControlName="ville">
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Ville</label>
+                <input type="text" class="form-control" formControlName="ville" placeholder="ex: Alger">
+            </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
+            <div class="col-12 mb-1">
+                <label class="form-label font-weight-bold">Description additionnelle</label>
+                <textarea class="form-control" formControlName="description" rows="3" placeholder="Informations complémentaires..."></textarea>
+            </div>
         </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-        <button mat-button type="button" mat-dialog-close>Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+    <mat-dialog-actions class="px-2 pb-2 justify-content-end">
+        <button class="btn btn-light-secondary mr-1" type="button" mat-dialog-close>
+            <i class="bx bx-x mr-25"></i> Annuler
+        </button>
+        <button class="btn btn-primary glow shadow" type="submit" [disabled]="form.invalid">
+            <i class="bx bx-check-circle mr-25"></i> {{ isEditMode ? 'Enregistrer les modifications' : 'Créer le bâtiment' }}
         </button>
     </mat-dialog-actions>
 </form>

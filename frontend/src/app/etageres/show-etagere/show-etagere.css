@@ -1,47 +1,47 @@
-.show-etagere-container {
-    padding: 20px;
-}
-
-.toolbar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+/* show-etagere.css */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
-.search-field {
-    flex: 1;
-    min-width: 250px;
+.table thead th {
+    background-color: #f8f9fb;
+    border-top: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #475f7b;
 }
 
-.filter-field {
-    width: 200px;
-}
-
-.table-container {
-    position: relative;
-    min-height: 200px;
-    overflow: auto;
+.has-icon-left .form-control {
+    padding-left: 35px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-table {
-    width: 100%;
+.form-control-position {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #828d99;
 }
 
-.taux-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.badge-light-primary {
+    background-color: #e2ecff;
+    color: #5a8dee;
 }
 
-.taux-value {
-    font-size: 12px;
-    min-width: 40px;
+::ng-deep .custom-paginator {
+    background: transparent !important;
 }
 
-.mat-mdc-row:hover {
-    background-color: #f5f5f5;
+::ng-deep .custom-paginator .mat-mdc-paginator-container {
+    padding: 0 !important;
 }

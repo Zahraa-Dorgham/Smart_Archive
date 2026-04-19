@@ -1,53 +1,53 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une armoire</h2>
+<div class="modal-header bg-light-primary py-1">
+    <h5 class="modal-title font-weight-bold">
+        <i class="bx" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modification armoire' : 'Nouvelle armoire d\'archivage' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-4"></i>
+    </button>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content>
-        <div class="form-grid">
-            <mat-form-field appearance="outline">
-                <mat-label>Code *</mat-label>
-                <input matInput formControlName="code" placeholder="ARM-001">
-                <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
+    <mat-dialog-content class="pt-2">
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Code Armoire <span class="text-danger">*</span></label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="code" placeholder="ex: ARM-001">
+                    <div class="form-control-position"><i class="bx bx-hash"></i></div>
+                </div>
+                <small class="text-danger" *ngIf="form.get('code')?.touched && form.get('code')?.hasError('required')">Requis</small>
+            </div>
 
-            <!-- <mat-form-field appearance="outline">
-                <mat-label>Type *</mat-label>
-                <mat-select formControlName="type_armoire">
-                    <mat-option value="METAL">Métallique</mat-option>
-                    <mat-option value="BOIS">Bois</mat-option>
-                    <mat-option value="COMPACT">Compact</mat-option>
-                    <mat-option value="MURAL">Mural</mat-option>
-                </mat-select>
-            </mat-form-field> -->
+            <div class="col-md-6 mb-1">
+                <label class="form-label font-weight-bold">Salle <span class="text-danger">*</span></label>
+                <fieldset class="form-group position-relative has-icon-left mb-0">
+                    <select class="form-control" formControlName="salle">
+                        <option [value]="null" disabled selected>Choisir une salle...</option>
+                        <option *ngFor="let s of salles" [value]="s.id">{{ s.nom }}</option>
+                    </select>
+                    <div class="form-control-position"><i class="bx bx-layout"></i></div>
+                </fieldset>
+                <small class="text-danger" *ngIf="form.get('salle')?.touched && form.get('salle')?.hasError('required')">Requis</small>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Salle *</mat-label>
-                <mat-select formControlName="salle">
-                    <mat-option *ngFor="let s of salles" [value]="s.id">{{ s.nom }}</mat-option>
-                </mat-select>
-                <mat-error *ngIf="form.get('salle')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-                <mat-label>Code-barres</mat-label>
-                <input matInput formControlName="code_barres">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-                <mat-label>Date d'installation</mat-label>
-                <input matInput type="date" formControlName="date_installation">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
+            <div class="col-md-12 mb-1">
+                <label class="form-label font-weight-bold">Code-barres / Identifiant Scannable</label>
+                <div class="position-relative has-icon-left">
+                    <input type="text" class="form-control" formControlName="code_barres" placeholder="Scanner ou saisir...">
+                    <div class="form-control-position"><i class="bx bx-barcode"></i></div>
+                </div>
+            </div>
         </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-        <button mat-button type="button" mat-dialog-close>Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+    <mat-dialog-actions class="px-2 pb-2 justify-content-end">
+        <button class="btn btn-light-secondary mr-1" type="button" mat-dialog-close>
+            <i class="bx bx-x mr-25"></i> Annuler
+        </button>
+        <button class="btn btn-primary glow shadow" type="submit" [disabled]="form.invalid">
+            <i class="bx bx-check-circle mr-25"></i> {{ isEditMode ? 'Enregistrer' : 'Créer l\'armoire' }}
         </button>
     </mat-dialog-actions>
 </form>
