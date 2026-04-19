@@ -23,7 +23,13 @@
 .has-icon-left .form-control {
     padding-left: 35px;
     border-radius: 8px;
-}
+    left: -4px;}
+
+
+.has-icon-left .form-control-position i {
+    position: relative;
+    left: -6px !important;
+    top: 2px !important;}
 
 .form-control-position {
     position: absolute;
