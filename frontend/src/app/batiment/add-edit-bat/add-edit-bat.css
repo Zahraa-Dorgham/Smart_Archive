@@ -1,62 +1,91 @@
-/* add-edit-bat.css */
-.modal-header {
-    border-bottom: 1px solid #dfe3e7;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+/* Unified Frest Dialog Style */
+:host {
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.bg-light-primary {
-    background-color: #e2ecff !important;
-    color: #5a8dee !important;
+.modal-header {
+    background-color: #f2f4f4; /* Standard Light Frest Header */
+    border-bottom: 1px solid #dfe3e7;
+    padding: 1rem 1.5rem !important;
+}
+
+.modal-title {
+    color: #475f7b !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
 }
 
 .btn-close-custom {
-    position: absolute;
-    right: 10px;
-    top: 8px;
-    color: #475f7b;
+    color: #475f7b !important;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #828d99;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #dfe3e7;
 }
 
 .form-label {
-    font-size: 0.85rem;
+    font-weight: 600;
     color: #475f7b;
-    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
 .form-control {
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid #dfe3e7;
     padding: 0.6rem 0.8rem;
-    transition: all 0.2s;
+    height: auto;
 }
 
 .form-control:focus {
     border-color: #5a8dee;
-    box-shadow: 0 3px 8px rgba(90, 141, 238, 0.15);
+    box-shadow: 0 3px 6px rgba(90, 141, 238, 0.1);
 }
 
-.has-icon-left .form-control {
-    padding-left: 35px;
+/* Perfect Icon Alignment */
+.icon-input-wrapper {
+    position: relative;
+    width: 100%;
 }
 
-.form-control-position {
+.icon-input-wrapper i {
     position: absolute;
-    top: 38px; /* Adjusted for label */
-    left: 10px;
+    top: 50% !important;
+    left: 12px !important;
+    transform: translateY(-50%) !important;
     color: #828d99;
+    font-size: 1.1rem;
     z-index: 2;
+    pointer-events: none;
+}
+
+.icon-input-wrapper .form-control {
+    padding-left: 38px !important;
+}
+
+.dialog-actions {
+    padding: 1rem 1.5rem !important;
+    border-top: 1px solid #dfe3e7;
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 .btn-primary.glow {
     box-shadow: 0 4px 12px rgba(90, 141, 238, 0.4);
-}
-
-.btn-light-secondary {
-    background-color: #f2f4f4;
-    color: #475f7b;
-    border: none;
-}
-
-.btn-light-secondary:hover {
-    background-color: #e2e4e4;
 }

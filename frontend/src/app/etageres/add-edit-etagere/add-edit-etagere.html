@@ -1,53 +1,53 @@
-<div class="modal-header bg-light-primary py-1">
-    <h5 class="modal-title font-weight-bold">
-        <i class="bx" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
-        {{ isEditMode ? 'Modification étagère' : 'Nouveau niveau d\'étagère' }}
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx text-primary" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier l\'Étagère' : 'Nouveau Niveau' }}
     </h5>
     <button mat-icon-button mat-dialog-close class="btn-close-custom">
-        <i class="bx bx-x font-medium-4"></i>
+        <i class="bx bx-x font-medium-3"></i>
     </button>
 </div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content class="pt-2">
+    <mat-dialog-content class="px-3 pb-2 pt-1">
+        <div class="section-title">Support</div>
         <div class="row">
             <div class="col-md-12 mb-1">
-                <label class="form-label font-weight-bold">Armoire de destination <span class="text-danger">*</span></label>
-                <fieldset class="form-group position-relative has-icon-left mb-0">
+                <label class="form-label">Armoire <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-cabinet"></i>
                     <select class="form-control" formControlName="armoire">
-                        <option [value]="null" disabled selected>Sélectionner l'armoire...</option>
+                        <option [value]="null" disabled selected>Assigner à une armoire...</option>
                         <option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</option>
                     </select>
-                    <div class="form-control-position"><i class="bx bx-cabinet"></i></div>
-                </fieldset>
-                <small class="text-danger" *ngIf="form.get('armoire')?.touched && form.get('armoire')?.hasError('required')">L'armoire est requise</small>
-            </div>
-
-            <div class="col-md-6 mb-1">
-                <label class="form-label font-weight-bold">Numéro de Niveau <span class="text-danger">*</span></label>
-                <div class="position-relative has-icon-left">
-                    <input type="number" class="form-control" formControlName="numero" placeholder="ex: 1">
-                    <div class="form-control-position"><i class="bx bx-list-ol"></i></div>
                 </div>
-                <small class="text-danger" *ngIf="form.get('numero')?.touched && form.get('numero')?.hasError('required')">Requis</small>
+            </div>
+        </div>
+
+        <div class="section-title">Spécifications</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Position (Niveau) <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-list-ol"></i>
+                    <input type="number" class="form-control" formControlName="numero" placeholder="ex: 1">
+                </div>
             </div>
 
             <div class="col-md-6 mb-1">
-                <label class="form-label font-weight-bold">Code-barres Scannable</label>
-                <div class="position-relative has-icon-left">
-                    <input type="text" class="form-control" formControlName="code_barres" placeholder="Scanner...">
-                    <div class="form-control-position"><i class="bx bx-barcode"></i></div>
+                <label class="form-label">Code-barres</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-barcode"></i>
+                    <input type="text" class="form-control" formControlName="code_barres" placeholder="Scanner tag...">
                 </div>
             </div>
         </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions class="px-2 pb-2 justify-content-end">
-        <button class="btn btn-light-secondary mr-1" type="button" mat-dialog-close>
-            <i class="bx bx-x mr-25"></i> Annuler
+    <div class="dialog-actions">
+        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
-        <button class="btn btn-primary glow shadow" type="submit" [disabled]="form.invalid">
-            <i class="bx bx-check-circle mr-25"></i> {{ isEditMode ? 'Enregistrer' : 'Créer l\'étagère' }}
-        </button>
-    </mat-dialog-actions>
+    </div>
 </form>

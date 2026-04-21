@@ -44,10 +44,10 @@ export class AddEditBatComponent implements OnInit {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
       nom: ['', Validators.required],
+      code: ['', Validators.required],
       adresse: ['', Validators.required],
       description: [''],
       ville: ['']
-     
     });
   }
 
