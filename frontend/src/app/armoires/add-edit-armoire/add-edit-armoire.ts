@@ -60,9 +60,13 @@ export class AddEditArmoireComponent implements OnInit {
   ngOnInit(): void {
     this.loadSalles();
     if (this.isEditMode && this.data.armoire) {
-      this.form.patchValue({
-        ...this.data.armoire,
-        salle: typeof this.data.armoire.salle === 'object' ? this.data.armoire.salle.id : this.data.armoire.salle
+      setTimeout(() => {
+        if (this.data.armoire) {
+          this.form.patchValue({
+            ...this.data.armoire,
+            salle: typeof this.data.armoire.salle === 'object' ? this.data.armoire.salle?.id : this.data.armoire.salle
+          });
+        }
       });
     }
   }

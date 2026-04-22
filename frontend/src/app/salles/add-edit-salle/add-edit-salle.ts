@@ -57,7 +57,14 @@ export class AddEditSalleComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isEditMode && this.data.salle) {
-      this.form.patchValue(this.data.salle);
+      setTimeout(() => {
+        if (this.data.salle) {
+          this.form.patchValue({
+            ...this.data.salle,
+            batiment: typeof this.data.salle.batiment === 'object' ? this.data.salle.batiment?.id : this.data.salle.batiment
+          });
+        }
+      });
     }
   }
 

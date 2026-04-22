@@ -53,7 +53,11 @@ export class AddEditBatComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isEditMode && this.data.batiment) {
-      this.form.patchValue(this.data.batiment);
+      setTimeout(() => {
+        if (this.data.batiment) {
+          this.form.patchValue(this.data.batiment);
+        }
+      });
     }
   }
 

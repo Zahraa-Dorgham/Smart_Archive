@@ -60,9 +60,13 @@ export class AddEditEtagereComponent implements OnInit {
   ngOnInit(): void {
     this.loadArmoires();
     if (this.isEditMode && this.data.etagere) {
-      this.form.patchValue({
-        ...this.data.etagere,
-        armoire: typeof this.data.etagere.armoire === 'object' ? this.data.etagere.armoire.id : this.data.etagere.armoire
+      setTimeout(() => {
+        if (this.data.etagere) {
+          this.form.patchValue({
+            ...this.data.etagere,
+            armoire: typeof this.data.etagere.armoire === 'object' ? this.data.etagere.armoire?.id : this.data.etagere.armoire
+          });
+        }
       });
     }
   }
