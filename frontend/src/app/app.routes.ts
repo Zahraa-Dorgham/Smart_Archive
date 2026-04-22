@@ -43,11 +43,14 @@ export const routes: Routes = [
         canActivate: [() => roleGuard(['Archiviste', 'Administrateur'])()],
         children: [
           { path: 'batiments', loadComponent: () => import('./batiment/show-batiment/show-batiment').then(m => m.ShowBatimentComponent) },
+          // Calendrier module (new)
+          { path: 'calendrier', loadComponent: () => import('./calendrier/show-calendrier/show-calendrier').then(m => m.ShowCalendrierComponent) },
+          // Legacy 'phases' route also points to the Calendrier component
+          { path: 'phases', loadComponent: () => import('./calendrier/show-calendrier/show-calendrier').then(m => m.ShowCalendrierComponent) },
           { path: 'directions', loadComponent: () => import('./direction/show-direction/show-direction').then(m => m.ShowDirectionComponent) },
           { path: 'salles', loadComponent: () => import('./salles/show-salle/show-salle').then(m => m.ShowSalleComponent) },
           { path: 'armoires', loadComponent: () => import('./armoires/show-armoire/show-armoire').then(m => m.ShowArmoireComponent) },
           { path: 'etageres', loadComponent: () => import('./etageres/show-etagere/show-etagere').then(m => m.ShowEtagereComponent) },
-          { path: 'phases', loadComponent: () => import('./phases/show-phase/show-phase').then(m => m.ShowPhaseComponent) },
           { path: 'boitiers', loadComponent: () => import('./boitiers/show-boitier/show-boitier').then(m => m.ShowBoitierComponent) },
           { path: 'dossiers', loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent) },
           { path: 'documents', loadComponent: () => import('./documents/show-doc/show-doc').then(m => m.ShowDocumentComponent) },
@@ -80,6 +83,7 @@ export const routes: Routes = [
       { path: 'armoires', redirectTo: '/archiviste/armoires' },
       { path: 'etageres', redirectTo: '/archiviste/etageres' },
       { path: 'phases', redirectTo: '/archiviste/phases' },
+      { path: 'calendrier', redirectTo: '/archiviste/calendrier' },
       { path: 'boitiers', redirectTo: '/archiviste/boitiers' },
       { path: 'dossiers', redirectTo: '/archiviste/dossiers' },
       { path: 'documents', redirectTo: '/archiviste/documents' }

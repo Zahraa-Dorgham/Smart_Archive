@@ -7,10 +7,10 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "frontend": {
+        "frontend": {
       "projectType": "application",
       "schematics": {},
-      "root": "",
+          "root": ".",
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {

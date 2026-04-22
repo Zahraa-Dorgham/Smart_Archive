@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un calendrier</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Code *</mat-label>
+        <input matInput formControlName="code">
+        <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Intitule *</mat-label>
+        <input matInput formControlName="title">
+        <mat-error *ngIf="form.get('title')?.hasError('required')">Requis</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Direction</mat-label>
+        <mat-select formControlName="direction">
+          <mat-option [value]="null">Aucune</mat-option>
+          <mat-option *ngFor="let d of directions" [value]="d.id">{{ d.nom }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Type d'exemplaire</mat-label>
+        <input matInput formControlName="exemplaire_type">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Delai actif (ans)</mat-label>
+        <input matInput type="number" formControlName="conservation_active_period">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Delai semi-actif (ans)</mat-label>
+        <input matInput type="number" formControlName="conservation_semi_active_period">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Sort final</mat-label>
+        <input matInput formControlName="sort_final_type">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Commentaire du sort final</mat-label>
+        <input matInput formControlName="sort_final_comment">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Delai de securite (ans)</mat-label>
+        <input matInput type="number" formControlName="sort_final_security_years">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Remarques</mat-label>
+        <textarea matInput formControlName="remarques" rows="3"></textarea>
+      </mat-form-field>
+
+      <div class="checkbox-row full-width">
+        <mat-checkbox formControlName="is_dossier">Dossier</mat-checkbox>
+        <mat-checkbox formControlName="validation_archive">Validation archive</mat-checkbox>
+        <mat-checkbox formControlName="is_active">Actif</mat-checkbox>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Annuler</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      {{ isEditMode ? 'Modifier' : 'Creer' }}
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,186 @@
+<div class="show-calendrier-container">
+  <div class="toolbar">
+    <h2>Calendriers</h2>
+    <form [formGroup]="filterForm" class="search-field">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Recherche</mat-label>
+        <input matInput formControlName="search" placeholder="Chercher..." />
+      </mat-form-field>
+    </form>
+
+    <button mat-icon-button color="primary" aria-label="Refresh" (click)="loadCalendriers()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <button mat-raised-button color="primary" (click)="openAddDialog()">Ajouter</button>
+  </div>
+
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row"><mat-checkbox></mat-checkbox></td>
+      </ng-container>
+
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
+        <td mat-cell *matCellDef="let row">{{ row.code }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Intitulé</th>
+        <td mat-cell *matCellDef="let row">{{ row.title }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="unit_responsable">
+        <th mat-header-cell *matHeaderCellDef>Unité responsable</th>
+        <td mat-cell *matCellDef="let row">{{ row.unit_responsable }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="direction">
+        <th mat-header-cell *matHeaderCellDef>Direction</th>
+        <td mat-cell *matCellDef="let row">{{ row.direction_detail?.nom || row.direction }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="exemplaire_type">
+        <th mat-header-cell *matHeaderCellDef>Type d'exemplaire</th>
+        <td mat-cell *matCellDef="let row">{{ row.exemplaire_type }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="conservation_active_period">
+        <th mat-header-cell *matHeaderCellDef>Actif (ans)</th>
+        <td mat-cell *matCellDef="let row">{{ row.conservation_active_period }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="conservation_semi_active_period">
+        <th mat-header-cell *matHeaderCellDef>Semi-actif (ans)</th>
+        <td mat-cell *matCellDef="let row">{{ row.conservation_semi_active_period }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sort_final_type">
+        <th mat-header-cell *matHeaderCellDef>Sort final</th>
+        <td mat-cell *matCellDef="let row">{{ row.sort_final_type }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="remarques">
+        <th mat-header-cell *matHeaderCellDef>Remarques</th>
+        <td mat-cell *matCellDef="let row">{{ row.remarques }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-icon-button color="primary" (click)="openEditDialog(row)" matTooltip="Modifier"><mat-icon>edit</mat-icon></button>
+          <button mat-icon-button color="warn" (click)="deleteCalendrier(row)" matTooltip="Supprimer"><mat-icon>delete</mat-icon></button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5,10,25]" showFirstLastButtons></mat-paginator>
+  </div>
+</div>
+<div class="show-calendrier-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Gestion du calendrier</mat-card-title>
+      <mat-card-subtitle>Liste des regles et dossiers</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div [formGroup]="filterForm" class="toolbar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher</mat-label>
+          <input matInput formControlName="search" placeholder="Code, intitule, direction...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="toolbar-actions">
+          <button mat-raised-button color="primary" (click)="openAddDialog()">
+            <mat-icon>add</mat-icon>
+            Nouveau calendrier
+          </button>
+          <button mat-stroked-button color="primary" (click)="loadCalendriers()">
+            <mat-icon>refresh</mat-icon>
+            Rafraichir
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort>
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let c">
+              <mat-checkbox></mat-checkbox>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>No regle</th>
+            <td mat-cell *matCellDef="let c">{{ c.code }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Intitule</th>
+            <td mat-cell *matCellDef="let c">{{ c.title }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="unit_responsable">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Unite responsable</th>
+            <td mat-cell *matCellDef="let c">{{ c.unit_responsable }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="direction">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Direction</th>
+            <td mat-cell *matCellDef="let c">{{ c.direction_detail?.nom || c.direction }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="exemplaire_type">
+            <th mat-header-cell *matHeaderCellDef>Exemplaire</th>
+            <td mat-cell *matCellDef="let c">{{ c.exemplaire_type }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="conservation_active_period">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Delai actif (ans)</th>
+            <td mat-cell *matCellDef="let c">{{ c.conservation_active_period }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="conservation_semi_active_period">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Delai semi-actif (ans)</th>
+            <td mat-cell *matCellDef="let c">{{ c.conservation_semi_active_period }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="sort_final_type">
+            <th mat-header-cell *matHeaderCellDef>Sort final</th>
+            <td mat-cell *matCellDef="let c">{{ c.sort_final_type }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="remarques">
+            <th mat-header-cell *matHeaderCellDef>Remarques</th>
+            <td mat-cell *matCellDef="let c">{{ c.remarques }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let c">
+              <button mat-icon-button color="primary" (click)="openEditDialog(c)" matTooltip="Modifier">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteCalendrier(c)" matTooltip="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
