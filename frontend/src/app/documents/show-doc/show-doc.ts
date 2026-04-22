@@ -53,7 +53,7 @@ export class ShowDocumentComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   dataSource = new MatTableDataSource<Document>([]);
-  displayedColumns: string[] = ['idDoc', 'reference', 'titre', 'dossier', 'phase', 'date', 'confidentialite', 'actions'];
+  displayedColumns: string[] = ['idDoc', 'reference', 'titre', 'dossier', 'calendrier', 'phase', 'date', 'confidentialite', 'actions'];
   filterForm: FormGroup;
 
   constructor(
@@ -124,7 +124,9 @@ export class ShowDocumentComponent implements OnInit {
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(AddEditDocumentComponent, {
-      width: '600px',
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: { mode: 'add' }
     });
     dialogRef.afterClosed().subscribe(result => {
@@ -134,7 +136,9 @@ export class ShowDocumentComponent implements OnInit {
 
   openEditDialog(document: Document): void {
     const dialogRef = this.dialog.open(AddEditDocumentComponent, {
-      width: '600px',
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: { mode: 'edit', document }
     });
     dialogRef.afterClosed().subscribe(result => {

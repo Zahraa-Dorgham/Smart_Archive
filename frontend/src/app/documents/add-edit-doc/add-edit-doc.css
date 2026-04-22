@@ -1,0 +1,40 @@
+.form-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 12px;
+	width: 100%;
+	box-sizing: border-box;
+}
+.full-width {
+	grid-column: 1 / -1;
+	min-width: 0;
+}
+.file-upload {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+mat-dialog-content {
+	max-height: calc(90vh - 160px);
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding-right: 8px;
+}
+
+mat-form-field {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+mat-dialog-actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+@media (max-width: 600px) {
+	.form-grid { gap: 8px; }
+	mat-dialog-content { max-height: calc(100vh - 120px); }
+}

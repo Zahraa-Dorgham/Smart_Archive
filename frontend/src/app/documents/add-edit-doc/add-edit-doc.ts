@@ -13,6 +13,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { DocumentService } from '../../core/services/document.service';
 import { DossierService } from '../../core/services/dossier.service';
 import { PhaseArchiveService } from '../../core/services/phase-archive.service';
+import { CalendrierService } from '../../core/services/calendrier.service';
 import { Document } from '../../core/models/document.model';
 
 export interface DialogData {
@@ -43,6 +44,7 @@ export class AddEditDocumentComponent implements OnInit {
   isEditMode: boolean;
   dossiers: any[] = [];
   phases: any[] = [];
+  calendriers: any[] = [];
   selectedFile: File | null = null;
 
   constructor(
@@ -50,6 +52,7 @@ export class AddEditDocumentComponent implements OnInit {
     private documentService: DocumentService,
     private dossierService: DossierService,
     private phaseService: PhaseArchiveService,
+    private calendrierService: CalendrierService,
     private dialogRef: MatDialogRef<AddEditDocumentComponent>,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
@@ -60,6 +63,7 @@ export class AddEditDocumentComponent implements OnInit {
       reference: ['', Validators.required],
       titre: ['', Validators.required],
       dossier: ['', Validators.required],
+      calendrier: [null],
       phase_archive: ['', Validators.required],
       date_creation: ['', Validators.required],
       niv_confidentialite: ['INTERNE', Validators.required],
@@ -72,11 +76,13 @@ export class AddEditDocumentComponent implements OnInit {
   ngOnInit(): void {
     this.loadDossiers();
     this.loadPhases();
+    this.loadCalendriers();
     if (this.isEditMode && this.data.document) {
       const doc = this.data.document;
       this.form.patchValue({
         ...doc,
         dossier: typeof doc.dossier === 'object' ? doc.dossier.id : doc.dossier,
+        calendrier: typeof doc.calendrier === 'object' ? doc.calendrier.id : doc.calendrier,
         phase_archive: typeof doc.phase_archive === 'object' ? doc.phase_archive.id : doc.phase_archive
       });
     }
@@ -88,6 +94,10 @@ export class AddEditDocumentComponent implements OnInit {
 
   loadPhases(): void {
     this.phaseService.getPhases().subscribe(res => this.phases = res.results);
+  }
+
+  loadCalendriers(): void {
+    this.calendrierService.getCalendriers().subscribe(res => this.calendriers = res.results);
   }
 
   onFileSelected(event: any): void {

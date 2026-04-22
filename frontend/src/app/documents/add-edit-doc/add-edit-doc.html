@@ -30,6 +30,14 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
+                <mat-label>Calendrier</mat-label>
+                <mat-select formControlName="calendrier">
+                    <mat-option [value]="null">Aucun</mat-option>
+                    <mat-option *ngFor="let c of calendriers" [value]="c.id">{{ c.code }} - {{ c.title }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
                 <mat-label>Phase *</mat-label>
                 <mat-select formControlName="phase_archive">
                     <mat-option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</mat-option>

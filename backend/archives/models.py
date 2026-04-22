@@ -244,6 +244,8 @@ class Document(models.Model):
     reference = models.CharField(max_length=100, unique=True)
     titre = models.CharField(max_length=500)
     dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='documents')
+    # Foreign key to Calendrier (choice from calendrier app)
+    calendrier = models.ForeignKey('calendrier.Calendrier', on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
     phase_archive = models.ForeignKey(PhaseArchive, on_delete=models.PROTECT, related_name='documents')
     date_creation = models.DateField()
     niv_confidentialite = models.CharField(max_length=20, choices=NIV_CONFIDENTIALITE, default='INTERNE')
@@ -262,7 +264,7 @@ class Document(models.Model):
     class Meta:
         verbose_name = "Document"
         ordering = ['-date_creation', 'reference']
-        indexes = [models.Index(fields=['idDoc']), models.Index(fields=['reference']), models.Index(fields=['phase_archive'])]
+        indexes = [models.Index(fields=['idDoc']), models.Index(fields=['reference']), models.Index(fields=['phase_archive']), models.Index(fields=['calendrier'])]
 
     def __str__(self):
         return f"{self.reference} - {self.titre}"

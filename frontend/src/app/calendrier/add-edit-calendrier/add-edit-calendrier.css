@@ -5,6 +5,14 @@
   width: 100%;
   box-sizing: border-box;
 }
+.section-title {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(0,0,0,0.87);
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
 .full-width {
   grid-column: 1 / -1;
   min-width: 0;

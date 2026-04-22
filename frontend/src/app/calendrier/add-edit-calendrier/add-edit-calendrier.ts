@@ -54,6 +54,7 @@ export class AddEditCalendrierComponent implements OnInit {
       code: ['', Validators.required],
       title: ['', Validators.required],
       description: [''],
+      unit_responsable: [''],
       parent: [null],
       is_dossier: [false],
       direction: [null],

@@ -117,12 +117,15 @@ class DocumentSerializer(serializers.ModelSerializer):
     dossier_reference = serializers.CharField(source='dossier.reference', read_only=True)
     phase_archive_nom = serializers.CharField(source='phase_archive.nom', read_only=True)
     taille_fichier_lisible = serializers.SerializerMethodField()
+    calendrier_code = serializers.CharField(source='calendrier.code', read_only=True)
+    calendrier_title = serializers.CharField(source='calendrier.title', read_only=True)
 
     class Meta:
         model = Document
         fields = [
             'id', 'idDoc', 'reference', 'titre', 'dossier', 'dossier_reference',
             'phase_archive', 'phase_archive_nom', 'date_creation',
+            'calendrier', 'calendrier_code', 'calendrier_title',
             'niv_confidentialite', 'version', 'type_document', 'auteur',
             'description', 'fichier', 'taille_fichier', 'taille_fichier_lisible',
             'hash_fichier', 'date_entree', 'date_modification'

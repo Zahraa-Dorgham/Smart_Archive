@@ -32,6 +32,7 @@ export class DocumentService {
         formData.append('date_creation', data.date_creation.toISOString().split('T')[0]); // format YYYY-MM-DD
         formData.append('niv_confidentialite', data.niv_confidentialite);
         formData.append('type_document', data.type_document);
+        if (data.calendrier) formData.append('calendrier', data.calendrier);
         if (data.auteur) formData.append('auteur', data.auteur);
         if (data.description) formData.append('description', data.description);
         if (fichier) formData.append('fichier', fichier);

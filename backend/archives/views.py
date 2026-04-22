@@ -220,10 +220,10 @@ class DossierViewSet(viewsets.ModelViewSet):
 
 # ========== DOCUMENTS ==========
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all().select_related('dossier', 'phase_archive')
+    queryset = Document.objects.all().select_related('dossier', 'phase_archive', 'calendrier')
     serializer_class = DocumentSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['phase_archive', 'dossier', 'type_document', 'niv_confidentialite']
+    filterset_fields = ['phase_archive', 'dossier', 'type_document', 'niv_confidentialite', 'calendrier']
     search_fields = ['idDoc', 'reference', 'titre', 'auteur']
     ordering_fields = ['date_creation', 'version']
 
