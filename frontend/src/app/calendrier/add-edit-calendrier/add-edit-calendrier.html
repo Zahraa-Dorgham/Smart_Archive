@@ -29,6 +29,14 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
+        <mat-label>Parent</mat-label>
+        <mat-select formControlName="parent">
+          <mat-option [value]="null">Aucun</mat-option>
+          <mat-option *ngFor="let p of parents" [value]="p.id">{{ p.code }} - {{ p.title }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
         <mat-label>Type d'exemplaire</mat-label>
         <input matInput formControlName="exemplaire_type">
       </mat-form-field>

@@ -39,6 +39,7 @@ export class AddEditCalendrierComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
   directions: any[] = [];
+  parents: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -53,6 +54,7 @@ export class AddEditCalendrierComponent implements OnInit {
       code: ['', Validators.required],
       title: ['', Validators.required],
       description: [''],
+      parent: [null],
       is_dossier: [false],
       direction: [null],
       exemplaire_type: [''],
@@ -73,10 +75,25 @@ export class AddEditCalendrierComponent implements OnInit {
       error: () => { this.directions = []; }
     });
 
+    // Load possible parent calendriers
+    this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe({
+      next: (res: any) => {
+        const list = res.results || [];
+        // if editing, exclude the current calendrier from parent list
+        if (this.isEditMode && this.data.calendrier) {
+          this.parents = list.filter((p: any) => String(p.id) !== String(this.data.calendrier?.id));
+        } else {
+          this.parents = list;
+        }
+      },
+      error: () => { this.parents = []; }
+    });
+
     if (this.isEditMode && this.data.calendrier) {
       const c = this.data.calendrier as any;
       const patch = {
         ...c,
+        parent: c.parent || (c.parent_detail ? (c.parent_detail.id || c.parent_detail) : null),
         direction: c.direction || (c.direction_detail ? (c.direction_detail.id || c.direction_detail) : null)
       };
       this.form.patchValue(patch);

@@ -68,7 +68,9 @@ export class ShowCalendrierComponent implements OnInit {
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(AddEditCalendrierComponent, {
-      width: '700px',
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: { mode: 'add' }
     });
     dialogRef.afterClosed().subscribe(result => { if (result) this.loadCalendriers(); });
@@ -76,7 +78,9 @@ export class ShowCalendrierComponent implements OnInit {
 
   openEditDialog(item: Calendrier): void {
     const dialogRef = this.dialog.open(AddEditCalendrierComponent, {
-      width: '700px',
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: { mode: 'edit', calendrier: item }
     });
     dialogRef.afterClosed().subscribe(result => { if (result) this.loadCalendriers(); });
