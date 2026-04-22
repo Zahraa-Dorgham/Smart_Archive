@@ -36,6 +36,9 @@
 .has-icon-left .form-control {
     padding-left: 35px;
     border-radius: 8px;
+    position: relative;
+    left: 10px;
+    top: -3px;
 }
 
 .form-control-position {
