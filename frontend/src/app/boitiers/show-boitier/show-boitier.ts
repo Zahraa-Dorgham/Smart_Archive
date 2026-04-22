@@ -69,7 +69,7 @@ export class ShowBoitierComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
 
     dataSource = new MatTableDataSource<Boitier>([]);
-    displayedColumns: string[] = ['idboit', 'titre', 'code_barre', 'localisation', 'capacite', 'statut', 'actions'];
+    displayedColumns: string[] = ['idboit', 'titre', 'code_barre', 'localisation'];
     filterForm: FormGroup;
 
     constructor(
@@ -77,12 +77,13 @@ export class ShowBoitierComponent implements OnInit {
         private dialog: MatDialog,
         private snackBar: MatSnackBar,
         private loadingService: LoadingService,
-        private cdr: ChangeDetectorRef,
-
-
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private cdr: ChangeDetectorRef
     ) {
-        this.filterForm = this.fb.group({ search: [''] });
+        this.filterForm = this.fb.group({ 
+            search: [''],
+            statut: ['']
+        });
     }
 
     ngOnInit(): void {
@@ -108,14 +109,19 @@ export class ShowBoitierComponent implements OnInit {
     }
 
     applyFilter(): void {
-        const search = this.filterForm.value.search?.toLowerCase().trim() || '';
-        this.dataSource.filterPredicate = (data: Boitier, filter: string) => {
-            const idboitMatch = data.idboit.toLowerCase().includes(filter);
-            const titreMatch = data.titre.toLowerCase().includes(filter);
-            const codeBarreMatch = data.code_barre ? data.code_barre.toLowerCase().includes(filter) : false;
-            return idboitMatch || titreMatch || codeBarreMatch;
+        const filter = this.filterForm.value;
+        this.dataSource.filterPredicate = (data: Boitier, filterStr: string) => {
+            const searchTerm = filter.search?.toLowerCase().trim() || '';
+            const searchMatch = !searchTerm || 
+                data.idboit.toLowerCase().includes(searchTerm) ||
+                data.titre.toLowerCase().includes(searchTerm) ||
+                !!(data.code_barre && data.code_barre.toLowerCase().includes(searchTerm));
+            
+            const statutMatch = !filter.statut || data.statut === filter.statut;
+            
+            return !!(searchMatch && statutMatch);
         };
-        this.dataSource.filter = search;
+        this.dataSource.filter = JSON.stringify(filter);
     }
 
     getLocalisation(boitier: Boitier): string {
