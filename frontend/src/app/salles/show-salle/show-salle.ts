@@ -113,7 +113,7 @@ export class ShowSalleComponent implements OnInit {
       const matchesSearch = !filterValue || 
         data.nom.toLowerCase().includes(filterValue) ||
         data.code.toLowerCase().includes(filterValue);
-      const matchesBatiment = !batimentId || data.batiment === batimentId;
+      const matchesBatiment = !batimentId || data.batiment == batimentId;
       return matchesSearch && matchesBatiment;
     };
     this.dataSource.filter = filterValue + batimentId; // trick to trigger filter

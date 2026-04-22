@@ -5,8 +5,9 @@ import { Batiment } from './batiment.model';
 export interface Salle extends BaseModel {
     nom: string;
     code: string;
-    batiment: Batiment | string;
+    batiment: Batiment | string | number;
     batiment_details?: Batiment;
+    batiment_nom?: string;
     type_salle: string;
     etage: number;
     description?: string;

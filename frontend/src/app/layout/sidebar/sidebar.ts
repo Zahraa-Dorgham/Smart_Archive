@@ -1,7 +1,8 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,8 +11,36 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
-export class Sidebar implements AfterViewInit {
-  constructor(public authService: AuthService) {}
+export class Sidebar implements AfterViewInit, OnInit {
+  isEmplacementOpen = false;
+
+  constructor(public authService: AuthService, private router: Router) {
+    // Écouter les changements de route pour garder le menu ouvert si un enfant est actif
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.checkActiveRoute(event.urlAfterRedirects);
+    });
+  }
+
+  ngOnInit() {
+    this.checkActiveRoute(this.router.url);
+  }
+
+  private checkActiveRoute(url: string) {
+    const childRoutes = ['/batiments', '/salles', '/armoires', '/etageres', '/boitiers', '/archiviste/'];
+    if (childRoutes.some(route => url.includes(route))) {
+      this.isEmplacementOpen = true;
+    } else {
+      this.isEmplacementOpen = false;
+    }
+  }
+
+  toggleEmplacement(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isEmplacementOpen = !this.isEmplacementOpen;
+  }
 
   ngAfterViewInit() {
     this.refreshMenu();

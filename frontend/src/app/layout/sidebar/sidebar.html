@@ -39,12 +39,12 @@
                 </li>
 
                 <!-- MENU EMPLACEMENT AVEC SOUS-MENUS -->
-                <li class="nav-item has-sub" routerLinkActive="open">
-                    <a href="javascript:void(0)">
+                <li class="nav-item has-sub" [class.open]="isEmplacementOpen">
+                    <a href="javascript:void(0)" (click)="toggleEmplacement($event)">
                         <i class="bx bx-map"></i>
                         <span class="menu-title">Emplacement</span>
                     </a>
-                    <ul class="menu-content">
+                    <ul class="menu-content" [style.display]="isEmplacementOpen ? 'block' : 'none'">
                         <li routerLinkActive="active">
                             <a routerLink="/batiments">
                                 <i class="bx bx-building-house"></i>
