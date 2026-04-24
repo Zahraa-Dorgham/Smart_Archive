@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute } from '@angular/router';
 
 import { SalleService } from '../../core/services/salle.service';
 import { BatimentService } from '../../core/services/batiment.service';
@@ -56,6 +57,7 @@ export class ShowSalleComponent implements OnInit {
   displayedColumns: string[] = ['code', 'nom', 'batiment_nom', 'type_salle', 'etage', 'actions'];
   filterForm: FormGroup;
   batiments: any[] = [];
+  parentBatimentId: any = null;
 
   constructor(
     private salleService: SalleService,
@@ -63,7 +65,8 @@ export class ShowSalleComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute
   ) {
     this.filterForm = this.fb.group({
       search: [''],
@@ -73,7 +76,16 @@ export class ShowSalleComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBatiments();
-    this.loadSalles();
+    
+    // Check for query parameters for hierarchical navigation
+    this.route.queryParams.subscribe(params => {
+      const batimentId = params['batiment'];
+      this.parentBatimentId = batimentId || null;
+      this.filterForm.patchValue({ batiment: batimentId || '' }, { emitEvent: false });
+      this.applyFilter();
+      this.loadSalles();
+    });
+
     this.filterForm.valueChanges.subscribe(() => {
       this.applyFilter();
     });
@@ -120,9 +132,14 @@ export class ShowSalleComponent implements OnInit {
   }
 
   openAddDialog(): void {
+    const currentBatiment = this.filterForm.get('batiment')?.value;
     const dialogRef = this.dialog.open(AddEditSalleComponent, {
       width: '600px',
-      data: { mode: 'add', batiments: this.batiments }
+      data: { 
+        mode: 'add', 
+        batiments: this.batiments,
+        initialData: { batiment: currentBatiment } 
+      }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadSalles();

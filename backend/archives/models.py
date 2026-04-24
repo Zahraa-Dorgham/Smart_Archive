@@ -44,6 +44,7 @@ class Salle(models.Model):
     code = models.CharField(max_length=20, unique=True, blank=True, null=True)
     batiment = models.ForeignKey(Batiment, on_delete=models.CASCADE, related_name='salles')
     etage = models.IntegerField(default=0)
+    type_salle = models.CharField(max_length=50, default='ARCHIVE')
     description = models.TextField(blank=True)
     dimensions = models.CharField(max_length=100, blank=True, null=True)
     volume = models.FloatField(default=0.0)
@@ -62,6 +63,9 @@ class Armoire(models.Model):
     code = models.CharField(max_length=50, unique=True)
     salle = models.ForeignKey(Salle, on_delete=models.CASCADE, related_name='armoires')
     code_barres = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+    type_armoire = models.CharField(max_length=50, default='METAL')
+    date_installation = models.DateField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Armoire"
@@ -76,6 +80,9 @@ class Etagere(models.Model):
     armoire = models.ForeignKey(Armoire, on_delete=models.CASCADE, related_name='etageres')
     numero = models.IntegerField()
     code_barres = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    capacite_max_boites = models.IntegerField(default=10)
+    occupation_actuelle = models.IntegerField(default=0)
+    description = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Étagère"

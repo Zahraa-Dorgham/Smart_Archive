@@ -62,9 +62,17 @@ class BatimentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['nom', 'code', 'adresse']
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'salles']:
             return [EstLectureAutorisee()]
         return [EstArchiviste()]
+
+    @action(detail=True, methods=['get'])
+    def salles(self, request, pk=None):
+        """Get all salles for a specific batiment"""
+        batiment = self.get_object()
+        salles = batiment.salles.all()
+        serializer = SalleSerializer(salles, many=True)
+        return Response(serializer.data)
 
 class SalleViewSet(viewsets.ModelViewSet):
     queryset = Salle.objects.all()
@@ -73,9 +81,17 @@ class SalleViewSet(viewsets.ModelViewSet):
     filterset_fields = ['batiment', 'etage']
     search_fields = ['nom', 'code']
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'armoires']:
             return [EstLectureAutorisee()]
         return [EstArchiviste()]
+
+    @action(detail=True, methods=['get'])
+    def armoires(self, request, pk=None):
+        """Get all armoires for a specific salle"""
+        salle = self.get_object()
+        armoires = salle.armoires.all()
+        serializer = ArmoireSerializer(armoires, many=True)
+        return Response(serializer.data)
 
 class ArmoireViewSet(viewsets.ModelViewSet):
     queryset = Armoire.objects.all()
@@ -84,9 +100,17 @@ class ArmoireViewSet(viewsets.ModelViewSet):
     filterset_fields = ['salle']
     search_fields = ['code', 'code_barres']
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'etageres']:
             return [EstLectureAutorisee()]
         return [EstArchiviste()]
+
+    @action(detail=True, methods=['get'])
+    def etageres(self, request, pk=None):
+        """Get all etageres for a specific armoire"""
+        armoire = self.get_object()
+        etageres = armoire.etageres.all()
+        serializer = EtagereSerializer(etageres, many=True)
+        return Response(serializer.data)
 
 class EtagereViewSet(viewsets.ModelViewSet):
     queryset = Etagere.objects.all()

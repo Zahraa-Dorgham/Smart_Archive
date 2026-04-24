@@ -2,7 +2,12 @@
     <div class="content-header-left col-12 mb-2 mt-1">
         <div class="row breadcrumbs-top">
             <div class="col-12">
-                <h5 class="content-header-title float-left pr-1 mb-0">Niveaux de Rangement</h5>
+                <h5 class="content-header-title float-left pr-1 mb-0">
+                    <button *ngIf="filterForm.get('armoire')?.value" class="btn btn-sm btn-icon btn-light-secondary mr-50" [routerLink]="['/armoires']" [queryParams]="{ salle: grandParentSalleId }" title="Retour aux armoires">
+                        <i class="bx bx-arrow-back"></i>
+                    </button>
+                    Niveaux de Rangement
+                </h5>
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb p-0 mb-0">
                         <li class="breadcrumb-item"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i></a></li>

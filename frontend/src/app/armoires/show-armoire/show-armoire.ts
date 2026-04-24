@@ -14,6 +14,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute } from '@angular/router';
 
 import { ArmoireService } from '../../core/services/armoire.service';
 import { SalleService } from '../../core/services/salle.service';
@@ -58,6 +59,7 @@ export class ShowArmoireComponent implements OnInit {
   displayedColumns: string[] = ['code', 'type', 'salle', 'code_barres', 'actions'];
   filterForm: FormGroup;
   salles: any[] = [];
+  grandParentBatimentId: any = null;
 
   constructor(
     private armoireService: ArmoireService,
@@ -65,7 +67,8 @@ export class ShowArmoireComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute
   ) {
     this.filterForm = this.fb.group({
       search: [''],
@@ -75,7 +78,20 @@ export class ShowArmoireComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadSalles();
-    this.loadArmoires();
+    
+    // Check for query parameters for hierarchical navigation
+    this.route.queryParams.subscribe(params => {
+      const salleId = params['salle'];
+      if (salleId) {
+        this.fetchSalleDetail(salleId);
+      } else {
+        this.grandParentBatimentId = null;
+      }
+      this.filterForm.patchValue({ salle: salleId || '' }, { emitEvent: false });
+      this.applyFilter();
+      this.loadArmoires();
+    });
+
     this.filterForm.valueChanges.subscribe(() => {
       this.applyFilter();
     });
@@ -85,6 +101,15 @@ export class ShowArmoireComponent implements OnInit {
     this.salleService.getSalles().subscribe({
       next: (res) => {
         this.salles = res.results;
+      }
+    });
+  }
+
+  fetchSalleDetail(salleId: string): void {
+    this.salleService.getSalle(salleId).subscribe({
+      next: (salle) => {
+        // salle.batiment is usually an ID or an object depending on serializer
+        this.grandParentBatimentId = typeof salle.batiment === 'object' ? (salle.batiment as any).id : salle.batiment;
       }
     });
   }
@@ -121,9 +146,14 @@ export class ShowArmoireComponent implements OnInit {
   }
 
   openAddDialog(): void {
+    const currentSalle = this.filterForm.get('salle')?.value;
     const dialogRef = this.dialog.open(AddEditArmoireComponent, {
       width: '600px',
-      data: { mode: 'add' }
+      data: { 
+        mode: 'add',
+        salles: this.salles,
+        initialData: { salle: currentSalle }
+      }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadArmoires();
@@ -133,7 +163,7 @@ export class ShowArmoireComponent implements OnInit {
   openEditDialog(armoire: Armoire): void {
     const dialogRef = this.dialog.open(AddEditArmoireComponent, {
       width: '600px',
-      data: { mode: 'edit', armoire }
+      data: { mode: 'edit', armoire, salles: this.salles }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadArmoires();

@@ -37,7 +37,7 @@
                     <i class="bx bx-layout"></i>
                     <select class="form-control" formControlName="salle">
                         <option [value]="null" disabled selected>Sélectionner la salle...</option>
-                        <option *ngFor="let s of salles" [value]="s.id">{{ s.nom }}</option>
+                        <option *ngFor="let s of data.salles" [value]="s.id">{{ s.nom }}</option>
                     </select>
                 </div>
             </div>

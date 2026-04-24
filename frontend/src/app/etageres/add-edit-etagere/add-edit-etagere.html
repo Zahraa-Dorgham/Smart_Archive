@@ -18,7 +18,7 @@
                     <i class="bx bx-cabinet"></i>
                     <select class="form-control" formControlName="armoire">
                         <option [value]="null" disabled selected>Assigner à une armoire...</option>
-                        <option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</option>
+                        <option *ngFor="let a of data.armoires" [value]="a.id">{{ a.code }}</option>
                     </select>
                 </div>
             </div>

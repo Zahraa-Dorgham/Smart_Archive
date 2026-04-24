@@ -2,7 +2,12 @@
     <div class="content-header-left col-12 mb-2 mt-1">
         <div class="row breadcrumbs-top">
             <div class="col-12">
-                <h5 class="content-header-title float-left pr-1 mb-0">Gestion du Mobilier</h5>
+                <h5 class="content-header-title float-left pr-1 mb-0">
+                    <button *ngIf="filterForm.get('salle')?.value" class="btn btn-sm btn-icon btn-light-secondary mr-50" [routerLink]="['/salles']" [queryParams]="{ batiment: grandParentBatimentId }" title="Retour aux salles">
+                        <i class="bx bx-arrow-back"></i>
+                    </button>
+                    Gestion du Mobilier
+                </h5>
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb p-0 mb-0">
                         <li class="breadcrumb-item"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i></a></li>
@@ -76,6 +81,9 @@
                                         <!-- <span class="badge badge-light-secondary text-uppercase">{{a.type_armoire || 'Standard'}}</span> -->
                                     </td>
                                     <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-info mr-1" [routerLink]="['/archiviste/etageres']" [queryParams]="{armoire: a.id}" title="Voir les étagères">
+                                            <i class="bx bx-show-alt"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(a)" title="Modifier">
                                             <i class="bx bx-edit-alt"></i>
                                         </button>

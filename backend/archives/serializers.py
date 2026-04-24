@@ -1,55 +1,71 @@
-# archives/serializers.py - Version avec uniquement les modèles existants
+# archives/serializers.py
 from rest_framework import serializers
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from .models import (
-    ArchiveDefinitive, ArchiveIntermediaire,ArchiveCourant, Bordereau,  Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert,Consultation
-    # Retirez Boitier, Dossier, Document, Service s'ils n'existent pas
+    ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, 
+    Role, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, 
+    Consultation, Boitier, Dossier, Document
 )
 
-# Serializer pour Role
+User = get_user_model()
+
+# ========== GROUPES & UTILISATEURS ==========
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['id', 'name']
+
+class UserSerializer(serializers.ModelSerializer):
+    groups = serializers.StringRelatedField(many=True, read_only=True)
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups']
+
+# ========== RÔLE ==========
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
 
-# Serializer pour Batiment
-class BatimentSerializer(serializers.ModelSerializer):
-    nombre_salles = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Batiment
-        fields = ['id', 'nom', 'code', 'adresse', 'description', 'date_creation', 'nombre_salles','ville']
-
-    def get_nombre_salles(self, obj):
-        return obj.salles.count()
-
-# Serializer pour Salle
-class SalleSerializer(serializers.ModelSerializer):
-    batiment_nom = serializers.CharField(source='batiment.nom', read_only=True)
-    
-    class Meta:
-        model = Salle
-        fields = ['id', 'nom', 'code', 'batiment', 'batiment_nom', 
-                  'etage', 'description']
-
-# Serializer pour Armoire
-class ArmoireSerializer(serializers.ModelSerializer):
-    salle_nom = serializers.CharField(source='salle.nom', read_only=True)
-    
-    class Meta:
-        model = Armoire
-        fields = ['id', 'code', 'salle', 'salle_nom', 
-                   
-                  'code_barres']
-
-# Serializer pour Etagere
+# ========== BÂTIMENT, SALLE, ARMOIRE, ÉTAGÈRE ==========
 class EtagereSerializer(serializers.ModelSerializer):
     armoire_code = serializers.CharField(source='armoire.code', read_only=True)
     
     class Meta:
         model = Etagere
-        fields = ['id', 'armoire', 'armoire_code', 'numero', 'code_barres']
+        fields = ['id', 'armoire', 'armoire_code', 'numero', 'code_barres', 'capacite_max_boites', 'occupation_actuelle', 'description']
 
-# Serializer pour PhaseArchive
+class ArmoireSerializer(serializers.ModelSerializer):
+    salle_nom = serializers.CharField(source='salle.nom', read_only=True)
+    etageres = EtagereSerializer(many=True, read_only=True)
+    nombre_etageres = serializers.IntegerField(source='etageres.count', read_only=True)
+    
+    class Meta:
+        model = Armoire
+        fields = ['id', 'code', 'salle', 'salle_nom', 'code_barres', 'etageres', 'nombre_etageres', 'description', 'type_armoire', 'date_installation']
+
+class SalleSerializer(serializers.ModelSerializer):
+    batiment_nom = serializers.CharField(source='batiment.nom', read_only=True)
+    armoires = ArmoireSerializer(many=True, read_only=True)
+    nombre_armoires = serializers.IntegerField(source='armoires.count', read_only=True)
+    
+    class Meta:
+        model = Salle
+        fields = ['id', 'nom', 'code', 'batiment', 'batiment_nom', 'etage', 'type_salle', 'description', 'dimensions', 'volume', 'armoires', 'nombre_armoires']
+
+class BatimentSerializer(serializers.ModelSerializer):
+    nombre_salles = serializers.SerializerMethodField()
+    salles = SalleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Batiment
+        fields = ['id', 'nom', 'code', 'adresse', 'ville', 'description', 'date_creation', 'nombre_salles', 'salles']
+
+    def get_nombre_salles(self, obj):
+        return obj.salles.count()
+
+# ========== PHASES D'ARCHIVAGE ==========
 class PhaseArchiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhaseArchive
@@ -57,34 +73,28 @@ class PhaseArchiveSerializer(serializers.ModelSerializer):
 
 class ArchiveCourantSerializer(serializers.ModelSerializer):
     phase_detail = PhaseArchiveSerializer(source='phase', read_only=True)
-
     class Meta:
         model = ArchiveCourant
         fields = '__all__'
 
 class ArchiveIntermediaireSerializer(serializers.ModelSerializer):
     phase_detail = PhaseArchiveSerializer(source='phase', read_only=True)
-
     class Meta:
         model = ArchiveIntermediaire
         fields = '__all__'
 
 class ArchiveDefinitiveSerializer(serializers.ModelSerializer):
     phase_detail = PhaseArchiveSerializer(source='phase', read_only=True)
-
     class Meta:
         model = ArchiveDefinitive
         fields = '__all__'
-        
-# archives/serializers.py
-from rest_framework import serializers
-from .models import Boitier, Dossier, Document, Armoire, Etagere, PhaseArchive
 
+# ========== BOÎTIER, DOSSIER, DOCUMENT ==========
 class BoitierSerializer(serializers.ModelSerializer):
     armoire_nom = serializers.CharField(source='armoire.code', read_only=True)
     etagere_numero = serializers.IntegerField(source='etagere.numero', read_only=True)
     localisation = serializers.SerializerMethodField()
-    taux_remplissage = serializers.FloatField(read_only=True)  # property du modèle
+    taux_remplissage = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Boitier
@@ -101,6 +111,7 @@ class BoitierSerializer(serializers.ModelSerializer):
 class DossierSerializer(serializers.ModelSerializer):
     nombre_documents = serializers.IntegerField(read_only=True)
     volume_total = serializers.IntegerField(read_only=True)
+    phase_archive_nom = serializers.CharField(source='phaseArchive.nom', read_only=True)
 
     class Meta:
         model = Dossier
@@ -132,61 +143,18 @@ class DocumentSerializer(serializers.ModelSerializer):
             return f"{size:.2f} To"
         return None
 
-
-
-
-
-# class DemandeConsultationSerializer(serializers.ModelSerializer):
-#     employe_nom = serializers.CharField(source='employe.username', read_only=True)
-#     document_titre = serializers.CharField(source='document.titre', read_only=True)
-
-#     class Meta:
-#         model = DemandeConsultation
-#         fields = '__all__'
-#         read_only_fields = ['date_demande', 'statut']
-
-
+# ========== CONSULTATION, TRANSFERT, BORDEREAU ==========
 class ConsultationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Consultation
         fields = '__all__'
 
-
-# --- Transfert ---
 class TransfertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transfert
         fields = '__all__'
 
-# --- Bordereau ---
 class BordereauSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bordereau
         fields = '__all__'
-
-
-
-
-from django.contrib.auth.models import Group
-
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ['id', 'name']
-
-
-
-
-from django.contrib.auth import get_user_model
-from rest_framework import serializers
-
-User = get_user_model()
-
-class UserSerializer(serializers.ModelSerializer):
-    groups = serializers.StringRelatedField(many=True, read_only=True)
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups']
-		
-		
-		

@@ -15,6 +15,8 @@ import { Armoire } from '../../core/models/armoire.model';
 export interface DialogData {
   mode: 'add' | 'edit';
   armoire?: Armoire;
+  salles: any[];
+  initialData?: any;
 }
 
 @Component({
@@ -58,7 +60,6 @@ export class AddEditArmoireComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadSalles();
     if (this.isEditMode && this.data.armoire) {
       setTimeout(() => {
         if (this.data.armoire) {
@@ -68,6 +69,8 @@ export class AddEditArmoireComponent implements OnInit {
           });
         }
       });
+    } else if (this.data.initialData) {
+      this.form.patchValue(this.data.initialData);
     }
   }
 
@@ -82,14 +85,20 @@ export class AddEditArmoireComponent implements OnInit {
   onSubmit(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.value;
+    const formValue = { ...this.form.value };
+    // Convert empty strings to null for backend compatibility
+    if (formValue.date_installation === '') formValue.date_installation = null;
+    if (formValue.description === '') formValue.description = null;
+    if (formValue.code_barres === '') formValue.code_barres = null;
+
     if (this.isEditMode && this.data.armoire) {
       this.armoireService.updateArmoire(this.data.armoire.id, formValue).subscribe({
         next: () => {
           this.snackBar.open('Armoire modifiée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
+        error: (err) => {
+          console.error(err);
           this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
         }
       });
@@ -99,7 +108,8 @@ export class AddEditArmoireComponent implements OnInit {
           this.snackBar.open('Armoire créée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
+        error: (err) => {
+          console.error(err);
           this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
         }
       });

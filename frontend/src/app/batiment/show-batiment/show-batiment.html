@@ -78,6 +78,9 @@
                                     </td>
                                     <td class="py-2 text-right px-2">
                                         <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-icon btn-light-info mr-1" [routerLink]="['/archiviste/salles']" [queryParams]="{batiment: b.id}" title="Voir les salles">
+                                                <i class="bx bx-show-alt"></i>
+                                            </button>
                                             <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(b)" title="Modifier">
                                                 <i class="bx bx-edit-alt"></i>
                                             </button>

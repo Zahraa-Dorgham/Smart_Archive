@@ -15,6 +15,7 @@ export interface DialogData {
   mode: 'add' | 'edit';
   salle?: Salle;
   batiments: any[];
+  initialData?: any;
 }
 
 @Component({
@@ -65,6 +66,8 @@ export class AddEditSalleComponent implements OnInit {
           });
         }
       });
+    } else if (this.data.initialData) {
+      this.form.patchValue(this.data.initialData);
     }
   }
 

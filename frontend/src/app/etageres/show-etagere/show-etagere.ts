@@ -14,6 +14,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute } from '@angular/router';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { EtagereService } from '../../core/services/etagere.service';
@@ -56,9 +57,10 @@ export class ShowEtagereComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   dataSource = new MatTableDataSource<Etagere>([]);
-  displayedColumns: string[] = ['numero', 'armoire', 'code_barres', 'capacite', 'occupation', 'taux', 'actions'];
+  displayedColumns: string[] = ['numero', 'armoire', 'code_barres', 'actions'];
   filterForm: FormGroup;
   armoires: any[] = [];
+  grandParentSalleId: any = null;
 
   constructor(
     private etagereService: EtagereService,
@@ -66,7 +68,8 @@ export class ShowEtagereComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute
   ) {
     this.filterForm = this.fb.group({
       search: [''],
@@ -76,7 +79,20 @@ export class ShowEtagereComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadArmoires();
-    this.loadEtageres();
+    
+    // Check for query parameters for hierarchical navigation
+    this.route.queryParams.subscribe(params => {
+      const armoireId = params['armoire'];
+      if (armoireId) {
+        this.fetchArmoireDetail(armoireId);
+      } else {
+        this.grandParentSalleId = null;
+      }
+      this.filterForm.patchValue({ armoire: armoireId || '' }, { emitEvent: false });
+      this.applyFilter();
+      this.loadEtageres();
+    });
+
     this.filterForm.valueChanges.subscribe(() => {
       this.applyFilter();
     });
@@ -86,6 +102,14 @@ export class ShowEtagereComponent implements OnInit {
     this.armoireService.getArmoires().subscribe({
       next: (res) => {
         this.armoires = res.results;
+      }
+    });
+  }
+
+  fetchArmoireDetail(armoireId: string): void {
+    this.armoireService.getArmoire(armoireId).subscribe({
+      next: (armoire) => {
+        this.grandParentSalleId = typeof armoire.salle === 'object' ? (armoire.salle as any).id : armoire.salle;
       }
     });
   }
@@ -136,9 +160,14 @@ export class ShowEtagereComponent implements OnInit {
   }
 
   openAddDialog(): void {
+    const currentArmoire = this.filterForm.get('armoire')?.value;
     const dialogRef = this.dialog.open(AddEditEtagereComponent, {
       width: '600px',
-      data: { mode: 'add' }
+      data: { 
+        mode: 'add',
+        armoires: this.armoires,
+        initialData: { armoire: currentArmoire }
+      }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadEtageres();
@@ -148,7 +177,7 @@ export class ShowEtagereComponent implements OnInit {
   openEditDialog(etagere: Etagere): void {
     const dialogRef = this.dialog.open(AddEditEtagereComponent, {
       width: '600px',
-      data: { mode: 'edit', etagere }
+      data: { mode: 'edit', etagere, armoires: this.armoires }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadEtageres();

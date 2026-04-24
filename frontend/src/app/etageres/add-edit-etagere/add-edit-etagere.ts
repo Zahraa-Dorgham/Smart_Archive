@@ -15,6 +15,8 @@ import { Etagere } from '../../core/models/etagere.model';
 export interface DialogData {
   mode: 'add' | 'edit';
   etagere?: Etagere;
+  armoires: any[];
+  initialData?: any;
 }
 
 @Component({
@@ -58,7 +60,6 @@ export class AddEditEtagereComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadArmoires();
     if (this.isEditMode && this.data.etagere) {
       setTimeout(() => {
         if (this.data.etagere) {
@@ -68,6 +69,8 @@ export class AddEditEtagereComponent implements OnInit {
           });
         }
       });
+    } else if (this.data.initialData) {
+      this.form.patchValue(this.data.initialData);
     }
   }
 
@@ -82,14 +85,18 @@ export class AddEditEtagereComponent implements OnInit {
   onSubmit(): void {
     if (this.form.invalid) return;
 
-    const formValue = this.form.value;
+    const formValue = { ...this.form.value };
+    if (formValue.description === '') formValue.description = null;
+    if (formValue.code_barres === '') formValue.code_barres = null;
+
     if (this.isEditMode && this.data.etagere) {
       this.etagereService.updateEtagere(this.data.etagere.id, formValue).subscribe({
         next: () => {
           this.snackBar.open('Étagère modifiée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
+        error: (err) => {
+          console.error(err);
           this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
         }
       });
@@ -99,7 +106,8 @@ export class AddEditEtagereComponent implements OnInit {
           this.snackBar.open('Étagère créée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
+        error: (err) => {
+          console.error(err);
           this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
         }
       });
