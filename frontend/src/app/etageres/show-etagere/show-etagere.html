@@ -76,6 +76,9 @@
                                         <small class="text-muted"><i class="bx bx-barcode-reader mr-25"></i> {{e.code_barres || 'Non défini'}}</small>
                                     </td>
                                     <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-warning mr-1" [routerLink]="['/archiviste/boitiers']" [queryParams]="{etagere: e.id}" title="Voir les boîtiers">
+                                            <i class="bx bx-package"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(e)" title="Modifier">
                                             <i class="bx bx-edit-alt"></i>
                                         </button>

@@ -145,6 +145,7 @@ class Boitier(models.Model):
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='ACTIF')
     date_creation = models.DateTimeField(default=timezone.now)
     date_modification = models.DateTimeField(default=timezone.now)
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Boîtier"
@@ -186,9 +187,20 @@ class Boitier(models.Model):
         return True, f"Dossier {dossier.idDossier} retiré"
 
     def localisation_complete(self):
-        if self.armoire and self.etagere:
-            return f"{self.armoire.salle.batiment.nom} > {self.armoire.salle.nom} > {self.armoire.code} > Étagère {self.etagere.numero} > Boîtier {self.idboit}"
-        return "Non localisé"
+        parts = []
+        if self.armoire:
+            if self.armoire.salle:
+                if self.armoire.salle.batiment:
+                    parts.append(self.armoire.salle.batiment.nom)
+                parts.append(self.armoire.salle.nom)
+            parts.append(f"Armoire {self.armoire.code}")
+        
+        if self.etagere:
+            parts.append(f"Étagère {self.etagere.numero}")
+        
+        if not parts:
+            return "Non localisé"
+        return " > ".join(parts)
 
 # ========== DOSSIER (unique et complet) ==========
 class Dossier(models.Model):

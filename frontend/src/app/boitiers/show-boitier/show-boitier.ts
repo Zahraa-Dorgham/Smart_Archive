@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ActivatedRoute } from '@angular/router';
 import { ChangeDetectorRef } from "@angular/core";
 
 import { BoitierService } from '../../core/services/boitier.service';
@@ -78,9 +79,10 @@ export class ShowBoitierComponent implements OnInit {
     }
 
     dataSource = new MatTableDataSource<Boitier>([]);
-    displayedColumns: string[] = ['idboit', 'titre', 'code_barre', 'localisation'];
+    displayedColumns: string[] = ['idboit', 'titre', 'code_barre', 'localisation', 'actions'];
     filterForm: FormGroup;
     etageres: any[] = [];
+    grandParentArmoireId: any = null;
 
     constructor(
         private boitierService: BoitierService,
@@ -89,7 +91,8 @@ export class ShowBoitierComponent implements OnInit {
         private snackBar: MatSnackBar,
         private loadingService: LoadingService,
         private fb: FormBuilder,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private route: ActivatedRoute
     ) {
         this.filterForm = this.fb.group({ 
             search: [''],
@@ -99,7 +102,19 @@ export class ShowBoitierComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadEtageres();
-        this.loadBoitiers();
+        
+        this.route.queryParams.subscribe(params => {
+            const etagereId = params['etagere'];
+            if (etagereId) {
+                this.fetchEtagereDetail(etagereId);
+            } else {
+                this.grandParentArmoireId = null;
+            }
+            this.filterForm.patchValue({ etagere: etagereId || '' }, { emitEvent: false });
+            this.applyFilter();
+            this.loadBoitiers();
+        });
+
         this.filterForm.valueChanges.subscribe(() => this.applyFilter());
     }
 
@@ -107,6 +122,14 @@ export class ShowBoitierComponent implements OnInit {
         this.etagereService.getEtageres().subscribe({
             next: (res) => {
                 this.etageres = res.results;
+            }
+        });
+    }
+
+    fetchEtagereDetail(etagereId: string): void {
+        this.etagereService.getEtagere(etagereId).subscribe({
+            next: (etagere) => {
+                this.grandParentArmoireId = typeof etagere.armoire === 'object' ? (etagere.armoire as any).id : etagere.armoire;
             }
         });
     }
@@ -144,13 +167,7 @@ export class ShowBoitierComponent implements OnInit {
     }
 
     getLocalisation(boitier: Boitier): string {
-        if (boitier.armoire && boitier.etagere) {
-            // Utilisation des type guards pour accéder aux propriétés
-            const armoireCode = isArmoire(boitier.armoire) ? boitier.armoire.code : boitier.armoire;
-            const etagereNumero = isEtagere(boitier.etagere) ? `Étagère ${boitier.etagere.numero}` : boitier.etagere;
-            return `${armoireCode} / ${etagereNumero}`;
-        }
-        return 'Non localisé';
+        return boitier.localisation || 'Non localisé';
     }
 
     getEtagereLabel(etagere: any): string {
@@ -175,9 +192,14 @@ export class ShowBoitierComponent implements OnInit {
     }
 
     openAddDialog(): void {
+        const currentEtagere = this.filterForm.get('etagere')?.value;
         const dialogRef = this.dialog.open(AddEditBoitierComponent, {
             width: '600px',
-            data: { mode: 'add' }
+            data: { 
+                mode: 'add',
+                etageres: this.etageres,
+                initialData: { etagere: currentEtagere }
+            }
         });
         dialogRef.afterClosed().subscribe(result => {
             if (result) this.loadBoitiers();
@@ -187,7 +209,7 @@ export class ShowBoitierComponent implements OnInit {
     openEditDialog(boitier: Boitier): void {
         const dialogRef = this.dialog.open(AddEditBoitierComponent, {
             width: '600px',
-            data: { mode: 'edit', boitier }
+            data: { mode: 'edit', boitier, etageres: this.etageres }
         });
         dialogRef.afterClosed().subscribe(result => {
             if (result) this.loadBoitiers();

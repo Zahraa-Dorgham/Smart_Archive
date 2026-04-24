@@ -1,61 +1,105 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un boîtier</h2>
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx text-primary" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier le Boîtier' : 'Nouveau Boîtier' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-3"></i>
+    </button>
+</div>
+
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content>
-        <div class="form-grid">
-            <mat-form-field appearance="outline">
-                <mat-label>ID Boîtier *</mat-label>
-                <input matInput formControlName="idboit" placeholder="BOX-2024-001">
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Code-barres *</mat-label>
-                <input matInput formControlName="code_barre">
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Titre *</mat-label>
-                <input matInput formControlName="titre">
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Capacité (nb dossiers) *</mat-label>
-                <input matInput type="number" formControlName="capacite">
-                <mat-error>Requis (≥ 1)</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Armoire</mat-label>
-                <mat-select formControlName="armoire">
-                    <mat-option value="">Aucune</mat-option>
-                    <mat-option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Étagère</mat-label>
-                <mat-select formControlName="etagere">
-                    <mat-option value="">Aucune</mat-option>
-                    <mat-option *ngFor="let e of etageres" [value]="e.id">Étagère {{ e.numero }}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>Statut *</mat-label>
-                <mat-select formControlName="statut">
-                    <mat-option value="ACTIF">Actif</mat-option>
-                    <mat-option value="PLEIN">Plein</mat-option>
-                    <mat-option value="ARCHIVE">Archivé</mat-option>
-                    <mat-option value="EN_TRANSFERT">En transfert</mat-option>
-                    <mat-option value="EN_PREPARATION">En préparation</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
+    <mat-dialog-content class="px-3 pb-2 pt-1">
+        <!-- Section Identité -->
+        <div class="section-title">Identité & Traçabilité</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">ID Boîtier <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-box"></i>
+                    <input type="text" class="form-control" formControlName="idboit" placeholder="BOX-2024-001">
+                </div>
+            </div>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Code-barres <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-barcode-reader"></i>
+                    <input type="text" class="form-control" formControlName="code_barre" placeholder="Scanner tag...">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mb-1">
+                <label class="form-label">Titre <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-purchase-tag-alt"></i>
+                    <input type="text" class="form-control" formControlName="titre" placeholder="Nom descriptif du conteneur">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Localisation -->
+        <div class="section-title">Localisation & Capacité</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Armoire Parente</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-cabinet"></i>
+                    <select class="form-control" formControlName="armoire">
+                        <option value="">Aucune</option>
+                        <option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Étagère / Niveau</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-list-ol"></i>
+                    <select class="form-control" formControlName="etagere">
+                        <option value="">Aucune</option>
+                        <option *ngFor="let e of etageres" [value]="e.id">Niveau {{ e.numero }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Capacité (Dossiers) <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-archive"></i>
+                    <input type="number" class="form-control" formControlName="capacite" placeholder="10">
+                </div>
+            </div>
+            <!-- <div class="col-md-6 mb-1">
+                <label class="form-label">Statut Actuel <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-check-shield"></i>
+                    <select class="form-control" formControlName="statut">
+                        <option value="ACTIF">Actif / Ouvert</option>
+                        <option value="PLEIN">Plein / Scellé</option>
+                        <option value="ARCHIVE">Archivé</option>
+                        <option value="EN_TRANSFERT">En transfert</option>
+                        <option value="EN_PREPARATION">En préparation</option>
+                    </select>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- Section Notes -->
+        <div class="section-title">Notes Techniques</div>
+        <div class="row">
+            <div class="col-12 mb-1">
+                <textarea class="form-control" formControlName="description" rows="2" placeholder="Informations complémentaires..."></textarea>
+            </div>
         </div>
     </mat-dialog-content>
-    <mat-dialog-actions align="end">
-        <button mat-button type="button" mat-dialog-close>Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+
+    <div class="dialog-actions">
+        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Enregistrer les modifications' : 'Créer le Boîtier' }}
         </button>
-    </mat-dialog-actions>
+    </div>
 </form>

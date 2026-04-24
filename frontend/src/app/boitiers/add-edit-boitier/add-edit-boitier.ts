@@ -15,6 +15,8 @@ import { Boitier } from '../../core/models/boitier.model';
 export interface DialogData {
   mode: 'add' | 'edit';
   boitier?: Boitier;
+  etageres: any[];
+  initialData?: any;
 }
 
 @Component({
@@ -80,7 +82,20 @@ export class AddEditBoitierComponent implements OnInit {
         const armoireId = typeof boitier.armoire === 'object' ? (boitier.armoire as any).id : boitier.armoire;
         this.loadEtageres(armoireId);
       }
+    } else if (this.data.initialData) {
+      // If we have an etagere ID, we should try to find its armoire first
+      if (this.data.initialData.etagere) {
+        this.etagereService.getEtagere(this.data.initialData.etagere).subscribe(etagere => {
+          const armoireId = typeof etagere.armoire === 'object' ? (etagere.armoire as any).id : etagere.armoire;
+          this.form.patchValue({ armoire: armoireId }, { emitEvent: false });
+          this.loadEtageres(armoireId);
+          this.form.patchValue({ etagere: this.data.initialData.etagere });
+        });
+      } else {
+        this.form.patchValue(this.data.initialData);
+      }
     }
+
     this.form.get('armoire')?.valueChanges.subscribe(armoireId => {
       this.form.patchValue({ etagere: '' });
       this.loadEtageres(armoireId);
@@ -102,14 +117,26 @@ export class AddEditBoitierComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) return;
-    const formValue = this.form.value;
+    const formValue = { ...this.form.value };
+    
+    // Ensure numbers are numbers
+    formValue.capacite = Number(formValue.capacite);
+
+    // Cleanup empty strings to null for ForeignKeys and optional fields
+    if (formValue.armoire === '') formValue.armoire = null;
+    if (formValue.etagere === '') formValue.etagere = null;
+    if (formValue.description === '') formValue.description = null;
+    
     if (this.isEditMode && this.data.boitier) {
       this.boitierService.updateBoitier(this.data.boitier.id, formValue).subscribe({
         next: () => {
           this.snackBar.open('Boîtier modifié', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 })
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
+        }
       });
     } else {
       this.boitierService.createBoitier(formValue).subscribe({
@@ -117,7 +144,10 @@ export class AddEditBoitierComponent implements OnInit {
           this.snackBar.open('Boîtier créé', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 })
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
+        }
       });
     }
   }
