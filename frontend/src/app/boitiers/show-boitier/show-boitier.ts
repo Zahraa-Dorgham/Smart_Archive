@@ -19,6 +19,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ChangeDetectorRef } from "@angular/core";
 
 import { BoitierService } from '../../core/services/boitier.service';
+import { EtagereService } from '../../core/services/etagere.service';
 import { Boitier } from '../../core/models/boitier.model';
 import { Armoire } from '../../core/models/armoire.model';
 import { Etagere } from '../../core/models/etagere.model';
@@ -71,9 +72,11 @@ export class ShowBoitierComponent implements OnInit {
     dataSource = new MatTableDataSource<Boitier>([]);
     displayedColumns: string[] = ['idboit', 'titre', 'code_barre', 'localisation'];
     filterForm: FormGroup;
+    etageres: any[] = [];
 
     constructor(
         private boitierService: BoitierService,
+        private etagereService: EtagereService,
         private dialog: MatDialog,
         private snackBar: MatSnackBar,
         private loadingService: LoadingService,
@@ -82,13 +85,22 @@ export class ShowBoitierComponent implements OnInit {
     ) {
         this.filterForm = this.fb.group({ 
             search: [''],
-            statut: ['']
+            etagere: ['']
         });
     }
 
     ngOnInit(): void {
+        this.loadEtageres();
         this.loadBoitiers();
         this.filterForm.valueChanges.subscribe(() => this.applyFilter());
+    }
+
+    loadEtageres(): void {
+        this.etagereService.getEtageres().subscribe({
+            next: (res) => {
+                this.etageres = res.results;
+            }
+        });
     }
 
     loadBoitiers(): void {
@@ -98,7 +110,7 @@ export class ShowBoitierComponent implements OnInit {
                 this.dataSource.data = response.results;
                 this.dataSource.paginator = this.paginator;
                 this.dataSource.sort = this.sort;
-                this.cdr.detectChanges(); // Force la mise à jour
+                this.cdr.detectChanges();
                 this.loadingService.hide();
             },
             error: (err) => {
@@ -117,9 +129,10 @@ export class ShowBoitierComponent implements OnInit {
                 data.titre.toLowerCase().includes(searchTerm) ||
                 !!(data.code_barre && data.code_barre.toLowerCase().includes(searchTerm));
             
-            const statutMatch = !filter.statut || data.statut === filter.statut;
+            // Use == for loose comparison (string from select vs number from API)
+            const etagereMatch = !filter.etagere || data.etagere == filter.etagere;
             
-            return !!(searchMatch && statutMatch);
+            return !!(searchMatch && etagereMatch);
         };
         this.dataSource.filter = JSON.stringify(filter);
     }
@@ -132,6 +145,13 @@ export class ShowBoitierComponent implements OnInit {
             return `${armoireCode} / ${etagereNumero}`;
         }
         return 'Non localisé';
+    }
+
+    getEtagereLabel(etagere: any): string {
+        if (etagere.armoire_code) {
+            return `${etagere.armoire_code} / Niveau ${etagere.numero}`;
+        }
+        return `Étagère n°${etagere.numero}`;
     }
 
     getTaux(boitier: Boitier): number {

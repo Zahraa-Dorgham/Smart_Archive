@@ -24,18 +24,15 @@
                     <div class="form-control-position"><i class="bx bx-search"></i></div>
                 </fieldset>
             </div>
-            <!-- <div class="col-12 col-sm-6 col-lg-3">
-                <label class="font-weight-bold">Statut du Boîtier</label>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <label class="font-weight-bold">Étagère</label>
                 <fieldset class="form-group mb-0">
-                    <select class="form-control" formControlName="statut">
-                        <option value="">Tous les statuts</option>
-                        <option value="ACTIF">Actif</option>
-                        <option value="PLEIN">Plein</option>
-                        <option value="ARCHIVE">Archivé</option>
-                        <option value="EN_TRANSFERT">En transfert</option>
+                    <select class="form-control" formControlName="etagere">
+                        <option value="">Toutes les étagères</option>
+                        <option *ngFor="let et of etageres" [value]="et.id">{{ getEtagereLabel(et) }}</option>
                     </select>
                 </fieldset>
-            </div> -->
+            </div>
             <div class="col-12 col-sm-6 col-lg-6 d-flex align-items-center justify-content-end mt-sm-0 mt-1">
                 <button type="button" class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
                     <i class="bx bx-plus-circle mr-50"></i> Nouveau Boîtier
@@ -55,7 +52,6 @@
                                     <th class="py-2">Identifiant</th>
                                     <th class="py-2">Titre / Description</th>
                                     <th class="py-2">Localisation</th>
-                                    <th class="py-2"></th>
                                     <th class="py-2 text-right px-2">Actions</th>
                                 </tr>
                             </thead>
@@ -76,14 +72,6 @@
                                     <td class="py-2">
                                         <i class="bx bx-map-pin mr-25"></i> {{getLocalisation(b)}}
                                     </td>
-                                    <td class="py-2">
-                                        <!-- <span class="badge" [ngClass]="{
-                                            'badge-light-success': b.statut === 'ACTIF',
-                                            'badge-light-danger': b.statut === 'PLEIN',
-                                            'badge-light-secondary': b.statut === 'ARCHIVE',
-                                            'badge-light-warning': b.statut === 'EN_TRANSFERT'
-                                        }">{{b.statut}}</span> -->
-                                    </td>
                                     <td class="py-2 text-right px-2">
                                         <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(b)" title="Modifier">
                                             <i class="bx bx-edit-alt"></i>
@@ -94,7 +82,7 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="dataSource.filteredData.length === 0">
-                                    <td colspan="5" class="text-center py-4 text-muted">Aucun boîtier trouvé.</td>
+                                    <td colspan="4" class="text-center py-4 text-muted">Aucun boîtier trouvé.</td>
                                 </tr>
                             </tbody>
                         </table>

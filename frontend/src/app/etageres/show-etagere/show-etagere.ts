@@ -113,15 +113,14 @@ export class ShowEtagereComponent implements OnInit {
       const searchTerm = filter.search?.toLowerCase().trim() || '';
       const searchMatch = !searchTerm ||
         data.numero.toString().includes(searchTerm) ||
-        (data.code_barres && data.code_barres.toLowerCase().includes(searchTerm));
+        !!(data.code_barres && data.code_barres.toLowerCase().includes(searchTerm));
 
-      const armoireId = filter.armoire;
-      const armoireMatch = !armoireId ||
-        (typeof data.armoire === 'object' ? data.armoire.id === armoireId : data.armoire === armoireId);
+      // Use == for loose comparison (string from select vs number from API)
+      const armoireMatch = !filter.armoire || data.armoire == filter.armoire;
 
       return !!(searchMatch && armoireMatch);
     };
-    this.dataSource.filter = 'apply';
+    this.dataSource.filter = JSON.stringify(filter);
   }
 
   getArmoireCode(etagere: Etagere): string {

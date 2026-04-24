@@ -109,15 +109,15 @@ export class ShowArmoireComponent implements OnInit {
   applyFilter(): void {
     const filter = this.filterForm.value;
     this.dataSource.filterPredicate = (data: Armoire, filterStr: string) => {
-      const searchMatch = !filter.search ||
-        data.code.toLowerCase().includes(filter.search.toLowerCase()) ||
-        (data.code_barres && data.code_barres.toLowerCase().includes(filter.search.toLowerCase()))
-        ? true : false; // ← transformation en booléen explicite
-      const salleMatch = !filter.salle ||
-        (typeof data.salle === 'object' ? data.salle.id === filter.salle : data.salle === filter.salle);
-      return searchMatch && salleMatch; // ces deux variables sont maintenant des booléens
+      const searchTerm = filter.search?.trim().toLowerCase() || '';
+      const searchMatch = !searchTerm ||
+        data.code.toLowerCase().includes(searchTerm) ||
+        !!(data.code_barres && data.code_barres.toLowerCase().includes(searchTerm));
+      // Use == for loose comparison (string from select vs number from API)
+      const salleMatch = !filter.salle || data.salle == filter.salle;
+      return !!(searchMatch && salleMatch);
     };
-    this.dataSource.filter = 'apply';
+    this.dataSource.filter = JSON.stringify(filter);
   }
 
   openAddDialog(): void {

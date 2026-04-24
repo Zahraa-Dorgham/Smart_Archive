@@ -106,17 +106,17 @@ export class ShowSalleComponent implements OnInit {
   }
 
   applyFilter(): void {
-    const filterValue = this.filterForm.get('search')?.value?.trim().toLowerCase();
-    const batimentId = this.filterForm.get('batiment')?.value;
-
-    this.dataSource.filterPredicate = (data: Salle, filter: string) => {
-      const matchesSearch = !filterValue || 
-        data.nom.toLowerCase().includes(filterValue) ||
-        data.code.toLowerCase().includes(filterValue);
-      const matchesBatiment = !batimentId || data.batiment == batimentId;
-      return matchesSearch && matchesBatiment;
+    const filter = this.filterForm.value;
+    this.dataSource.filterPredicate = (data: Salle, filterStr: string) => {
+      const searchTerm = filter.search?.trim().toLowerCase() || '';
+      const matchesSearch = !searchTerm || 
+        data.nom.toLowerCase().includes(searchTerm) ||
+        data.code.toLowerCase().includes(searchTerm);
+      // Use == for loose comparison (string from select vs number from API)
+      const matchesBatiment = !filter.batiment || data.batiment == filter.batiment;
+      return !!(matchesSearch && matchesBatiment);
     };
-    this.dataSource.filter = filterValue + batimentId; // trick to trigger filter
+    this.dataSource.filter = JSON.stringify(filter);
   }
 
   openAddDialog(): void {
