@@ -62,7 +62,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let a of dataSource.filteredData">
+                                <tr *ngFor="let a of dataSource.connect() | async">
                                     <td class="py-2">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar bg-light-info mr-1">

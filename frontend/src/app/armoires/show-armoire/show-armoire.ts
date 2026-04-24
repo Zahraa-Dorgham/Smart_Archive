@@ -52,8 +52,16 @@ import { PaginatedResponse } from '../../core/models/base.model';
   styleUrls: ['./show-armoire.css']
 })
 export class ShowArmoireComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+    if (paginator) {
+      this.dataSource.paginator = paginator;
+    }
+  }
+  @ViewChild(MatSort) set sort(sort: MatSort) {
+    if (sort) {
+      this.dataSource.sort = sort;
+    }
+  }
 
   dataSource = new MatTableDataSource<Armoire>([]);
   displayedColumns: string[] = ['code', 'type', 'salle', 'code_barres', 'actions'];
@@ -119,8 +127,6 @@ export class ShowArmoireComponent implements OnInit {
     this.armoireService.getArmoires().subscribe({
       next: (response: PaginatedResponse<Armoire>) => {
         this.dataSource.data = response.results;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
         this.loadingService.hide();
       },
       error: (err) => {

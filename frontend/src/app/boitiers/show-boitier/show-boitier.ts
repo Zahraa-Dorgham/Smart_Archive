@@ -66,8 +66,16 @@ function isEtagere(obj: any): obj is Etagere {
     styleUrls: ['./show-boitier.css']
 })
 export class ShowBoitierComponent implements OnInit {
-    @ViewChild(MatPaginator) paginator!: MatPaginator;
-    @ViewChild(MatSort) sort!: MatSort;
+    @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+        if (paginator) {
+            this.dataSource.paginator = paginator;
+        }
+    }
+    @ViewChild(MatSort) set sort(sort: MatSort) {
+        if (sort) {
+            this.dataSource.sort = sort;
+        }
+    }
 
     dataSource = new MatTableDataSource<Boitier>([]);
     displayedColumns: string[] = ['idboit', 'titre', 'code_barre', 'localisation'];
@@ -108,8 +116,6 @@ export class ShowBoitierComponent implements OnInit {
         this.boitierService.getBoitiers().subscribe({
             next: (response) => {
                 this.dataSource.data = response.results;
-                this.dataSource.paginator = this.paginator;
-                this.dataSource.sort = this.sort;
                 this.cdr.detectChanges();
                 this.loadingService.hide();
             },

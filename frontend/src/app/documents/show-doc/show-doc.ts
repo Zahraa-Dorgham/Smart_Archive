@@ -49,8 +49,16 @@ import { LoadingService } from '../../core/services/loading.service';
   styleUrls: ['./show-doc.css']
 })
 export class ShowDocumentComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+    if (paginator) {
+      this.dataSource.paginator = paginator;
+    }
+  }
+  @ViewChild(MatSort) set sort(sort: MatSort) {
+    if (sort) {
+      this.dataSource.sort = sort;
+    }
+  }
 
   dataSource = new MatTableDataSource<Document>([]);
   displayedColumns: string[] = ['idDoc', 'reference', 'titre', 'dossier', 'phase', 'date', 'confidentialite', 'actions'];
@@ -76,8 +84,6 @@ export class ShowDocumentComponent implements OnInit {
     this.documentService.getDocuments().subscribe({
       next: (response: PaginatedResponse<Document>) => {
         this.dataSource.data = response.results;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
         this.loadingService.hide();
       },
       error: (err) => {

@@ -45,8 +45,16 @@ import { LoadingService } from '../../core/services/loading.service';
   styleUrls: ['./show-batiment.css']
 })
 export class ShowBatimentComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+    if (paginator) {
+      this.dataSource.paginator = paginator;
+    }
+  }
+  @ViewChild(MatSort) set sort(sort: MatSort) {
+    if (sort) {
+      this.dataSource.sort = sort;
+    }
+  }
   
 
   dataSource = new MatTableDataSource<Batiment>([]);
@@ -77,8 +85,6 @@ export class ShowBatimentComponent implements OnInit {
     this.batimentService.getBatiments().subscribe({
       next: (response: PaginatedResponse<Batiment>) => {
         this.dataSource.data = response.results;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
         this.loadingService.hide();
       },
       error: (err) => {

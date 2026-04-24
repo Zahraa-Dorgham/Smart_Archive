@@ -65,8 +65,16 @@ function isBoitier(obj: any): obj is Boitier {
   styleUrls: ['./show-dossier.css']
 })
 export class ShowDossierComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+    if (paginator) {
+      this.dataSource.paginator = paginator;
+    }
+  }
+  @ViewChild(MatSort) set sort(sort: MatSort) {
+    if (sort) {
+      this.dataSource.sort = sort;
+    }
+  }
 
   dataSource = new MatTableDataSource<Dossier>([]);
   displayedColumns: string[] = ['reference', 'titre', 'phase', 'boitier', 'statut', 'confidentialite', 'date_creation', 'nb_docs', 'actions'];
@@ -108,8 +116,6 @@ export class ShowDossierComponent implements OnInit {
     this.dossierService.getDossiers().subscribe({
       next: (response: PaginatedResponse<Dossier>) => {
         this.dataSource.data = response.results;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
         this.loadingService.hide();
       },
       error: (err) => {

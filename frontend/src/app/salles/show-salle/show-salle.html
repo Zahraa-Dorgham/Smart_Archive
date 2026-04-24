@@ -62,7 +62,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let s of dataSource.filteredData">
+                                <tr *ngFor="let s of dataSource.connect() | async">
                                     <td class="py-2">
                                         <span class="badge badge-light-primary text-uppercase font-weight-bold">{{s.code}}</span>
                                     </td>

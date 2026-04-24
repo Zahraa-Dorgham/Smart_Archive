@@ -53,8 +53,16 @@ import { LoadingService } from '../../core/services/loading.service';
   styleUrls: ['./show-etagere.css']
 })
 export class ShowEtagereComponent implements OnInit {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
+    if (paginator) {
+      this.dataSource.paginator = paginator;
+    }
+  }
+  @ViewChild(MatSort) set sort(sort: MatSort) {
+    if (sort) {
+      this.dataSource.sort = sort;
+    }
+  }
 
   dataSource = new MatTableDataSource<Etagere>([]);
   displayedColumns: string[] = ['numero', 'armoire', 'code_barres', 'actions'];
@@ -119,8 +127,6 @@ export class ShowEtagereComponent implements OnInit {
     this.etagereService.getEtageres().subscribe({
       next: (response: PaginatedResponse<Etagere>) => {
         this.dataSource.data = response.results;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
         this.loadingService.hide();
       },
       error: (err) => {

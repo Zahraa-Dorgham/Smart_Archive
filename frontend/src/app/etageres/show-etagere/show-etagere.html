@@ -61,7 +61,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let e of dataSource.filteredData">
+                                <tr *ngFor="let e of dataSource.connect() | async">
                                     <td class="py-2">
                                         <div class="badge badge-light-primary px-1">
                                             <i class="bx bx-list-ol mr-25"></i> Niveau {{e.numero}}
