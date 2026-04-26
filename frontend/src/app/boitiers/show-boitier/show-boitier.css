@@ -9,3 +9,19 @@
 .avatar .avatar-content i {
     font-size: 1.2rem;
 }
+
+.form-control {
+    /* display: block;
+    width: 100%;
+    height: calc(1.4em + 0.94rem + 3.7px);
+    padding: 0.47rem 0.8rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #475F7B;
+    background-color: #FFFFFF;
+    background-clip: padding-box; */
+    border: 1px solid #DFE3E7;
+    border-radius: 8px;
+    
+}

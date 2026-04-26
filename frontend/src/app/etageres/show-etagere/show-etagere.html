@@ -23,7 +23,7 @@
     <div class="users-list-filter px-1">
         <form [formGroup]="filterForm" class="row border rounded py-2 mb-2 bg-white shadow-sm mx-0">
             <div class="col-12 col-sm-6 col-lg-3">
-                <label class="font-weight-bold">Filtrer</label>
+                <label class="font-weight-bold filter">Filtrer</label>
                 <fieldset class="form-group position-relative has-icon-left mb-0">
                     <input type="text" class="form-control" formControlName="search" placeholder="Numéro ou code-barres...">
                     <div class="form-control-position"><i class="bx bx-search"></i></div>
@@ -69,7 +69,7 @@
                                     </td>
                                     <td class="py-2">
                                         <div class="font-weight-bold text-primary">
-                                            <i class="bx bx-cabinet mr-25"></i> {{getArmoireCode(e)}}
+                                            <i class="bx bx-archive mr-25"></i> {{getArmoireCode(e)}}
                                         </div>
                                     </td>
                                     <td class="py-2">

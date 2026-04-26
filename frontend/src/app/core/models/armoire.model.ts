@@ -10,6 +10,7 @@ export interface Armoire extends BaseModel {
     code_barres?: string;
     description?: string;
     date_installation?: Date;
+    nombre_etageres?: number;
 }
 
 export interface ArmoireCreate {

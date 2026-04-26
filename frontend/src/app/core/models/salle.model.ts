@@ -11,6 +11,7 @@ export interface Salle extends BaseModel {
     type_salle: string;
     etage: number;
     description?: string;
+    nombre_armoires?: number;
     // autres champs
 }
 

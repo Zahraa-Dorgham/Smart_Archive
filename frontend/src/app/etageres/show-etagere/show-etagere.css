@@ -25,7 +25,7 @@
     border-radius: 8px;
     position: relative;
      left: 10px;
-    top: -2px;
+    top: -1px;
     }
 
 
@@ -48,4 +48,10 @@
 
 ::ng-deep .custom-paginator .mat-mdc-paginator-container {
     padding: 0 !important;
+}
+.font-weight-bold.filter {
+   
+    position: relative;
+    left: 15px;
+    top: -1px;
 }

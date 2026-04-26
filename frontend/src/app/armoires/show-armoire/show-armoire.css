@@ -38,7 +38,7 @@
     border-radius: 8px;
     position: relative;
     left: 10px;
-    top: -3px;
+    top: -1px;
 }
 
 .form-control-position {
@@ -51,4 +51,11 @@
 
 ::ng-deep .custom-paginator {
     background: transparent !important;
+}
+
+.font-weight-bold.rech {
+
+    position: relative;
+    left: 15px;
+  
 }

@@ -55,8 +55,9 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th class="py-2">Code Armoire</th>
-                                    <th class="py-2">Localisation</th>
-                                    <th class="py-2">Code-Barres</th>
+                                    <th class="py-2">Localisation (Salle)</th>
+                                    <th class="py-2 text-center">Niveaux (Étageres)</th>
+                                    <th class="py-2">Code-barres</th>
                                     <th class="py-2"></th>
                                     <th class="py-2 text-right px-2">Actions</th>
                                 </tr>
@@ -73,6 +74,9 @@
                                     </td>
                                     <td class="py-2 text-primary">
                                         <i class="bx bx-map-pin mr-25"></i> {{ a.salle_nom || 'N/A' }}
+                                    </td>
+                                    <td class="py-2 text-center">
+                                        <span class="badge badge-light-info">{{ a.nombre_etageres || 0 }}</span>
                                     </td>
                                     <td class="py-2">
                                         <small class="text-muted"><i class="bx bx-barcode mr-25"></i> {{a.code_barres}}</small>

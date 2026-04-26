@@ -126,6 +126,14 @@ export class ShowBatimentComponent implements OnInit {
   }
 
   deleteBatiment(batiment: Batiment): void {
+    if (batiment.nombre_salles && batiment.nombre_salles > 0) {
+      this.snackBar.open(`Impossible de supprimer ce bâtiment.`, 'Fermer', {
+        duration: 5000,
+        panelClass: ['snackbar-warning']
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
@@ -144,7 +152,7 @@ export class ShowBatimentComponent implements OnInit {
             this.loadBatiments();
           },
           error: (err) => {
-            this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+            this.snackBar.open('Erreur lors de la suppression. Assurez-vous que l\'emplacement est vide.', 'Fermer', { duration: 5000 });
             this.loadingService.hide();
           }
         });

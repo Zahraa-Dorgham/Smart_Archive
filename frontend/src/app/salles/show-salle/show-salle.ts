@@ -62,7 +62,7 @@ export class ShowSalleComponent implements OnInit {
   }
 
   dataSource = new MatTableDataSource<Salle>([]);
-  displayedColumns: string[] = ['code', 'nom', 'batiment_nom', 'type_salle', 'etage', 'actions'];
+  displayedColumns: string[] = ['code', 'nom', 'batiment_nom', 'nombre_armoires', 'etage', 'actions'];
   filterForm: FormGroup;
   batiments: any[] = [];
   parentBatimentId: any = null;
@@ -163,6 +163,14 @@ export class ShowSalleComponent implements OnInit {
   }
 
   deleteSalle(salle: Salle): void {
+    if (salle.nombre_armoires && salle.nombre_armoires > 0) {
+      this.snackBar.open(`Impossible de supprimer cette salle.`, 'Fermer', {
+        duration: 5000,
+        panelClass: ['snackbar-warning']
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
@@ -181,7 +189,7 @@ export class ShowSalleComponent implements OnInit {
             this.loadSalles();
           },
           error: (err) => {
-            this.snackBar.open('Erreur suppression', 'Fermer', { duration: 3000 });
+            this.snackBar.open('Erreur lors de la suppression. Assurez-vous que l\'emplacement est vide.', 'Fermer', { duration: 5000 });
             this.loadingService.hide();
           }
         });

@@ -191,6 +191,14 @@ export class ShowEtagereComponent implements OnInit {
   }
 
   deleteEtagere(etagere: Etagere): void {
+    if (etagere.occupation_actuelle && etagere.occupation_actuelle > 0) {
+      this.snackBar.open(`Impossible de supprimer cette étagère.`, 'Fermer', {
+        duration: 5000,
+        panelClass: ['snackbar-warning']
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
@@ -209,7 +217,7 @@ export class ShowEtagereComponent implements OnInit {
             this.loadEtageres();
           },
           error: (err) => {
-            this.snackBar.open('Erreur lors de la suppression', 'Fermer', { duration: 3000 });
+            this.snackBar.open('Erreur lors de la suppression. Assurez-vous que l\'étagère est vide.', 'Fermer', { duration: 5000 });
             this.loadingService.hide();
           }
         });
