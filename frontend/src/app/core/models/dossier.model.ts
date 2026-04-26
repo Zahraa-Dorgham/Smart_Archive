@@ -1,34 +1,35 @@
 import { BaseModel } from './base.model';
+import { Boitier } from './boitier.model';
+import { PhaseArchive } from './phase-archive.model';
 
 export interface Dossier extends BaseModel {
-    idDossier: string;
-    reference: string;
-    titre: string;
-    description?: string;
-    boitier?: string;
+    idDossier: number;
+    nomDos?: string | null;
+    boitier?: Boitier | string | null;
     boitier_idboit?: string;
-    phase_archive: string;
-    phase_archive_nom?: string;
+    phaseArchive?: PhaseArchive | string | null;
+    phaseArchive_nom?: string;
+    phaseType: string;
     date_creation: Date;
-    date_cloture?: Date;
-    statut: string;
-    niveau_confidentialite: string;
+    date_cloture?: Date | null;
+    dureeCourant: number;
+    dureeIntermediaire: number;
+    dureeDefinitive: number;
     nombre_documents?: number;
 }
 
 export interface DossierCreate {
-    idDossier: string;
-    reference: string;
-    titre: string;
-    description?: string;
-    boitier?: string;
-    phase_archive: string;
+    nomDos?: string | null;
+    boitier?: string | null;
+    phaseArchive?: string | null;
+    phaseType: string;
     date_creation: Date;
-    date_cloture?: Date;
-    statut: string;
-    niveau_confidentialite: string;
+    date_cloture?: Date | null;
+    dureeCourant?: number;
+    dureeIntermediaire?: number;
+    dureeDefinitive?: number;
 }
 
 export interface DossierUpdate extends Partial<DossierCreate> {
-    id: string;
+    idDossier: number;
 }

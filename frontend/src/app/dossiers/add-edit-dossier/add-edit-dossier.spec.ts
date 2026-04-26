@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddEditDossier } from './add-edit-dossier';
+import { AddEditDossierComponent } from './add-edit-dossier';
 
 describe('AddEditDossier', () => {
-  let component: AddEditDossier;
-  let fixture: ComponentFixture<AddEditDossier>;
+  let component: AddEditDossierComponent;
+  let fixture: ComponentFixture<AddEditDossierComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddEditDossier],
+      imports: [AddEditDossierComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AddEditDossier);
+    fixture = TestBed.createComponent(AddEditDossierComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

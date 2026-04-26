@@ -79,10 +79,16 @@ export class AddEditDocumentComponent implements OnInit {
     this.loadCalendriers();
     if (this.isEditMode && this.data.document) {
       const doc = this.data.document;
+      const currentCalendrier = doc.calendrier as { id?: string } | string | null | undefined;
+      const calendrierValue =
+        currentCalendrier && typeof currentCalendrier === 'object'
+          ? currentCalendrier.id ?? null
+          : currentCalendrier;
+
       this.form.patchValue({
         ...doc,
         dossier: typeof doc.dossier === 'object' ? doc.dossier.id : doc.dossier,
-        calendrier: typeof doc.calendrier === 'object' ? doc.calendrier.id : doc.calendrier,
+        calendrier: calendrierValue,
         phase_archive: typeof doc.phase_archive === 'object' ? doc.phase_archive.id : doc.phase_archive
       });
     }
@@ -97,7 +103,7 @@ export class AddEditDocumentComponent implements OnInit {
   }
 
   loadCalendriers(): void {
-    this.calendrierService.getCalendriers().subscribe(res => this.calendriers = res.results);
+    this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe(res => this.calendriers = res.results);
   }
 
   onFileSelected(event: any): void {

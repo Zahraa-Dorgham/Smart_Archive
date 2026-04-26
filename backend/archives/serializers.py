@@ -106,15 +106,23 @@ class BoitierSerializer(serializers.ModelSerializer):
         return obj.localisation_complete()
 
 class DossierSerializer(serializers.ModelSerializer):
+    boitier_idboit = serializers.CharField(source='boitier.idboit', read_only=True)
+    phaseArchive_nom = serializers.CharField(source='phaseArchive.nom', read_only=True)
     nombre_documents = serializers.IntegerField(read_only=True)
     volume_total = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Dossier
-        fields = '__all__'
+        fields = [
+            'idDossier', 'nomDos', 'date_creation', 'date_cloture',
+            'boitier', 'boitier_idboit', 'phaseArchive', 'phaseArchive_nom',
+            'phaseType', 'dureeCourant', 'dureeIntermediaire', 'dureeDefinitive',
+            'nombre_documents', 'volume_total'
+        ]
 
 class DocumentSerializer(serializers.ModelSerializer):
-    dossier_reference = serializers.CharField(source='dossier.reference', read_only=True)
+    dossier_reference = serializers.CharField(source='dossier.idDossier', read_only=True)
+    dossier_nom = serializers.CharField(source='dossier.nomDos', read_only=True)
     phase_archive_nom = serializers.CharField(source='phase_archive.nom', read_only=True)
     taille_fichier_lisible = serializers.SerializerMethodField()
     calendrier_code = serializers.CharField(source='calendrier.code', read_only=True)
@@ -123,7 +131,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = [
-            'id', 'idDoc', 'reference', 'titre', 'dossier', 'dossier_reference',
+            'id', 'idDoc', 'reference', 'titre', 'dossier', 'dossier_reference', 'dossier_nom',
             'phase_archive', 'phase_archive_nom', 'date_creation',
             'calendrier', 'calendrier_code', 'calendrier_title',
             'niv_confidentialite', 'version', 'type_document', 'auteur',

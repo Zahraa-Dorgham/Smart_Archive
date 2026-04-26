@@ -27,13 +27,12 @@ import { AddEditDossierComponent } from '../add-edit-dossier/add-edit-dossier';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { LoadingService } from '../../core/services/loading.service';
 
-// Type guards
-function isPhaseArchive(obj: any): obj is PhaseArchive {
-  return obj && typeof obj === 'object' && 'id' in obj && 'nom' in obj;
+function isPhaseArchive(obj: unknown): obj is PhaseArchive {
+  return !!obj && typeof obj === 'object' && 'id' in obj && 'nom' in obj;
 }
 
-function isBoitier(obj: any): obj is Boitier {
-  return obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
+function isBoitier(obj: unknown): obj is Boitier {
+  return !!obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
 }
 
 @Component({
@@ -69,7 +68,7 @@ export class ShowDossierComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   dataSource = new MatTableDataSource<Dossier>([]);
-  displayedColumns: string[] = ['reference', 'titre', 'phase', 'boitier', 'statut', 'confidentialite', 'date_creation', 'nb_docs', 'actions'];
+  displayedColumns: string[] = ['idDossier', 'nomDos', 'phase', 'boitier', 'phaseType', 'date_creation', 'nb_docs', 'actions'];
   filterForm: FormGroup;
   phases: PhaseArchive[] = [];
 
@@ -84,7 +83,7 @@ export class ShowDossierComponent implements OnInit {
     this.filterForm = this.fb.group({
       search: [''],
       phase: [''],
-      statut: ['']
+      phaseType: ['']
     });
   }
 
@@ -95,7 +94,7 @@ export class ShowDossierComponent implements OnInit {
   }
 
   loadPhases(): void {
-    this.phaseService.getPhases().subscribe({
+    this.phaseService.getPhases({ page_size: 1000 }).subscribe({
       next: (response: PaginatedResponse<PhaseArchive>) => {
         this.phases = response.results;
       },
@@ -105,7 +104,7 @@ export class ShowDossierComponent implements OnInit {
 
   loadDossiers(): void {
     this.loadingService.show();
-    this.dossierService.getDossiers().subscribe({
+    this.dossierService.getDossiers({ page_size: 1000 }).subscribe({
       next: (response: PaginatedResponse<Dossier>) => {
         this.dataSource.data = response.results;
         this.dataSource.paginator = this.paginator;
@@ -121,71 +120,81 @@ export class ShowDossierComponent implements OnInit {
   }
 
   applyFilter(): void {
-    const filter = this.filterForm.value;
-    this.dataSource.filterPredicate = (data: Dossier, filterStr: string) => {
+    const filter = this.filterForm.getRawValue();
+
+    this.dataSource.filterPredicate = (data: Dossier) => {
       const searchTerm = filter.search?.toLowerCase().trim() || '';
-      const phaseMatch = !filter.phase ||
-        (isPhaseArchive(data.phase_archive) ? data.phase_archive.id === filter.phase : data.phase_archive === filter.phase);
-      const statutMatch = !filter.statut || data.statut === filter.statut;
+      const phaseId = this.getPhaseId(data);
+      const phaseMatch = !filter.phase || phaseId === filter.phase;
+      const phaseTypeMatch = !filter.phaseType || data.phaseType === filter.phaseType;
       const searchMatch = !searchTerm ||
-        data.reference.toLowerCase().includes(searchTerm) ||
-        data.titre.toLowerCase().includes(searchTerm);
-      return searchMatch && phaseMatch && statutMatch;
+        String(data.idDossier).includes(searchTerm) ||
+        (data.nomDos || '').toLowerCase().includes(searchTerm);
+
+      return searchMatch && phaseMatch && phaseTypeMatch;
     };
-    this.dataSource.filter = filter.search || '';
+
+    this.dataSource.filter = JSON.stringify(filter);
   }
 
-  getPhaseNom(d: Dossier): string {
-    if (isPhaseArchive(d.phase_archive)) {
-      return d.phase_archive.nom;
+  getPhaseId(dossier: Dossier): string | null {
+    if (dossier.phaseArchive && isPhaseArchive(dossier.phaseArchive)) {
+      return String(dossier.phaseArchive.id);
     }
-    return (d as any).phase_nom || 'N/A';
+
+    return dossier.phaseArchive ? String(dossier.phaseArchive) : null;
   }
 
-  getBoitierId(d: Dossier): string {
-    if (isBoitier(d.boitier)) {
-      return d.boitier.idboit;
+  getPhaseNom(dossier: Dossier): string {
+    if (dossier.phaseArchive && isPhaseArchive(dossier.phaseArchive)) {
+      return dossier.phaseArchive.nom;
     }
-    return (d.boitier as string) || 'Aucun';
+
+    return dossier.phaseArchive_nom || 'N/A';
   }
 
-  getStatutColor(statut: string): string {
-    switch (statut) {
-      case 'ACTIF': return 'primary';
-      case 'CLOS': return '';
-      case 'TRANSFERE': return 'accent';
-      case 'DETRUIT': return 'warn';
-      default: return '';
+  getBoitierId(dossier: Dossier): string {
+    if (dossier.boitier && isBoitier(dossier.boitier)) {
+      return dossier.boitier.idboit;
     }
+
+    return dossier.boitier_idboit || 'Aucun';
   }
 
-  getConfidentialiteColor(niveau: string): string {
-    switch (niveau) {
-      case 'PUBLIC': return 'primary';
-      case 'INTERNE': return 'accent';
-      case 'CONFIDENTIEL': return 'warn';
-      case 'SECRET': return 'warn';
+  getPhaseTypeColor(phaseType: string): string {
+    switch (phaseType) {
+      case 'COURANTE': return 'primary';
+      case 'INTERMEDIAIRE': return 'accent';
+      case 'DEFINITIVE': return 'warn';
       default: return '';
     }
   }
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(AddEditDossierComponent, {
-      width: '600px',
+      width: '700px',
+      maxWidth: '95vw',
       data: { mode: 'add' }
     });
+
     dialogRef.afterClosed().subscribe(result => {
-      if (result) this.loadDossiers();
+      if (result) {
+        this.loadDossiers();
+      }
     });
   }
 
   openEditDialog(dossier: Dossier): void {
     const dialogRef = this.dialog.open(AddEditDossierComponent, {
-      width: '600px',
+      width: '700px',
+      maxWidth: '95vw',
       data: { mode: 'edit', dossier }
     });
+
     dialogRef.afterClosed().subscribe(result => {
-      if (result) this.loadDossiers();
+      if (result) {
+        this.loadDossiers();
+      }
     });
   }
 
@@ -194,20 +203,21 @@ export class ShowDossierComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Confirmation',
-        message: `Supprimer le dossier ${dossier.reference} ?`,
+        message: `Supprimer le dossier ${dossier.nomDos || dossier.idDossier} ?`,
         confirmText: 'Supprimer',
         cancelText: 'Annuler'
       }
     });
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.loadingService.show();
-        this.dossierService.deleteDossier(dossier.id).subscribe({
+        this.dossierService.deleteDossier(String(dossier.idDossier)).subscribe({
           next: () => {
-            this.snackBar.open('Dossier supprimé', 'Fermer', { duration: 3000 });
+            this.snackBar.open('Dossier supprime', 'Fermer', { duration: 3000 });
             this.loadDossiers();
           },
-          error: (err) => {
+          error: () => {
             this.snackBar.open('Erreur suppression', 'Fermer', { duration: 3000 });
             this.loadingService.hide();
           }

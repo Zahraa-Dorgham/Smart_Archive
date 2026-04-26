@@ -100,9 +100,9 @@ export class ShowDocumentComponent implements OnInit {
 
   getDossierReference(doc: Document): string {
     if (typeof doc.dossier === 'object') {
-      return doc.dossier.reference;
+      return doc.dossier.nomDos || String(doc.dossier.idDossier);
     }
-    return (doc as any).dossier_reference || 'N/A';
+    return (doc as any).dossier_nom || (doc as any).dossier_reference || 'N/A';
   }
 
   getPhaseNom(doc: Document): string {

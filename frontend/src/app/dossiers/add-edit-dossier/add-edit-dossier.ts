@@ -17,13 +17,12 @@ import { Dossier } from '../../core/models/dossier.model';
 import { Boitier } from '../../core/models/boitier.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
 
-// Type guards
-function isBoitier(obj: any): obj is Boitier {
-  return obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
+function isBoitier(obj: unknown): obj is Boitier {
+  return !!obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
 }
 
-function isPhaseArchive(obj: any): obj is PhaseArchive {
-  return obj && typeof obj === 'object' && 'id' in obj && 'nom' in obj;
+function isPhaseArchive(obj: unknown): obj is PhaseArchive {
+  return !!obj && typeof obj === 'object' && 'id' in obj && 'nom' in obj;
 }
 
 export interface DialogData {
@@ -52,8 +51,8 @@ export interface DialogData {
 export class AddEditDossierComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
-  boitiers: any[] = [];
-  phases: any[] = [];
+  boitiers: Boitier[] = [];
+  phases: PhaseArchive[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -66,62 +65,71 @@ export class AddEditDossierComponent implements OnInit {
   ) {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
-      idDossier: ['', Validators.required],
-      reference: ['', Validators.required],
-      titre: ['', Validators.required],
-      description: [''],
-      boitier: [''],
-      phase_archive: ['', Validators.required],
+      nomDos: ['', Validators.required],
+      boitier: [null],
+      phaseArchive: [null, Validators.required],
+      phaseType: ['COURANTE', Validators.required],
       date_creation: ['', Validators.required],
-      date_cloture: [''],
-      statut: ['ACTIF', Validators.required],
-      niveau_confidentialite: ['INTERNE', Validators.required]
+      date_cloture: [null],
+      dureeCourant: [3, [Validators.required, Validators.min(0)]],
+      dureeIntermediaire: [10, [Validators.required, Validators.min(0)]],
+      dureeDefinitive: [100, [Validators.required, Validators.min(0)]]
     });
   }
 
   ngOnInit(): void {
     this.loadBoitiers();
     this.loadPhases();
+
     if (this.isEditMode && this.data.dossier) {
       const dossier = this.data.dossier;
-      const patchValues: any = { ...dossier };
+      const patchValues: Record<string, unknown> = { ...dossier };
+
       if (dossier.boitier && isBoitier(dossier.boitier)) {
-        patchValues.boitier = dossier.boitier.id;
+        patchValues['boitier'] = dossier.boitier.id;
       }
-      if (dossier.phase_archive && isPhaseArchive(dossier.phase_archive)) {
-        patchValues.phase_archive = dossier.phase_archive.id;
+
+      if (dossier.phaseArchive && isPhaseArchive(dossier.phaseArchive)) {
+        patchValues['phaseArchive'] = dossier.phaseArchive.id;
       }
+
       this.form.patchValue(patchValues);
     }
   }
 
   loadBoitiers(): void {
-    this.boitierService.getBoitiers().subscribe(res => this.boitiers = res.results);
+    this.boitierService.getBoitiers({ page_size: 1000 }).subscribe(res => this.boitiers = res.results);
   }
 
   loadPhases(): void {
-    this.phaseService.getPhases().subscribe(res => this.phases = res.results);
+    this.phaseService.getPhases({ page_size: 1000 }).subscribe(res => this.phases = res.results);
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
-    const formValue = this.form.value;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.form.getRawValue();
+
     if (this.isEditMode && this.data.dossier) {
-      this.dossierService.updateDossier(this.data.dossier.id, formValue).subscribe({
+      this.dossierService.updateDossier(String(this.data.dossier.idDossier), formValue).subscribe({
         next: () => {
-          this.snackBar.open('Dossier modifié', 'Fermer', { duration: 3000 });
+          this.snackBar.open('Dossier modifie', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
         error: () => this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 })
       });
-    } else {
-      this.dossierService.createDossier(formValue).subscribe({
-        next: () => {
-          this.snackBar.open('Dossier créé', 'Fermer', { duration: 3000 });
-          this.dialogRef.close(true);
-        },
-        error: () => this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 })
-      });
+      return;
     }
+
+    this.dossierService.createDossier(formValue).subscribe({
+      next: () => {
+        this.snackBar.open('Dossier cree', 'Fermer', { duration: 3000 });
+        this.dialogRef.close(true);
+      },
+      error: () => this.snackBar.open('Erreur creation', 'Fermer', { duration: 3000 })
+    });
   }
 }
