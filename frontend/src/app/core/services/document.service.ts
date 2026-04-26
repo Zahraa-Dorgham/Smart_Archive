@@ -27,7 +27,7 @@ export class DocumentService {
         formData.append('idDoc', data.idDoc);
         formData.append('reference', data.reference);
         formData.append('titre', data.titre);
-        formData.append('dossier', data.dossier);
+        formData.append('dossier', String(data.dossier));
         formData.append('phase_archive', data.phase_archive);
         formData.append('date_creation', data.date_creation.toISOString().split('T')[0]); // format YYYY-MM-DD
         formData.append('niv_confidentialite', data.niv_confidentialite);

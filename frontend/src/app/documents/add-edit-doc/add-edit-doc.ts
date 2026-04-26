@@ -15,6 +15,7 @@ import { DossierService } from '../../core/services/dossier.service';
 import { PhaseArchiveService } from '../../core/services/phase-archive.service';
 import { CalendrierService } from '../../core/services/calendrier.service';
 import { Document } from '../../core/models/document.model';
+import { Dossier } from '../../core/models/dossier.model';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -42,7 +43,7 @@ export interface DialogData {
 export class AddEditDocumentComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
-  dossiers: any[] = [];
+  dossiers: Dossier[] = [];
   phases: any[] = [];
   calendriers: any[] = [];
   selectedFile: File | null = null;
@@ -80,14 +81,19 @@ export class AddEditDocumentComponent implements OnInit {
     if (this.isEditMode && this.data.document) {
       const doc = this.data.document;
       const currentCalendrier = doc.calendrier as { id?: string } | string | null | undefined;
+      const currentDossier = doc.dossier as Dossier | number | string;
       const calendrierValue =
         currentCalendrier && typeof currentCalendrier === 'object'
           ? currentCalendrier.id ?? null
           : currentCalendrier;
+      const dossierValue =
+        currentDossier && typeof currentDossier === 'object'
+          ? currentDossier.idDossier
+          : currentDossier;
 
       this.form.patchValue({
         ...doc,
-        dossier: typeof doc.dossier === 'object' ? doc.dossier.id : doc.dossier,
+        dossier: dossierValue,
         calendrier: calendrierValue,
         phase_archive: typeof doc.phase_archive === 'object' ? doc.phase_archive.id : doc.phase_archive
       });
@@ -95,7 +101,7 @@ export class AddEditDocumentComponent implements OnInit {
   }
 
   loadDossiers(): void {
-    this.dossierService.getDossiers().subscribe(res => this.dossiers = res.results);
+    this.dossierService.getDossiers({ page_size: 1000 }).subscribe(res => this.dossiers = res.results);
   }
 
   loadPhases(): void {
@@ -111,7 +117,10 @@ export class AddEditDocumentComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     const formValue = this.form.value;
     if (this.isEditMode && this.data.document) {

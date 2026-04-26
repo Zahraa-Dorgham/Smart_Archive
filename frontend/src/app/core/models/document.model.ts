@@ -6,7 +6,7 @@ export interface Document extends BaseModel {
     idDoc: string;
     reference: string;
     titre: string;
-    dossier: Dossier | string;
+    dossier: Dossier | number | string;
     calendrier?: string | null;
     calendrier_title?: string | null;
     phase_archive: PhaseArchive | string;
@@ -27,7 +27,7 @@ export interface DocumentCreate {
     idDoc: string;
     reference: string;
     titre: string;
-    dossier: string;
+    dossier: string | number;
     calendrier?: string | null;
     phase_archive: string;
     date_creation: Date;

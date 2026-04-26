@@ -24,9 +24,11 @@
             <mat-form-field appearance="outline">
                 <mat-label>Dossier *</mat-label>
                 <mat-select formControlName="dossier">
-                    <mat-option *ngFor="let d of dossiers" [value]="d.id">{{ d.reference }}</mat-option>
+                    <mat-option *ngFor="let d of dossiers" [value]="d.idDossier">
+                        {{ d.idDossier }} - {{ d.nomDos || 'Sans nom' }}
+                    </mat-option>
                 </mat-select>
-                <mat-error>Requis</mat-error>
+                <mat-error *ngIf="form.get('dossier')?.hasError('required')">Requis</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
