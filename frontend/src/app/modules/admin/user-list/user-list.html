@@ -1,17 +1,4 @@
-<!-- <div class="sidebar">
-    <i class="bi bi-grid-fill text-white fs-3"></i>
-    <ul class="sidebar-nav">
-        <li><i class="bi bi-speedometer2"></i></li>
-        <li><i class="bi bi-file-earmark-text"></i></li>
-        <li><i class="bi bi-folder"></i></li>
-        <li><i class="bi bi-calendar3"></i></li>
-        <li class="active"><i class="bi bi-person-fill"></i></li>
-        <li><i class="bi bi-gear"></i></li>
-    </ul>
-</div> -->
-
 <div class="main-content">
-    <!-- Cartes statistiques -->
     <div class="row g-3 mb-4">
         <div class="col">
             <div class="card stat-card p-3">
@@ -22,21 +9,20 @@
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-primary" [style.width.%]="(totalUsers/totalUsers)*100"></div>
+                    <div class="progress-bar bg-primary" [style.width.%]="totalUsers ? 100 : 0"></div>
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="card stat-card p-3">
                 <div class="d-flex align-items-center">
-                    <div class="icon-box bg-success bg-opacity-10 text-success me-3"><i class="bi bi-person-check"></i>
-                    </div>
+                    <div class="icon-box bg-success bg-opacity-10 text-success me-3"><i class="bi bi-person-check"></i></div>
                     <div><small class="text-muted">Active Users</small>
                         <h5 class="mb-0 fw-bold">{{ activeUsers }}</h5>
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-success" [style.width.%]="(activeUsers/totalUsers)*100"></div>
+                    <div class="progress-bar bg-success" [style.width.%]="totalUsers ? (activeUsers / totalUsers) * 100 : 0"></div>
                 </div>
             </div>
         </div>
@@ -49,21 +35,20 @@
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-danger" [style.width.%]="(inactiveUsers/totalUsers)*100"></div>
+                    <div class="progress-bar bg-danger" [style.width.%]="totalUsers ? (inactiveUsers / totalUsers) * 100 : 0"></div>
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="card stat-card p-3">
                 <div class="d-flex align-items-center">
-                    <div class="icon-box bg-warning bg-opacity-10 text-warning me-3"><i class="bi bi-shield-lock"></i>
-                    </div>
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning me-3"><i class="bi bi-shield-lock"></i></div>
                     <div><small class="text-muted">Total Roles</small>
                         <h5 class="mb-0 fw-bold">{{ totalRoles }}</h5>
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-warning" [style.width.%]="(totalRoles/10)*100"></div>
+                    <div class="progress-bar bg-warning" [style.width.%]="(totalRoles / 4) * 100"></div>
                 </div>
             </div>
         </div>
@@ -76,7 +61,7 @@
                     </div>
                 </div>
                 <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-info" [style.width.%]="(totalDepartments/10)*100"></div>
+                    <div class="progress-bar bg-info" [style.width.%]="0"></div>
                 </div>
             </div>
         </div>
@@ -90,24 +75,20 @@
             </button>
         </div>
 
-        <!-- Barre de recherche -->
         <div class="mb-3 d-flex gap-2">
             <div class="input-group w-25">
                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
                 <input type="text" class="form-control border-start-0" placeholder="Search Users"
                     [(ngModel)]="searchTerm" (keyup)="applyFilter()">
             </div>
-            <button class="btn btn-light border text-primary"><i class="bi bi-filter"></i></button>
         </div>
 
-        <!-- Tableau des utilisateurs -->
         <table class="table user-table align-middle">
             <thead>
                 <tr>
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Email</th>
-                    <th>Department</th>
                     <th>Role</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -119,13 +100,11 @@
                     <td>{{ user.first_name || '-' }}</td>
                     <td>{{ user.last_name || '-' }}</td>
                     <td class="small">{{ user.email }}</td>
-                    <td>{{ user.department || '-' }}</td>
-
                     <td class="roles-cell">
-                        <span *ngFor="let group of user.groups" class="role-badge" [class]="group.toLowerCase()">
-                            {{ group }}
+                        <span *ngFor="let group of user.groups" class="role-badge" [class]="(group.name || '').toLowerCase()">
+                            {{ group.name }}
                         </span>
-                        <span *ngIf="!user.groups?.length" class="role-badge employee">employee</span>
+                        <span *ngIf="!user.groups?.length" class="role-badge employee">Employe</span>
                     </td>
                     <td>
                         <div class="form-check form-switch d-flex align-items-center">
@@ -138,21 +117,21 @@
                         </div>
                     </td>
                     <td>
-                        <i class="bi bi-pencil-square" style="cursor: pointer; margin-right: 8px;" (click)="edit(user); $event.stopPropagation()"></i>
+                        <i class="bi bi-pencil-square" style="cursor: pointer; margin-right: 8px;"
+                            (click)="edit(user); $event.stopPropagation()"></i>
                         <i class="bi bi-trash ms-2 text-danger" style="cursor: pointer;"
                             (click)="delete(user.id); $event.stopPropagation()"></i>
                     </td>
                 </tr>
                 <tr *ngIf="loadingUsers">
-                    <td colspan="7" class="text-center py-4 text-muted">Chargement des utilisateurs...</td>
+                    <td colspan="6" class="text-center py-4 text-muted">Chargement des utilisateurs...</td>
                 </tr>
                 <tr *ngIf="!loadingUsers && filteredUsers.length === 0">
-                    <td colspan="7" class="text-center py-4 text-muted">Aucun utilisateur trouvé</td>
+                    <td colspan="6" class="text-center py-4 text-muted">Aucun utilisateur trouve</td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- Pagination -->
         <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="filteredUsers.length > 0">
             <div class="pagination-info">
                 Items per page:
@@ -164,15 +143,13 @@
                 </select>
             </div>
             <div class="pagination-controls">
-                <button class="btn btn-outline-secondary btn-sm" (click)="previousPage()" [disabled]="page === 1">‹
-                    Précédent</button>
+                <button class="btn btn-outline-secondary btn-sm" (click)="previousPage()" [disabled]="page === 1">Precedent</button>
                 <span class="mx-2">Page {{ page }} sur {{ totalPages }}</span>
                 <button class="btn btn-outline-secondary btn-sm" (click)="nextPage()"
-                    [disabled]="page === totalPages">Suivant ›</button>
+                    [disabled]="page === totalPages">Suivant</button>
             </div>
         </div>
 
-        <!-- Panneau de détails (sous le tableau) -->
         <div class="user-detail-panel mt-4" *ngIf="selectedUser">
             <div class="row">
                 <div class="col-md-4 d-flex">
@@ -182,8 +159,8 @@
                         <h6 class="mb-0 fw-bold">{{ selectedUser.first_name }} {{ selectedUser.last_name }}</h6>
                         <p class="small text-muted mb-0">{{ selectedUser.email }}</p>
                         <div class="mt-2 small">
-                            <strong>Phone:</strong> {{ selectedUser.phone || '-' }}<br>
-                            <strong>Role:</strong> {{ selectedUser.role || 'employee' }}<br>
+                            <strong>Username:</strong> {{ selectedUser.username }}<br>
+                            <strong>Role:</strong> {{ selectedUser.role || 'Employe' }}<br>
                             <strong>Status:</strong> {{ selectedUser.is_active ? 'Active' : 'Inactive' }}
                         </div>
                     </div>
@@ -191,16 +168,19 @@
                 <div class="col-md-5">
                     <h6 class="small fw-bold text-muted">Role Permissions</h6>
                     <div class="d-flex flex-wrap">
-                        <span class="permission-badge" *ngFor="let perm of selectedUser.role_permissions || []">{{
-                            perm.name || perm }}</span>
-                        <span *ngIf="!selectedUser.role_permissions?.length" class="text-muted small">Aucune permission
-                            définie</span>
+                        <span class="permission-badge" *ngFor="let perm of selectedUser.role_permissions || []; trackBy: trackByPermission">
+                            {{ perm.codename || perm.name }}
+                        </span>
+                        <span *ngIf="!selectedUser.role_permissions?.length" class="text-muted small">Aucune permission definie</span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <h6 class="small fw-bold text-muted">Custom Permissions</h6>
                     <div class="d-flex flex-wrap">
-                        <span class="permission-badge" *ngFor="let perm of customPermissions">{{ perm }}</span>
+                        <span class="permission-badge" *ngFor="let perm of selectedUser.direct_permissions || []; trackBy: trackByPermission">
+                            {{ perm.codename || perm.name }}
+                        </span>
+                        <span *ngIf="!selectedUser.direct_permissions?.length" class="text-muted small">Aucune permission directe</span>
                     </div>
                 </div>
             </div>

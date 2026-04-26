@@ -52,10 +52,10 @@ export class LoginComponent {
         localStorage.setItem('refresh_token', res.refresh);
         localStorage.setItem('user', JSON.stringify(res.user));
 
-        const roles = res.user?.roles || [];
-        if (roles.includes('Administrateur')) {
+        const roles = (res.user?.roles || []).map((role: string) => role.toLowerCase());
+        if (roles.includes('admin') || roles.includes('administrateur')) {
           this.router.navigate(['/admin/users']);
-        } else if (roles.includes('Archiviste')) {
+        } else if (roles.includes('archiviste')) {
           this.router.navigate(['/dashboard']);
         } else {
           this.router.navigate(['/dashboard']);

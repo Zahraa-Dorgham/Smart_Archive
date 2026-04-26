@@ -4,16 +4,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .auth_serializers import (
     UserSerializer, RegisterSerializer, 
     CustomTokenObtainPairSerializer, ChangePasswordSerializer
 )
+from .permissions import EstAdministrateur
+
+User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
     """Inscription d'un nouvel utilisateur"""
     queryset = User.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [EstAdministrateur]
     serializer_class = RegisterSerializer
 
 class CustomTokenObtainPairView(TokenObtainPairView):

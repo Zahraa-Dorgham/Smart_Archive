@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { ApiService } from '../../../core/services/api.service';
-import { ChangeDetectorRef } from '@angular/core';
+
 @Component({
   selector: 'app-user-list',
   standalone: true,
@@ -15,7 +16,6 @@ export class UserListComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
   selectedUser: any = null;
-  customPermissions: string[] = ['read InventoryItem'];
 
   totalUsers = 0;
   activeUsers = 0;
@@ -29,42 +29,40 @@ export class UserListComponent implements OnInit {
   pageSize = 5;
   totalPages = 1;
 
-  constructor(private api: ApiService, private router: Router, private cd: ChangeDetectorRef) { }
+  constructor(
+    private api: ApiService,
+    private router: Router,
+    private cd: ChangeDetectorRef
+  ) {}
+
   ngOnInit(): void {
     this.loadUsers();
   }
 
   loadUsers(): void {
     this.loadingUsers = true;
-    this.searchTerm = '';
-    this.page = 1;
     this.selectedUser = null;
-    this.filteredUsers = [];
 
     this.api.get('/users/').subscribe({
       next: (data: any) => {
-        const usersData = data.results || data;
-        this.users = usersData.map((user: any) => {
-          let groups = user.groups || [];
-          if (groups.length > 0 && typeof groups[0] === 'object') {
-            groups = groups.map((g: any) => g.name || g);
-          }
+        const results = Array.isArray(data?.results) ? data.results : data;
+        this.users = (results || []).map((user: any) => {
+          const groups = Array.isArray(user.groups) ? user.groups : [];
+          const roleNames = Array.isArray(user.roles)
+            ? user.roles
+            : groups.map((group: any) => group?.name).filter(Boolean);
+
           return {
             ...user,
-            first_name: user.first_name || user.username || '?',
-            last_name: user.last_name || '',
-            department: user.department || '—',
-            groups: groups,
-            role: groups[0] || 'employee',
-            is_active: user.is_active === true,
-            phone: user.phone || '—',
-            address: user.address || '—',
-            created_at: user.created_at || user.date_joined || new Date(),
-            updated_at: user.updated_at || user.last_login || new Date(),
-            role_permissions: user.role_permissions || []
+            groups,
+            roles: roleNames,
+            role: user.primary_role || roleNames[0] || 'Employe',
+            full_name: user.full_name || [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username,
+            role_permissions: Array.isArray(user.role_permissions) ? user.role_permissions : [],
+            direct_permissions: Array.isArray(user.direct_permissions) ? user.direct_permissions : [],
           };
         });
-        console.log('Users chargés :', this.users); // Vérifie
+
         this.computeStats();
         this.applyFilter();
         this.loadingUsers = false;
@@ -79,41 +77,44 @@ export class UserListComponent implements OnInit {
 
   computeStats(): void {
     this.totalUsers = this.users.length;
-    this.activeUsers = this.users.filter(u => u.is_active).length;
+    this.activeUsers = this.users.filter((user) => user.is_active).length;
     this.inactiveUsers = this.totalUsers - this.activeUsers;
-
-    const rolesSet = new Set<string>();
-    this.users.forEach(u => u.groups.forEach((g: string) => rolesSet.add(g)));
-    this.totalRoles = rolesSet.size;
-
-    const deptsSet = new Set(this.users.map(u => u.department).filter(d => d && d !== '—'));
-    this.totalDepartments = deptsSet.size;
+    this.totalRoles = new Set(this.users.flatMap((user) => user.roles || [])).size;
+    this.totalDepartments = 0;
   }
 
   applyFilter(): void {
     const term = this.searchTerm.toLowerCase().trim();
-    this.filteredUsers = term ? this.users.filter(user => {
-      return user.first_name.toLowerCase().includes(term) ||
-             user.last_name.toLowerCase().includes(term) ||
-             user.email.toLowerCase().includes(term) ||
-             user.department.toLowerCase().includes(term) ||
-             user.role.toLowerCase().includes(term);
-    }) : [...this.users];
+    this.filteredUsers = term
+      ? this.users.filter((user) => {
+          const haystack = [
+            user.first_name,
+            user.last_name,
+            user.full_name,
+            user.email,
+            user.username,
+            ...(user.roles || []),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+
+          return haystack.includes(term);
+        })
+      : [...this.users];
+
     this.page = 1;
     this.updateTotalPages();
-    if (this.filteredUsers.length > 0) this.selectUser(this.filteredUsers[0]);
-    else this.selectedUser = null;
+    this.selectedUser = this.filteredUsers[0] || null;
   }
+
   updateTotalPages(): void {
-    this.totalPages = Math.ceil(this.filteredUsers.length / this.pageSize);
-    if (this.totalPages === 0) this.totalPages = 1;
+    this.totalPages = Math.max(1, Math.ceil(this.filteredUsers.length / this.pageSize));
   }
 
   get paginatedUsers(): any[] {
     const start = (this.page - 1) * this.pageSize;
-    const sliced = this.filteredUsers.slice(start, start + this.pageSize);
-    console.log('paginatedUsers slice:', sliced);
-    return sliced;
+    return this.filteredUsers.slice(start, start + this.pageSize);
   }
 
   onPageSizeChange(): void {
@@ -122,11 +123,15 @@ export class UserListComponent implements OnInit {
   }
 
   previousPage(): void {
-    if (this.page > 1) this.page--;
+    if (this.page > 1) {
+      this.page--;
+    }
   }
 
   nextPage(): void {
-    if (this.page < this.totalPages) this.page++;
+    if (this.page < this.totalPages) {
+      this.page++;
+    }
   }
 
   selectUser(user: any): void {
@@ -142,11 +147,17 @@ export class UserListComponent implements OnInit {
   }
 
   delete(id: number): void {
-    if (confirm('Supprimer définitivement cet utilisateur ?')) {
-      this.api.delete(`/users/${id}/`).subscribe({
-        next: () => this.loadUsers(),
-        error: (err) => console.error('Erreur suppression', err)
-      });
+    if (!confirm('Supprimer définitivement cet utilisateur ?')) {
+      return;
     }
+
+    this.api.delete(`/users/${id}/`).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => console.error('Erreur suppression', err)
+    });
+  }
+
+  trackByPermission(_: number, permission: any): string {
+    return permission?.label || permission?.codename || permission?.name || String(_);
   }
 }

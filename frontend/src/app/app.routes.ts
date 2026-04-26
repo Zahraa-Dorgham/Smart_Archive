@@ -3,17 +3,14 @@ import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { LayoutPublicComponent } from './layout/layout-public/layout-public';
 import { LayoutComponent } from './layout/layout-authentifie/layout-authentifie';
-import { HomeComponent } from './home/home';
 import { LoginComponent } from './auth/login/login.component';
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutPublicComponent,
-    
     children: [
       { path: '', component: LoginComponent },
-      // { path: 'home', loadComponent: () => import('./home/home').then(m => m.HomeComponent) },
       { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) }
     ]
   },
@@ -22,14 +19,16 @@ export const routes: Routes = [
     component: LayoutComponent,
     canActivate: [authGuard],
     children: [
-      // Routes admin
       {
         path: 'admin',
-        canActivate: [() => roleGuard(['Administrateur'])()],
+        canActivate: [() => roleGuard(['Admin', 'Administrateur'])()],
         children: [
           { path: 'users', loadComponent: () => import('./modules/admin/user-list/user-list').then(m => m.UserListComponent) },
           { path: 'users/new', loadComponent: () => import('./modules/admin/user-form/user-form').then(m => m.UserFormComponent) },
-          { path: 'users/:id/edit', loadComponent: () => import('./modules/admin/user-edit/user-edit').then(m => m.UserEditComponent) },          
+          { path: 'users/:id/edit', loadComponent: () => import('./modules/admin/user-edit/user-edit').then(m => m.UserEditComponent) },
+          { path: 'roles', loadComponent: () => import('./modules/admin/role-list/role-list').then(m => m.RoleListComponent) },
+          { path: 'roles/new', loadComponent: () => import('./modules/admin/role-form/role-form').then(m => m.RoleFormComponent) },
+          { path: 'roles/:id/edit', loadComponent: () => import('./modules/admin/role-form/role-form').then(m => m.RoleFormComponent) },
           { path: '', redirectTo: 'users', pathMatch: 'full' }
         ]
       },
@@ -37,10 +36,9 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-      // Routes archiviste
       {
         path: 'archiviste',
-        canActivate: [() => roleGuard(['Archiviste', 'Administrateur'])()],
+        canActivate: [() => roleGuard(['Archiviste', 'Admin', 'Administrateur'])()],
         children: [
           { path: 'batiments', loadComponent: () => import('./batiment/show-batiment/show-batiment').then(m => m.ShowBatimentComponent) },
           { path: 'salles', loadComponent: () => import('./salles/show-salle/show-salle').then(m => m.ShowSalleComponent) },
@@ -53,27 +51,16 @@ export const routes: Routes = [
           { path: '', redirectTo: 'batiments', pathMatch: 'full' }
         ]
       },
-      // Routes responsable
       {
         path: 'responsable',
-        canActivate: [() => roleGuard(['Responsable', 'Archiviste', 'Administrateur'])()],
-        children: [
-          // { path: 'transferts', loadComponent: () => import('./modules/responsable/transfert-list/transfert-list').then(m => m.TransfertListComponent) },
-          // { path: 'statistiques', loadComponent: () => import('./modules/responsable/statistiques/statistiques').then(m => m.StatistiquesComponent) },
-          // { path: '', redirectTo: 'transferts', pathMatch: 'full' }
-        ]
+        canActivate: [() => roleGuard(['Responsable', 'Archiviste', 'Admin', 'Administrateur'])()],
+        children: []
       },
-      // Routes employé
       {
         path: 'employe',
-        canActivate: [() => roleGuard(['Employé'])()],
-        children: [
-          // { path: 'recherche', loadComponent: () => import('./modules/employe/recherche-document/recherche-document').then(m => m.RechercheDocumentComponent) },
-          // { path: 'mes-demandes', loadComponent: () => import('./modules/employe/mes-demandes/mes-demandes').then(m => m.MesDemandesComponent) },
-          // { path: '', redirectTo: 'recherche', pathMatch: 'full' }
-        ]
+        canActivate: [() => roleGuard(['Employe', 'Employé'])()],
+        children: []
       },
-      // Redirections routes
       { path: 'batiments', redirectTo: '/archiviste/batiments' },
       { path: 'salles', redirectTo: '/archiviste/salles' },
       { path: 'armoires', redirectTo: '/archiviste/armoires' },

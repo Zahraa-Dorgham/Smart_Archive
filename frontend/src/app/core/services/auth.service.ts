@@ -115,15 +115,32 @@ export class AuthService {
                 roles = groups.map((g: any) => typeof g === 'object' ? g.name : g);
             }
         }
-        
-        return roles;
+
+        return roles.map((role: string) => this.normalizeRole(role));
     }
 
     hasRole(roles: string | string[]): boolean {
         const userRoles = this.getUserRoles();
-        if (Array.isArray(roles)) {
-            return roles.some(role => userRoles.includes(role));
+        const allowedRoles = Array.isArray(roles) ? roles : [roles];
+        const normalizedAllowedRoles = allowedRoles.map(role => this.normalizeRole(role));
+
+        return normalizedAllowedRoles.some(role => userRoles.includes(role));
+    }
+
+    private normalizeRole(role: string): string {
+        const normalized = (role || '').trim().toLowerCase();
+        if (normalized === 'administrateur' || normalized === 'admin') {
+            return 'admin';
         }
-        return userRoles.includes(roles);
+        if (normalized === 'archiviste') {
+            return 'archiviste';
+        }
+        if (normalized === 'responsable') {
+            return 'responsable';
+        }
+        if (normalized === 'employe' || normalized === 'employé') {
+            return 'employe';
+        }
+        return normalized;
     }
 }

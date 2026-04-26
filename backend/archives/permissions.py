@@ -1,92 +1,72 @@
-# archives/permissions.py
 from rest_framework import permissions
 
+ROLE_ALIASES = {
+    "admin": {"Admin", "Administrateur"},
+    "archiviste": {"Archiviste"},
+    "responsable": {"Responsable"},
+    "employe": {"Employe", "Employe", "Employé"},
+}
+
+
+def user_has_any_role(user, aliases):
+    if not user or not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+
+    allowed_names = set()
+    for alias in aliases:
+        allowed_names.update(ROLE_ALIASES.get(alias, {alias}))
+
+    return user.groups.filter(name__in=allowed_names).exists()
+
+
 class EstAdministrateur(permissions.BasePermission):
-    """Permission pour les administrateurs"""
-    message = "Vous devez être administrateur pour effectuer cette action."
-    
+    message = "Vous devez etre administrateur pour effectuer cette action."
+
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and (
-            request.user.is_superuser or 
-            request.user.groups.filter(name='Administrateur').exists()
-        )
+        return user_has_any_role(request.user, ["admin"])
+
 
 class EstArchiviste(permissions.BasePermission):
-    """Permission pour les archivistes"""
-    message = "Vous devez être archiviste pour effectuer cette action."
-    
+    message = "Vous devez etre archiviste pour effectuer cette action."
+
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and (
-            request.user.groups.filter(name='Archiviste').exists() or
-            request.user.groups.filter(name='Administrateur').exists()
-        )
+        return user_has_any_role(request.user, ["admin", "archiviste"])
+
 
 class EstResponsable(permissions.BasePermission):
-    """Permission pour les responsables de service"""
-    message = "Vous devez être responsable pour effectuer cette action."
-    
-    def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and (
-            request.user.groups.filter(name='Responsable').exists()
-            )
+    message = "Vous devez etre responsable pour effectuer cette action."
 
-# class EstEmploye(permissions.BasePermission):
-#     """Permission pour les employés (lecture seule généralement)"""
-    
-#     def has_permission(self, request, view):
-#         return request.user and request.user.is_authenticated
-class EstEmploye(permissions.BasePermission):
-   
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        # Vérifier que l'utilisateur appartient au groupe Employé
-        return request.user.groups.filter(name='Employé').exists()
+        return user_has_any_role(request.user, ["admin", "archiviste", "responsable"])
+
+
+class EstEmploye(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return user_has_any_role(request.user, ["admin", "archiviste", "responsable", "employe"])
+
 
 class PeutModifierDocument(permissions.BasePermission):
-    """Permission pour les documents - seuls les archivistes, responsables et administrateurs peuvent modifier"""    
     def has_object_permission(self, request, view, obj):
-        # Lecture autorisée pour tous les employés
         if request.method in permissions.SAFE_METHODS:
             return True
-        
-        # Modification autorisée seulement pour certains rôles
-        user = request.user
-        return (
-            user.is_superuser or
-            user.groups.filter(name='Administrateur').exists() or
-            user.groups.filter(name='Archiviste').exists()
-        )
+        return user_has_any_role(request.user, ["admin", "archiviste"])
+
 
 class EstProprietaireOuArchive(permissions.BasePermission):
-    """Permission pour les documents - seul le propriétaire ou archiviste peut modifier"""
-    
     def has_object_permission(self, request, view, obj):
-        # Lecture autorisée pour tous
         if request.method in permissions.SAFE_METHODS:
             return True
-        
-        if hasattr(obj, 'created_by') and obj.created_by == request.user:
+
+        if hasattr(obj, "created_by") and obj.created_by == request.user:
             return True
-        
-        # Vérifier les rôles autorisés
-        return (
-            request.user.is_superuser or
-            request.user.groups.filter(name='Administrateur').exists() or
-            request.user.groups.filter(name='Archiviste').exists() 
-        )
+
+        return user_has_any_role(request.user, ["admin", "archiviste"])
+
+
 class EstLectureAutorisee(permissions.BasePermission):
-    """
-    Permet la lecture (GET) aux employés, archivistes, responsables et administrateurs.
-    """
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
+        if request.method not in permissions.SAFE_METHODS:
             return False
-        # Pour les méthodes sûres seulement
-        if request.method in permissions.SAFE_METHODS:
-            return (
-                request.user.groups.filter(name__in=['Employé', 'Archiviste', 'Responsable', 'Administrateur']).exists() or
-                request.user.is_superuser
-            )
-        # Pour les écritures, cette permission n'est pas utilisée
-        return False
+        return user_has_any_role(request.user, ["admin", "archiviste", "responsable", "employe"])

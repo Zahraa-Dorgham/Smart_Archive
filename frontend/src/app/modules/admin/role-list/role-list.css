@@ -1,0 +1,120 @@
+.role-management-container {
+    padding: 2rem;
+    background-color: #f8f9fa; /* Matches the slightly off-white background of the page */
+    min-height: 100vh;
+}
+
+/* Page Title area */
+.page-title-section {
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.page-title-section h3 {
+    color: #2e384d; /* Dark navyish */
+}
+
+.title-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    height: 3px;
+    background-color: #4a6cf7; /* Blue accent */
+    border-radius: 2px;
+}
+
+.create-role-btn {
+    background-color: #3b5998; /* Specific blue from screenshot */
+    border-color: #3b5998;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+}
+
+/* Card Styling */
+.role-card {
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-divider {
+    border-top: 1px solid #edf1f7;
+    margin: 1rem 0;
+    opacity: 1;
+}
+
+.role-description {
+    font-size: 0.85rem;
+    color: #8f9bb3 !important;
+    min-height: 2.5rem;
+}
+
+.meta-text {
+    font-size: 0.8rem;
+    color: #8f9bb3;
+}
+
+.meta-text strong {
+    color: #2e384d;
+}
+
+.total-permissions-badge {
+    background-color: #00b5b8; /* Teal */
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+}
+
+/* Action Buttons */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 4px;
+    background: transparent;
+}
+
+.edit-btn {
+    color: #6366f1; /* Indigo/Purple */
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.edit-btn:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+.delete-btn {
+    color: #f43f5e; /* Rose/Red */
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.delete-btn:hover {
+    background-color: rgba(244, 63, 94, 0.05);
+}
+
+/* Modules List */
+.module-item {
+    border: 1px solid #edf1f7;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #ffffff;
+}
+
+.module-name {
+    font-size: 0.85rem;
+    color: #2e384d;
+}
+
+.module-count-badge {
+    background-color: #3b5998; /* Blue */
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}

@@ -1,15 +1,16 @@
-# archives/management/commands/init_roles.py
-from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group
+from django.core.management.base import BaseCommand
+
+from archives.views import DEFAULT_ROLE_PERMISSIONS
+
 
 class Command(BaseCommand):
-    help = 'Crée les groupes de rôles'
+    help = "Cree les groupes de roles par defaut"
 
     def handle(self, *args, **options):
-        groupes = ['Administrateur', 'Archiviste', 'Responsable', 'Employé']
-        for nom in groupes:
-            group, created = Group.objects.get_or_create(name=nom)
+        for role_name in DEFAULT_ROLE_PERMISSIONS.keys():
+            group, created = Group.objects.get_or_create(name=role_name)
             if created:
-                self.stdout.write(self.style.SUCCESS(f'Groupe "{nom}" créé'))
+                self.stdout.write(self.style.SUCCESS(f'Groupe "{role_name}" cree'))
             else:
-                self.stdout.write(f'Groupe "{nom}" existe déjà')
+                self.stdout.write(f'Groupe "{role_name}" existe deja')

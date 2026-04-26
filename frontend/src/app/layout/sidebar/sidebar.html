@@ -79,10 +79,18 @@
                 </li>
 
                 <!-- Gestion des Utilisateurs -->
-                <li class="nav-item" *ngIf="authService.hasRole('Administrateur')" routerLinkActive="active">
+                <li class="nav-item" *ngIf="authService.hasRole(['Admin', 'Administrateur'])" routerLinkActive="active">
                     <a routerLink="/admin/users">
                         <i class="bx bx-user"></i>
                         <span class="menu-title">Utilisateurs</span>
+                    </a>
+                </li>
+                
+                <!-- Gestion des Rôles -->
+                <li class="nav-item" *ngIf="authService.hasRole(['Admin', 'Administrateur'])" routerLinkActive="active">
+                    <a routerLink="/admin/roles">
+                        <i class="bx bx-shield-quarter"></i>
+                        <span class="menu-title">Rôles & Permissions</span>
                     </a>
                 </li>
             </ng-container>

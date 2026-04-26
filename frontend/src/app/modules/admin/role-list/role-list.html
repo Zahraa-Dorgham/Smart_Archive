@@ -1,0 +1,67 @@
+<div class="role-management-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="page-title-section">
+            <h3 class="fw-bold text-dark mb-0">Role Management</h3>
+            <div class="title-underline"></div>
+        </div>
+        <button class="btn btn-primary create-role-btn rounded" (click)="openCreate()">
+            <i class="bx bx-plus me-1"></i> Create Role
+        </button>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4" *ngFor="let role of roles">
+            <div class="card role-card h-100 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <!-- Header: Name and Actions -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-bold text-dark mb-0">{{ role.nom }}</h5>
+                        <div class="d-flex gap-2 role-actions">
+                            <button class="btn btn-sm btn-action edit-btn" (click)="edit(role)">
+                                <i class="bx bx-edit-alt"></i>
+                            </button>
+                            <button class="btn btn-sm btn-action delete-btn" (click)="delete(role.id)">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <hr class="card-divider">
+
+                    <!-- Description -->
+                    <p class="role-description text-muted mb-3">{{ role.description }}</p>
+
+                    <hr class="card-divider">
+
+                    <!-- Meta Data -->
+                    <div class="meta-section mb-4">
+                        <p class="meta-text mb-2">Created: <strong>{{ role.created_at | date:'MMM d, y, h:mm:ss a' }}</strong></p>
+                        <p class="meta-text mb-0 d-flex align-items-center">
+                            Total permissions: <span class="badge total-permissions-badge ms-2">{{ role.totalPermissions }}</span>
+                        </p>
+                    </div>
+
+                    <!-- Permissions by Module -->
+                    <div class="permissions-section">
+                        <p class="fw-bold text-dark mb-3" style="font-size: 0.9rem;">Permissions by Module</p>
+                        
+                        <div class="module-list">
+                            <div class="module-item d-flex justify-content-between align-items-center" *ngFor="let mod of role.modules">
+                                <span class="module-name text-dark fw-medium">{{ mod.moduleName }}</span>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge module-count-badge me-2">{{ mod.count }}</span>
+                                    <i class="bx bx-chevron-down text-muted" style="font-size: 1.1rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+</div>

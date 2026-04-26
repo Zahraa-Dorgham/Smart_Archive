@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
@@ -17,12 +18,13 @@ export class UserEditComponent implements OnInit {
         first_name: '',
         last_name: '',
         email: '',
-        phone: '',
-        address: '',
-        is_active: true
+        is_active: true,
+        password: ''
     };
     allGroups: any[] = [];
+    allPermissions: any[] = [];
     selectedGroupIds: number[] = [];
+    selectedPermissionIds: number[] = [];
     submitting = false;
     loading = true;
 
@@ -31,28 +33,42 @@ export class UserEditComponent implements OnInit {
         private router: Router,
         private api: ApiService,
         private cd: ChangeDetectorRef
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         const idParam = this.route.snapshot.paramMap.get('id');
         this.userId = idParam ? +idParam : null;
-        if (this.userId === null || this.userId === 0) {
+        if (!this.userId) {
             this.router.navigate(['/admin/users']);
             return;
         }
+
         this.loadGroups();
+        this.loadPermissions();
         this.loadUser();
     }
 
     loadGroups(): void {
-        this.api.get('/groups/').subscribe({
+        this.api.get('/roles/').subscribe({
             next: (data: any) => {
-                this.allGroups = data.results || data;
+                this.allGroups = data.results || data || [];
                 this.cd.markForCheck();
             },
             error: (err) => {
-                console.error('Erreur chargement groupes', err);
-                alert('Erreur lors du chargement des rôles');
+                console.error('Erreur chargement roles', err);
+                this.cd.markForCheck();
+            }
+        });
+    }
+
+    loadPermissions(): void {
+        this.api.get('/permissions/').subscribe({
+            next: (data: any) => {
+                this.allPermissions = data.results || data || [];
+                this.cd.markForCheck();
+            },
+            error: (err) => {
+                console.error('Erreur chargement permissions', err);
                 this.cd.markForCheck();
             }
         });
@@ -65,20 +81,20 @@ export class UserEditComponent implements OnInit {
                     first_name: user.first_name || '',
                     last_name: user.last_name || '',
                     email: user.email || '',
-                    phone: user.phone || '',
-                    address: user.address || '',
-                    is_active: user.is_active === true
+                    is_active: user.is_active === true,
+                    password: ''
                 };
-                // Récupération des IDs des groupes
-                if (user.groups && Array.isArray(user.groups)) {
-                    this.selectedGroupIds = user.groups.map((g: any) => typeof g === 'object' ? g.id : g);
-                }
+                this.selectedGroupIds = Array.isArray(user.groups)
+                    ? user.groups.map((group: any) => group.id)
+                    : [];
+                this.selectedPermissionIds = Array.isArray(user.direct_permissions)
+                    ? user.direct_permissions.map((permission: any) => permission.id)
+                    : [];
                 this.loading = false;
                 this.cd.markForCheck();
             },
             error: (err) => {
                 console.error('Erreur chargement utilisateur', err);
-                alert('Erreur lors du chargement de l\'utilisateur');
                 this.loading = false;
                 this.cd.markForCheck();
             }
@@ -87,7 +103,7 @@ export class UserEditComponent implements OnInit {
 
     onSubmit(): void {
         if (!this.userData.first_name || !this.userData.last_name || !this.userData.email) {
-            alert('Veuillez remplir les champs obligatoires (Prénom, Nom, Email)');
+            alert('Veuillez remplir les champs obligatoires');
             return;
         }
 
@@ -97,22 +113,24 @@ export class UserEditComponent implements OnInit {
             email: this.userData.email,
             first_name: this.userData.first_name,
             last_name: this.userData.last_name,
-            phone: this.userData.phone,
-            address: this.userData.address,
             is_active: this.userData.is_active,
-            groups: this.selectedGroupIds
+            groups: this.selectedGroupIds,
+            user_permissions: this.selectedPermissionIds
         };
+
+        if (this.userData.password) {
+            payload.password = this.userData.password;
+        }
 
         this.api.put(`/users/${this.userId}/`, payload).subscribe({
             next: () => {
                 this.submitting = false;
-                alert('Utilisateur modifié avec succès !');
                 this.router.navigate(['/admin/users']);
             },
             error: (err) => {
                 this.submitting = false;
                 console.error('Erreur modification', err);
-                alert('Erreur lors de la modification.');
+                alert('Erreur lors de la modification');
             }
         });
     }
