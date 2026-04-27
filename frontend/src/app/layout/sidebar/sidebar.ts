@@ -5,24 +5,33 @@ import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css',
-  standalone: true
+  styleUrl: './sidebar.css'
 })
 export class Sidebar implements AfterViewInit {
   constructor(public authService: AuthService) {}
 
   ngAfterViewInit() {
-    // Trigger Frest menu initialization after view is ready
+    this.refreshMenu();
+  }
+
+  private refreshMenu() {
+    // Initial delay to let DOM settle
     setTimeout(() => {
-      const $ = (window as any).$;
-      if ($ && $.app && $.app.menu) {
-        $.app.menu.init();
-      }
-      if ($ && $.app && $.app.nav) {
-        $.app.nav.init();
-      }
-    }, 100);
+      this.reinitFrest();
+    }, 200);
+  }
+
+  private reinitFrest() {
+    const $ = (window as any).$;
+    if ($ && $.app && $.app.menu) {
+      // Re-initialize menu only if needed to avoid flickering and fighting with toggle
+      $.app.menu.init(false); 
+    }
+    if ($ && $.app && $.app.nav) {
+      $.app.nav.init();
+    }
   }
 }

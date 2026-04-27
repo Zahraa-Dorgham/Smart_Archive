@@ -68,6 +68,7 @@ export class UserListComponent implements OnInit {
         this.computeStats();
         this.applyFilter();
         this.loadingUsers = false;
+        this.cd.detectChanges();
       },
       error: (err) => {
         console.error('Erreur chargement utilisateurs', err);
