@@ -91,6 +91,7 @@ export class AddEditDossierComponent implements OnInit {
     this.loadBoitiers();
     this.loadCalendriers();
     this.loadPhases();
+    this.form.get('calendrier')?.valueChanges.subscribe(value => this.onCalendrierChange(value));
 
     if (this.isEditMode && this.data.dossier) {
       const dossier = this.data.dossier;
@@ -118,6 +119,25 @@ export class AddEditDossierComponent implements OnInit {
 
   loadCalendriers(): void {
     this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe(res => this.calendriers = res.results);
+  }
+
+  onCalendrierChange(calendrierId: string | null): void {
+    if (!calendrierId) {
+      return;
+    }
+
+    const calendrier = this.calendriers.find(item => String(item.id) === String(calendrierId));
+    if (!calendrier) {
+      return;
+    }
+
+    this.form.patchValue({
+      conservation_active_period: calendrier.conservation_active_period ?? null,
+      conservation_semi_active_period: calendrier.conservation_semi_active_period ?? null,
+      sort_final_type: calendrier.sort_final_type ?? '',
+      sort_final_comment: calendrier.sort_final_comment ?? '',
+      sort_final_security_years: calendrier.sort_final_security_years ?? null
+    }, { emitEvent: false });
   }
 
   loadPhases(): void {
