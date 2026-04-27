@@ -21,14 +21,38 @@ export class DossierService {
     }
 
     createDossier(data: DossierCreate): Observable<Dossier> {
-        return this.api.post<Dossier>(this.endpoint, data);
+        return this.api.post<Dossier>(this.endpoint, this.serializeDossierPayload(data));
     }
 
     updateDossier(id: string, data: DossierUpdate): Observable<Dossier> {
-        return this.api.put<Dossier>(`${this.endpoint}${id}/`, data);
+        return this.api.put<Dossier>(`${this.endpoint}${id}/`, this.serializeDossierPayload(data));
     }
 
     deleteDossier(id: string): Observable<void> {
         return this.api.delete<void>(`${this.endpoint}${id}/`);
+    }
+
+    private serializeDossierPayload(data: DossierCreate | DossierUpdate): Record<string, unknown> {
+        const payload: Record<string, unknown> = {};
+
+        Object.entries(data).forEach(([key, value]) => {
+            if (key === 'idDossier' || value === undefined) {
+                return;
+            }
+
+            if (value instanceof Date) {
+                payload[key] = value.toISOString().split('T')[0];
+                return;
+            }
+
+            if (value === '') {
+                payload[key] = null;
+                return;
+            }
+
+            payload[key] = value;
+        });
+
+        return payload;
     }
 }

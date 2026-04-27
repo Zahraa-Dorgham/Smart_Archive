@@ -1,8 +1,8 @@
 // core/models/base.model.ts
 export interface BaseModel {
     id: string;
-    created_at?: Date;
-    updated_at?: Date;
+    created_at?: string | Date;
+    updated_at?: string | Date;
 }
 
 export interface PaginatedResponse<T> {

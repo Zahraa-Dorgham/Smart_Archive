@@ -61,7 +61,7 @@ export class ShowDocumentComponent implements OnInit {
   }
 
   dataSource = new MatTableDataSource<Document>([]);
-  displayedColumns: string[] = ['idDoc', 'reference', 'titre', 'dossier', 'phase', 'date', 'confidentialite', 'actions'];
+  displayedColumns: string[] = ['idDoc', 'reference', 'titre', 'dossier', 'calendrier', 'phase', 'date', 'confidentialite', 'actions'];
   filterForm: FormGroup;
 
   constructor(
@@ -106,9 +106,9 @@ export class ShowDocumentComponent implements OnInit {
 
   getDossierReference(doc: Document): string {
     if (typeof doc.dossier === 'object') {
-      return doc.dossier.reference;
+      return doc.dossier.nomDos || String(doc.dossier.idDossier);
     }
-    return (doc as any).dossier_reference || 'N/A';
+    return (doc as any).dossier_nom || (doc as any).dossier_reference || 'N/A';
   }
 
   getPhaseNom(doc: Document): string {
@@ -130,7 +130,9 @@ export class ShowDocumentComponent implements OnInit {
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(AddEditDocumentComponent, {
-      width: '600px',
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: { mode: 'add' }
     });
     dialogRef.afterClosed().subscribe(result => {
@@ -140,7 +142,9 @@ export class ShowDocumentComponent implements OnInit {
 
   openEditDialog(document: Document): void {
     const dialogRef = this.dialog.open(AddEditDocumentComponent, {
-      width: '600px',
+      width: '90vw',
+      maxWidth: '700px',
+      maxHeight: '90vh',
       data: { mode: 'edit', document }
     });
     dialogRef.afterClosed().subscribe(result => {

@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     #  mon app
     'archives',
+    # Calendrier module
+    'calendrier',
     # libraries
     'rest_framework',
     'corsheaders',

@@ -29,7 +29,7 @@
                 <li class="navigation-header"><span>Administrateur</span></li>
                 
                 <li class="nav-item" routerLinkActive="active">
-                    <a routerLink="/phases"><i class="bx bx-calendar"></i><span class="menu-title">Calendrier</span></a>
+                    <a routerLink="/archiviste/calendrier"><i class="bx bx-calendar"></i><span class="menu-title">Calendrier</span></a>
                 </li>
                 <li class="nav-item" routerLinkActive="active">
                     <a routerLink="/documents"><i class="bx bx-file"></i><span class="menu-title">Documents</span></a>
@@ -39,12 +39,12 @@
                 </li>
 
                 <!-- MENU EMPLACEMENT AVEC SOUS-MENUS -->
-                <li class="nav-item has-sub" [class.open]="isEmplacementOpen">
-                    <a href="javascript:void(0)" (click)="toggleEmplacement($event)">
+                <li class="nav-item has-sub" routerLinkActive="open">
+                    <a href="javascript:void(0)">
                         <i class="bx bx-map"></i>
                         <span class="menu-title">Emplacement</span>
                     </a>
-                    <ul class="menu-content" [style.display]="isEmplacementOpen ? 'block' : 'none'">
+                    <ul class="menu-content">
                         <li routerLinkActive="active">
                             <a routerLink="/batiments">
                                 <i class="bx bx-building-house"></i>
@@ -79,18 +79,16 @@
                 </li>
 
                 <!-- Gestion des Utilisateurs -->
-                <li class="nav-item" *ngIf="authService.hasRole(['Admin', 'Administrateur'])" routerLinkActive="active">
+                <li class="nav-item" *ngIf="authService.hasRole('Administrateur')" routerLinkActive="active">
                     <a routerLink="/admin/users">
                         <i class="bx bx-user"></i>
                         <span class="menu-title">Utilisateurs</span>
                     </a>
                 </li>
-                
-                <!-- Gestion des Rôles -->
-                <li class="nav-item" *ngIf="authService.hasRole(['Admin', 'Administrateur'])" routerLinkActive="active">
-                    <a routerLink="/admin/roles">
-                        <i class="bx bx-shield-quarter"></i>
-                        <span class="menu-title">Rôles & Permissions</span>
+                <li class="nav-item" *ngIf="authService.hasRole('Administrateur')" routerLinkActive="active">
+                    <a routerLink="/archiviste/directions">
+                        <i class="bx bx-directions"></i>
+                        <span class="menu-title">Directions</span>
                     </a>
                 </li>
             </ng-container>

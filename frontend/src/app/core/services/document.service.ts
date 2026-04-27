@@ -27,13 +27,25 @@ export class DocumentService {
         formData.append('idDoc', data.idDoc);
         formData.append('reference', data.reference);
         formData.append('titre', data.titre);
-        formData.append('dossier', data.dossier);
+        formData.append('dossier', String(data.dossier));
         formData.append('phase_archive', data.phase_archive);
         formData.append('date_creation', data.date_creation.toISOString().split('T')[0]); // format YYYY-MM-DD
         formData.append('niv_confidentialite', data.niv_confidentialite);
         formData.append('type_document', data.type_document);
+        if (data.calendrier) formData.append('calendrier', data.calendrier);
         if (data.auteur) formData.append('auteur', data.auteur);
         if (data.description) formData.append('description', data.description);
+        if (data.conservation_active_period !== undefined && data.conservation_active_period !== null) {
+            formData.append('conservation_active_period', String(data.conservation_active_period));
+        }
+        if (data.conservation_semi_active_period !== undefined && data.conservation_semi_active_period !== null) {
+            formData.append('conservation_semi_active_period', String(data.conservation_semi_active_period));
+        }
+        if (data.sort_final_type) formData.append('sort_final_type', data.sort_final_type);
+        if (data.sort_final_comment) formData.append('sort_final_comment', data.sort_final_comment);
+        if (data.sort_final_security_years !== undefined && data.sort_final_security_years !== null) {
+            formData.append('sort_final_security_years', String(data.sort_final_security_years));
+        }
         if (fichier) formData.append('fichier', fichier);
 
         return this.api.post<Document>(this.endpoint, formData);

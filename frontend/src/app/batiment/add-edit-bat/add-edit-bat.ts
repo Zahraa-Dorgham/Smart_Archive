@@ -33,6 +33,7 @@ export interface DialogData {
 export class AddEditBatComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
+  
 
   constructor(
     private fb: FormBuilder,

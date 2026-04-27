@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   hidePassword = true;
   loading = false;
@@ -25,13 +25,22 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private renderer: Renderer2
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
       rememberMe: [false]
     });
+  }
+
+  ngOnInit(): void {
+    this.renderer.addClass(document.body, 'login-page');
+  }
+
+  ngOnDestroy(): void {
+    this.renderer.removeClass(document.body, 'login-page');
   }
 
   get credentials() {
@@ -50,7 +59,9 @@ export class LoginComponent {
         this.loading = false;
         localStorage.setItem('access_token', res.access);
         localStorage.setItem('refresh_token', res.refresh);
-        localStorage.setItem('user', JSON.stringify(res.user));
+            localStorage.setItem('user', JSON.stringify(res.user));
+            // Store login timestamp for display in the topnav
+            localStorage.setItem('login_date', new Date().toISOString());
 
         const roles = (res.user?.roles || []).map((role: string) => role.toLowerCase());
         if (roles.includes('admin') || roles.includes('administrateur')) {
