@@ -120,6 +120,8 @@ class DossierSerializer(serializers.ModelSerializer):
             'boitier', 'boitier_idboit', 'calendrier', 'calendrier_code', 'calendrier_title',
             'phaseArchive', 'phaseArchive_nom',
             'phaseType', 'dureeCourant', 'dureeIntermediaire', 'dureeDefinitive',
+            'date_pass_intermediaire', 'date_pass_final',
+            'date_pass_intermediaire_real', 'date_pass_final_real',
             'conservation_active_period', 'conservation_semi_active_period',
             'sort_final_type', 'sort_final_comment', 'sort_final_security_years',
             'nombre_documents', 'volume_total'
@@ -140,7 +142,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             'phase_archive', 'phase_archive_nom', 'date_creation',
             'calendrier', 'calendrier_code', 'calendrier_title',
             'niv_confidentialite', 'version', 'type_document', 'auteur',
-            'description', 'conservation_active_period', 'conservation_semi_active_period',
+            'description', 'date_pass_intermediaire', 'date_pass_final',
+            'date_pass_intermediaire_real', 'date_pass_final_real',
+            'conservation_active_period', 'conservation_semi_active_period',
             'sort_final_type', 'sort_final_comment', 'sort_final_security_years',
             'fichier', 'taille_fichier', 'taille_fichier_lisible',
             'hash_fichier', 'date_entree', 'date_modification'
