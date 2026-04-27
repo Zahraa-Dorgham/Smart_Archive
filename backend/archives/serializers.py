@@ -107,6 +107,8 @@ class BoitierSerializer(serializers.ModelSerializer):
 
 class DossierSerializer(serializers.ModelSerializer):
     boitier_idboit = serializers.CharField(source='boitier.idboit', read_only=True)
+    calendrier_code = serializers.CharField(source='calendrier.code', read_only=True)
+    calendrier_title = serializers.CharField(source='calendrier.title', read_only=True)
     phaseArchive_nom = serializers.CharField(source='phaseArchive.nom', read_only=True)
     nombre_documents = serializers.IntegerField(read_only=True)
     volume_total = serializers.IntegerField(read_only=True)
@@ -115,7 +117,8 @@ class DossierSerializer(serializers.ModelSerializer):
         model = Dossier
         fields = [
             'idDossier', 'nomDos', 'date_creation', 'date_cloture',
-            'boitier', 'boitier_idboit', 'phaseArchive', 'phaseArchive_nom',
+            'boitier', 'boitier_idboit', 'calendrier', 'calendrier_code', 'calendrier_title',
+            'phaseArchive', 'phaseArchive_nom',
             'phaseType', 'dureeCourant', 'dureeIntermediaire', 'dureeDefinitive',
             'conservation_active_period', 'conservation_semi_active_period',
             'sort_final_type', 'sort_final_comment', 'sort_final_security_years',

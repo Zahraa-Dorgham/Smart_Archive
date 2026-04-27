@@ -34,6 +34,14 @@
                 </mat-select>
             </mat-form-field>
 
+            <mat-form-field appearance="outline">
+                <mat-label>Calendrier</mat-label>
+                <mat-select formControlName="calendrier">
+                    <mat-option [value]="null">Aucun</mat-option>
+                    <mat-option *ngFor="let c of calendriers" [value]="c.id">{{ c.code }} - {{ c.title }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
             <div class="row">
                 <mat-form-field appearance="outline">
                     <mat-label>Date creation *</mat-label>

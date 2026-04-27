@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
+import { Calendrier } from '../../core/models/calendrier.model';
 import { DossierService } from '../../core/services/dossier.service';
 import { PhaseArchiveService } from '../../core/services/phase-archive.service';
 import { Dossier } from '../../core/models/dossier.model';
@@ -33,6 +34,10 @@ function isPhaseArchive(obj: unknown): obj is PhaseArchive {
 
 function isBoitier(obj: unknown): obj is Boitier {
   return !!obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
+}
+
+function isCalendrier(obj: unknown): obj is Calendrier {
+  return !!obj && typeof obj === 'object' && 'id' in obj && 'code' in obj && 'title' in obj;
 }
 
 @Component({
@@ -68,7 +73,7 @@ export class ShowDossierComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   dataSource = new MatTableDataSource<Dossier>([]);
-  displayedColumns: string[] = ['idDossier', 'nomDos', 'phase', 'boitier', 'phaseType', 'date_creation', 'nb_docs', 'actions'];
+  displayedColumns: string[] = ['idDossier', 'nomDos', 'calendrier', 'phase', 'boitier', 'phaseType', 'date_creation', 'nb_docs', 'actions'];
   filterForm: FormGroup;
   phases: PhaseArchive[] = [];
 
@@ -159,6 +164,18 @@ export class ShowDossierComponent implements OnInit {
     }
 
     return dossier.boitier_idboit || 'Aucun';
+  }
+
+  getCalendrierLabel(dossier: Dossier): string {
+    if (dossier.calendrier && isCalendrier(dossier.calendrier)) {
+      return `${dossier.calendrier.code} - ${dossier.calendrier.title}`;
+    }
+
+    if (dossier.calendrier_code || dossier.calendrier_title) {
+      return `${dossier.calendrier_code || ''}${dossier.calendrier_code && dossier.calendrier_title ? ' - ' : ''}${dossier.calendrier_title || ''}`;
+    }
+
+    return 'Aucun';
   }
 
   getPhaseTypeColor(phaseType: string): string {

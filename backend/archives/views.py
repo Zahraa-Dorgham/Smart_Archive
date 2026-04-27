@@ -180,10 +180,10 @@ class BoitierViewSet(viewsets.ModelViewSet):
 
 # ========== DOSSIERS ==========
 class DossierViewSet(viewsets.ModelViewSet):
-    queryset = Dossier.objects.all().select_related('boitier', 'phaseArchive')
+    queryset = Dossier.objects.all().select_related('boitier', 'calendrier', 'phaseArchive')
     serializer_class = DossierSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['phaseArchive', 'boitier']
+    filterset_fields = ['phaseArchive', 'boitier', 'calendrier']
     search_fields = ['idDossier', 'description']
     ordering_fields = ['date_creation']
 

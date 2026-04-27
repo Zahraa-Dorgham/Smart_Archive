@@ -12,7 +12,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 import { DossierService } from '../../core/services/dossier.service';
 import { BoitierService } from '../../core/services/boitier.service';
+import { CalendrierService } from '../../core/services/calendrier.service';
 import { PhaseArchiveService } from '../../core/services/phase-archive.service';
+import { Calendrier } from '../../core/models/calendrier.model';
 import { Dossier } from '../../core/models/dossier.model';
 import { Boitier } from '../../core/models/boitier.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
@@ -52,12 +54,14 @@ export class AddEditDossierComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
   boitiers: Boitier[] = [];
+  calendriers: Calendrier[] = [];
   phases: PhaseArchive[] = [];
 
   constructor(
     private fb: FormBuilder,
     private dossierService: DossierService,
     private boitierService: BoitierService,
+    private calendrierService: CalendrierService,
     private phaseService: PhaseArchiveService,
     private dialogRef: MatDialogRef<AddEditDossierComponent>,
     private snackBar: MatSnackBar,
@@ -67,6 +71,7 @@ export class AddEditDossierComponent implements OnInit {
     this.form = this.fb.group({
       nomDos: ['', Validators.required],
       boitier: [null],
+      calendrier: [null],
       phaseArchive: [null, Validators.required],
       phaseType: ['COURANTE', Validators.required],
       date_creation: ['', Validators.required],
@@ -84,6 +89,7 @@ export class AddEditDossierComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBoitiers();
+    this.loadCalendriers();
     this.loadPhases();
 
     if (this.isEditMode && this.data.dossier) {
@@ -92,6 +98,10 @@ export class AddEditDossierComponent implements OnInit {
 
       if (dossier.boitier && isBoitier(dossier.boitier)) {
         patchValues['boitier'] = dossier.boitier.id;
+      }
+
+      if (dossier.calendrier && typeof dossier.calendrier === 'object') {
+        patchValues['calendrier'] = dossier.calendrier.id;
       }
 
       if (dossier.phaseArchive && isPhaseArchive(dossier.phaseArchive)) {
@@ -104,6 +114,10 @@ export class AddEditDossierComponent implements OnInit {
 
   loadBoitiers(): void {
     this.boitierService.getBoitiers({ page_size: 1000 }).subscribe(res => this.boitiers = res.results);
+  }
+
+  loadCalendriers(): void {
+    this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe(res => this.calendriers = res.results);
   }
 
   loadPhases(): void {

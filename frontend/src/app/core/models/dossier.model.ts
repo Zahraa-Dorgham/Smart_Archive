@@ -1,5 +1,6 @@
 import { BaseModel } from './base.model';
 import { Boitier } from './boitier.model';
+import { Calendrier } from './calendrier.model';
 import { PhaseArchive } from './phase-archive.model';
 
 export interface Dossier extends BaseModel {
@@ -7,6 +8,9 @@ export interface Dossier extends BaseModel {
     nomDos?: string | null;
     boitier?: Boitier | string | null;
     boitier_idboit?: string;
+    calendrier?: Calendrier | string | null;
+    calendrier_code?: string | null;
+    calendrier_title?: string | null;
     phaseArchive?: PhaseArchive | string | null;
     phaseArchive_nom?: string;
     phaseType: string;
@@ -26,6 +30,7 @@ export interface Dossier extends BaseModel {
 export interface DossierCreate {
     nomDos?: string | null;
     boitier?: string | null;
+    calendrier?: string | null;
     phaseArchive?: string | null;
     phaseType: string;
     date_creation: Date;
