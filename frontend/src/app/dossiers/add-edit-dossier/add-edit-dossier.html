@@ -68,6 +68,31 @@
                 <input matInput type="number" formControlName="dureeDefinitive">
                 <mat-error>Requis</mat-error>
             </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Conservation active (ans)</mat-label>
+                <input matInput type="number" formControlName="conservation_active_period">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Conservation semi-active (ans)</mat-label>
+                <input matInput type="number" formControlName="conservation_semi_active_period">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Sort final</mat-label>
+                <input matInput formControlName="sort_final_type">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Commentaire du sort final</mat-label>
+                <textarea matInput formControlName="sort_final_comment" rows="3"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Delai de securite (ans)</mat-label>
+                <input matInput type="number" formControlName="sort_final_security_years">
+            </mat-form-field>
         </div>
     </mat-dialog-content>
 

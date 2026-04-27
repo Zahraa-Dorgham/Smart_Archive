@@ -73,7 +73,12 @@ export class AddEditDossierComponent implements OnInit {
       date_cloture: [null],
       dureeCourant: [3, [Validators.required, Validators.min(0)]],
       dureeIntermediaire: [10, [Validators.required, Validators.min(0)]],
-      dureeDefinitive: [100, [Validators.required, Validators.min(0)]]
+      dureeDefinitive: [100, [Validators.required, Validators.min(0)]],
+      conservation_active_period: [null],
+      conservation_semi_active_period: [null],
+      sort_final_type: [''],
+      sort_final_comment: [''],
+      sort_final_security_years: [null]
     });
   }
 

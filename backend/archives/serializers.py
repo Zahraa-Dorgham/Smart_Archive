@@ -117,6 +117,8 @@ class DossierSerializer(serializers.ModelSerializer):
             'idDossier', 'nomDos', 'date_creation', 'date_cloture',
             'boitier', 'boitier_idboit', 'phaseArchive', 'phaseArchive_nom',
             'phaseType', 'dureeCourant', 'dureeIntermediaire', 'dureeDefinitive',
+            'conservation_active_period', 'conservation_semi_active_period',
+            'sort_final_type', 'sort_final_comment', 'sort_final_security_years',
             'nombre_documents', 'volume_total'
         ]
 
@@ -135,7 +137,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             'phase_archive', 'phase_archive_nom', 'date_creation',
             'calendrier', 'calendrier_code', 'calendrier_title',
             'niv_confidentialite', 'version', 'type_document', 'auteur',
-            'description', 'fichier', 'taille_fichier', 'taille_fichier_lisible',
+            'description', 'conservation_active_period', 'conservation_semi_active_period',
+            'sort_final_type', 'sort_final_comment', 'sort_final_security_years',
+            'fichier', 'taille_fichier', 'taille_fichier_lisible',
             'hash_fichier', 'date_entree', 'date_modification'
         ]
         read_only_fields = ['date_entree', 'date_modification', 'hash_fichier']

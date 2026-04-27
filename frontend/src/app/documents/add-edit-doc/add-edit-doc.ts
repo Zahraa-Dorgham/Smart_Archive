@@ -70,7 +70,12 @@ export class AddEditDocumentComponent implements OnInit {
       niv_confidentialite: ['INTERNE', Validators.required],
       type_document: ['AUTRE', Validators.required],
       auteur: [''],
-      description: ['']
+      description: [''],
+      conservation_active_period: [null],
+      conservation_semi_active_period: [null],
+      sort_final_type: [''],
+      sort_final_comment: [''],
+      sort_final_security_years: [null]
     });
   }
 

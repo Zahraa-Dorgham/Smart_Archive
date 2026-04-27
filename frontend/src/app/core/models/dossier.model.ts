@@ -15,6 +15,11 @@ export interface Dossier extends BaseModel {
     dureeCourant: number;
     dureeIntermediaire: number;
     dureeDefinitive: number;
+    conservation_active_period?: number | null;
+    conservation_semi_active_period?: number | null;
+    sort_final_type?: string | null;
+    sort_final_comment?: string | null;
+    sort_final_security_years?: number | null;
     nombre_documents?: number;
 }
 
@@ -28,6 +33,11 @@ export interface DossierCreate {
     dureeCourant?: number;
     dureeIntermediaire?: number;
     dureeDefinitive?: number;
+    conservation_active_period?: number | null;
+    conservation_semi_active_period?: number | null;
+    sort_final_type?: string | null;
+    sort_final_comment?: string | null;
+    sort_final_security_years?: number | null;
 }
 
 export interface DossierUpdate extends Partial<DossierCreate> {

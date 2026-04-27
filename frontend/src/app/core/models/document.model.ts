@@ -16,6 +16,11 @@ export interface Document extends BaseModel {
     type_document: string;
     auteur?: string;
     description?: string;
+    conservation_active_period?: number | null;
+    conservation_semi_active_period?: number | null;
+    sort_final_type?: string | null;
+    sort_final_comment?: string | null;
+    sort_final_security_years?: number | null;
     fichier?: string;
     taille_fichier?: number;
     hash_fichier?: string;
@@ -35,6 +40,11 @@ export interface DocumentCreate {
     type_document: string;
     auteur?: string;
     description?: string;
+    conservation_active_period?: number | null;
+    conservation_semi_active_period?: number | null;
+    sort_final_type?: string | null;
+    sort_final_comment?: string | null;
+    sort_final_security_years?: number | null;
 }
 
 export interface DocumentUpdate extends Partial<DocumentCreate> {

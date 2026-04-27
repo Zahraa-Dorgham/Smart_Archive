@@ -206,6 +206,11 @@ class Dossier(models.Model):
     dureeCourant = models.IntegerField(default=3)
     dureeIntermediaire = models.IntegerField(default=10)
     dureeDefinitive = models.IntegerField(default=100)
+    conservation_active_period = models.IntegerField(blank=True, null=True)
+    conservation_semi_active_period = models.IntegerField(blank=True, null=True)
+    sort_final_type = models.CharField(max_length=255, blank=True, null=True)
+    sort_final_comment = models.TextField(blank=True, null=True)
+    sort_final_security_years = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Dossier"
@@ -253,6 +258,11 @@ class Document(models.Model):
     type_document = models.CharField(max_length=20, choices=TYPE_DOCUMENT, default='AUTRE')
     auteur = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
+    conservation_active_period = models.IntegerField(blank=True, null=True)
+    conservation_semi_active_period = models.IntegerField(blank=True, null=True)
+    sort_final_type = models.CharField(max_length=255, blank=True, null=True)
+    sort_final_comment = models.TextField(blank=True, null=True)
+    sort_final_security_years = models.IntegerField(blank=True, null=True)
     fichier = models.FileField(upload_to='documents/%Y/%m/', null=True, blank=True)
     taille_fichier = models.BigIntegerField(null=True, blank=True)
     hash_fichier = models.CharField(max_length=64, blank=True)
