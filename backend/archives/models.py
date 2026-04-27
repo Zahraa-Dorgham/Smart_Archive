@@ -5,6 +5,17 @@ from django.utils import timezone
 from datetime import timedelta
 import hashlib
 
+
+def add_years_safe(source_date, years):
+    if not source_date or years is None:
+        return None
+
+    try:
+        return source_date.replace(year=source_date.year + int(years))
+    except ValueError:
+        # Handle February 29th on non-leap years.
+        return source_date.replace(month=2, day=28, year=source_date.year + int(years))
+
 # ========== ROLE ==========
 class Role(models.Model):
     nom = models.CharField(max_length=50, unique=True)
@@ -220,6 +231,18 @@ class Dossier(models.Model):
     class Meta:
         verbose_name = "Dossier"
 
+    def save(self, *args, **kwargs):
+        if self.date_creation and self.conservation_semi_active_period is not None:
+            self.date_pass_intermediaire = add_years_safe(self.date_creation, self.conservation_semi_active_period)
+            if self.conservation_active_period is not None:
+                self.date_pass_final = add_years_safe(self.date_pass_intermediaire, self.conservation_active_period)
+            else:
+                self.date_pass_final = None
+        else:
+            self.date_pass_intermediaire = None
+            self.date_pass_final = None
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Dossier {self.idDossier}"
 
@@ -284,6 +307,18 @@ class Document(models.Model):
         verbose_name = "Document"
         ordering = ['-date_creation', 'reference']
         indexes = [models.Index(fields=['idDoc']), models.Index(fields=['reference']), models.Index(fields=['phase_archive']), models.Index(fields=['calendrier'])]
+
+    def save(self, *args, **kwargs):
+        if self.date_creation and self.conservation_semi_active_period is not None:
+            self.date_pass_intermediaire = add_years_safe(self.date_creation, self.conservation_semi_active_period)
+            if self.conservation_active_period is not None:
+                self.date_pass_final = add_years_safe(self.date_pass_intermediaire, self.conservation_active_period)
+            else:
+                self.date_pass_final = None
+        else:
+            self.date_pass_intermediaire = None
+            self.date_pass_final = None
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.reference} - {self.titre}"
