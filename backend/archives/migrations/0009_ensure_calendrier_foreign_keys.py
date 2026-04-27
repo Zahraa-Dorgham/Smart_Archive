@@ -62,7 +62,7 @@ def _ensure_calendrier_foreign_keys(apps, schema_editor):
                 ALTER TABLE {table_name}
                 MODIFY COLUMN calendrier_id CHAR(32)
                 CHARACTER SET utf8mb4
-                COLLATE utf8mb4_unicode_ci
+                COLLATE utf8mb4_unicode_520_ci
                 NULL
                 """
             )

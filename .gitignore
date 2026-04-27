@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.log
+*.out.log
+*.err.log
+
+backend/runserver.out.log
+backend/runserver.err.log
+frontend/ng-serve.out.log
+frontend/ng-serve.err.log

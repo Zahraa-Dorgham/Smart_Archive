@@ -1,52 +1,73 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .serializers import UserReadSerializer, UserWriteSerializer
+from .serializers import UserSerializer
 
 User = get_user_model()
 
 
-class UserSerializer(UserReadSerializer):
-    class Meta(UserReadSerializer.Meta):
-        fields = UserReadSerializer.Meta.fields
-
-
-class RegisterSerializer(UserWriteSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, style={"input_type": "password"})
     password2 = serializers.CharField(write_only=True, required=True, style={"input_type": "password"})
+    groups = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Group.objects.all(),
+        required=False,
+    )
 
-    class Meta(UserWriteSerializer.Meta):
-        fields = UserWriteSerializer.Meta.fields + ["password2"]
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "password2",
+            "is_active",
+            "groups",
+        ]
 
     def validate(self, attrs):
-        attrs = super().validate(attrs)
-        password = attrs.get("password")
-        password2 = attrs.pop("password2", None)
-
-        if password != password2:
+        if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError({"password": "Les mots de passe ne correspondent pas."})
-
         return attrs
+
+    def create(self, validated_data):
+        groups = validated_data.pop("groups", [])
+        validated_data.pop("password2", None)
+        password = validated_data.pop("password")
+
+        if not validated_data.get("username") and validated_data.get("email"):
+            validated_data["username"] = validated_data["email"]
+
+        user = User.objects.create_user(password=password, **validated_data)
+        if groups:
+            user.groups.set(groups)
+        return user
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         attrs = attrs.copy()
-        username_field = self.username_field
-        identifier = attrs.get(username_field)
+        identifier = attrs.get(self.username_field)
 
         if identifier:
             try:
                 user = User.objects.get(email__iexact=identifier)
-                attrs[username_field] = user.get_username()
+                attrs[self.username_field] = user.get_username()
             except User.DoesNotExist:
                 pass
 
         data = super().validate(attrs)
-        serializer = UserReadSerializer(self.user)
+        serializer = UserSerializer(self.user)
         data["user"] = {
             **serializer.data,
-            "roles": serializer.data.get("roles", []),
+            "roles": [group.name for group in self.user.groups.all()],
+            "is_staff": self.user.is_staff,
+            "is_superuser": self.user.is_superuser,
         }
         return data
 
