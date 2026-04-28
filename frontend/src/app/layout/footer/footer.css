@@ -1,0 +1,75 @@
+/* Footer principal */
+.footer p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0;
+}
+
+/* Conteneur en flex pour remplacer le float */
+.footer p {
+    display: flex;
+   
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0;
+}
+
+/* Texte copyright */
+.footer .float-left {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Bouton scroll to top personnalisé */
+.scroll-top {
+    background-color: #0d6efd;
+    /* bleu primaire */
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.scroll-top i,
+.scroll-top .bx {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.scroll-top:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.scroll-top:active {
+    transform: translateY(0);
+}
+
+/* Ajustement pour petits écrans */
+@media (max-width: 576px) {
+    .footer {
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .footer p {
+        justify-content: center;
+    }
+
+    .footer .float-left {
+        width: 100%;
+        text-align: center;
+    }
+}

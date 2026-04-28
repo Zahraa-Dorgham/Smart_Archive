@@ -1,27 +1,39 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} une direction</h2>
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx text-primary" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier la direction' : 'Nouvelle direction' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-3"></i>
+    </button>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content>
-        <div class="form-grid">
-            <mat-form-field appearance="outline">
-                <mat-label>Nom *</mat-label>
-                <input matInput formControlName="nom">
-                <mat-error *ngIf="form.get('nom')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
+    <mat-dialog-content class="px-3 pb-2 pt-1">
+        <div class="section-title">Identification</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Nom <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-heading"></i>
+                    <input type="text" class="form-control" formControlName="nom" placeholder="Nom de la direction">
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Code *</mat-label>
-                <input matInput formControlName="code" placeholder="ex: D001">
-                <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
-
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Code <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-hash"></i>
+                    <input type="text" class="form-control" formControlName="code" placeholder="ex: D001">
+                </div>
+            </div>
         </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-        <button mat-button type="button" mat-dialog-close>Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+    <div class="dialog-actions">
+        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
-    </mat-dialog-actions>
+    </div>
 </form>

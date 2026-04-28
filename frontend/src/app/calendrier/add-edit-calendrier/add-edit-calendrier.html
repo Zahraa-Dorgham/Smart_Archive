@@ -1,103 +1,162 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un calendrier</h2>
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx text-primary" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier le calendrier' : 'Nouveau calendrier' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-3"></i>
+    </button>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <mat-dialog-content>
-    <div class="form-grid">
+    <mat-dialog-content class="px-3 pb-2 pt-1">
+        <div class="section-title">Identification</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Code <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-hash"></i>
+                    <input type="text" class="form-control" formControlName="code" placeholder="ex: CAL-001">
+                </div>
+            </div>
 
-      <div class="full-width">
-        <h3 class="section-title">Détails</h3>
-      </div>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Intitulé <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-heading"></i>
+                    <input type="text" class="form-control" formControlName="title" placeholder="Titre du calendrier">
+                </div>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Code *</mat-label>
-        <input matInput formControlName="code">
-        <mat-error *ngIf="form.get('code')?.hasError('required')">Requis</mat-error>
-      </mat-form-field>
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" formControlName="description" rows="2" placeholder="Description..."></textarea>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Intitulé *</mat-label>
-        <input matInput formControlName="title">
-        <mat-error *ngIf="form.get('title')?.hasError('required')">Requis</mat-error>
-      </mat-form-field>
+        <div class="section-title">Classification</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Type d'exemplaire</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-shape-circle"></i>
+                    <input type="text" class="form-control" formControlName="exemplaire_type" placeholder="Type">
+                </div>
+            </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description" rows="3"></textarea>
-      </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Unité responsable</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-building"></i>
+                    <input type="text" class="form-control" formControlName="unit_responsable" placeholder="Unité">
+                </div>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Type d'exemplaire</mat-label>
-        <input matInput formControlName="exemplaire_type">
-      </mat-form-field>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Direction</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-briefcase"></i>
+                    <select class="form-control" formControlName="direction">
+                        <option [value]="null">Aucune</option>
+                        <option *ngFor="let d of directions" [value]="d.id">{{ d.nom }}</option>
+                    </select>
+                </div>
+            </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Unité responsable</mat-label>
-        <input matInput formControlName="unit_responsable">
-      </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Parent</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-sitemap"></i>
+                    <select class="form-control" formControlName="parent">
+                        <option [value]="null">Aucun</option>
+                        <option *ngFor="let p of parents" [value]="p.id">{{ p.code }} - {{ p.title }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Direction</mat-label>
-        <mat-select formControlName="direction">
-          <mat-option [value]="null">Aucune</mat-option>
-          <mat-option *ngFor="let d of directions" [value]="d.id">{{ d.nom }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <div class="section-title">Gestion de Conservation</div>
+        <div class="row">
+            <div class="col-md-4 mb-1">
+                <label class="form-label">Courant - Durée (ans)</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-time"></i>
+                    <input type="number" class="form-control" formControlName="conservation_active_period" placeholder="0">
+                </div>
+            </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Parent</mat-label>
-        <mat-select formControlName="parent">
-          <mat-option [value]="null">Aucun</mat-option>
-          <mat-option *ngFor="let p of parents" [value]="p.id">{{ p.code }} - {{ p.title }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+            <div class="col-md-4 mb-1">
+                <label class="form-label">Intermédiaire - Durée (ans)</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-time"></i>
+                    <input type="number" class="form-control" formControlName="conservation_semi_active_period" placeholder="0">
+                </div>
+            </div>
 
-      <div class="full-width">
-        <h3 class="section-title">Phases</h3>
-      </div>
+            <div class="col-md-4 mb-1">
+                <label class="form-label">Délai sécurité (ans)</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-shield"></i>
+                    <input type="number" class="form-control" formControlName="sort_final_security_years" placeholder="0">
+                </div>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Courant - Durée (ans)</mat-label>
-        <input matInput type="number" formControlName="conservation_active_period">
-      </mat-form-field>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Sort final</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-trash"></i>
+                    <input type="text" class="form-control" formControlName="sort_final_type" placeholder="ex: Destruction">
+                </div>
+            </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Intermédiaire - Durée (ans)</mat-label>
-        <input matInput type="number" formControlName="conservation_semi_active_period">
-      </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Commentaire sort final</label>
+                <textarea class="form-control" formControlName="sort_final_comment" rows="2" placeholder="Commentaires..."></textarea>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Sort final</mat-label>
-        <input matInput formControlName="sort_final_type">
-      </mat-form-field>
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <label class="form-label">Remarques</label>
+                <textarea class="form-control" formControlName="remarques" rows="2" placeholder="Remarques générales..."></textarea>
+            </div>
+        </div>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Commentaire du sort final</mat-label>
-        <input matInput formControlName="sort_final_comment">
-      </mat-form-field>
+        <div class="section-title">Options</div>
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_dossier" formControlName="is_dossier">
+                    <label class="form-check-label" for="is_dossier">
+                        Dossier
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="validation_archive" formControlName="validation_archive">
+                    <label class="form-check-label" for="validation_archive">
+                        Validation archive
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_active" formControlName="is_active">
+                    <label class="form-check-label" for="is_active">
+                        Actif
+                    </label>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Delai de securite (ans)</mat-label>
-        <input matInput type="number" formControlName="sort_final_security_years">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Remarques</mat-label>
-        <textarea matInput formControlName="remarques" rows="3"></textarea>
-      </mat-form-field>
-
-      <div class="checkbox-row full-width">
-        <mat-checkbox formControlName="is_dossier">Dossier</mat-checkbox>
-        <mat-checkbox formControlName="validation_archive">Validation archive</mat-checkbox>
-        <mat-checkbox formControlName="is_active">Actif</mat-checkbox>
-      </div>
-
+    <div class="dialog-actions">
+        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
+        </button>
     </div>
-  </mat-dialog-content>
-
-  <mat-dialog-actions align="end">
-    <button mat-button type="button" mat-dialog-close>Annuler</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-      {{ isEditMode ? 'Modifier' : 'Creer' }}
-    </button>
-  </mat-dialog-actions>
 </form>

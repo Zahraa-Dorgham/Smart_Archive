@@ -61,14 +61,14 @@ export class AddEditDocumentComponent implements OnInit {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
       idDoc: ['', Validators.required],
-      reference: ['', Validators.required],
+      // reference: ['', Validators.required],
       titre: ['', Validators.required],
       dossier: ['', Validators.required],
       calendrier: [null],
-      phase_archive: ['', Validators.required],
-      date_creation: ['', Validators.required],
+      // phase_archive: ['', Validators.required],
+      date_creation: [''],
       niv_confidentialite: ['INTERNE', Validators.required],
-      type_document: ['AUTRE', Validators.required],
+      // type_document: ['AUTRE', Validators.required],
       auteur: [''],
       description: [''],
       conservation_active_period: [null],
@@ -101,7 +101,7 @@ export class AddEditDocumentComponent implements OnInit {
         ...doc,
         dossier: dossierValue,
         calendrier: calendrierValue,
-        phase_archive: typeof doc.phase_archive === 'object' ? doc.phase_archive.id : doc.phase_archive
+        // phase_archive: typeof doc.phase_archive === 'object' ? doc.phase_archive.id : doc.phase_archive
       });
     }
   }

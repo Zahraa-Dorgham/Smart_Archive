@@ -1,55 +1,96 @@
 <!-- direction/show-direction/show-direction.html -->
-<div class="show-direction-container">
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title>Gestion des Directions</mat-card-title>
-            <mat-card-subtitle>Liste des directions</mat-card-subtitle>
-        </mat-card-header>
+<div class="content-header row">
+    <div class="content-header-left col-12 mb-2 mt-1">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h5 class="content-header-title float-left pr-1 mb-0">Gestion des Directions</h5>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb p-0 mb-0">
+                        <li class="breadcrumb-item"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item active">Directions</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <mat-card-content>
-            <div [formGroup]="filterForm" class="toolbar">
-                <mat-form-field appearance="outline" class="search-field">
-                    <mat-label>Rechercher</mat-label>
-                    <input matInput formControlName="search" placeholder="Nom, code...">
-                    <mat-icon matSuffix>search</mat-icon>
-                </mat-form-field>
-
-                <button mat-raised-button color="primary" (click)="openAddDialog()">
-                    <mat-icon>add</mat-icon>
-                    Nouvelle direction
+<section class="users-list-wrapper">
+    <div class="users-list-filter px-1">
+        <div class="row border rounded py-2 mb-2 bg-white shadow-sm mx-0">
+            <div class="col-12 col-sm-6 col-lg-4 d-flex align-items-center">
+                <div [formGroup]="filterForm" class="w-100">
+                    <fieldset class="form-group position-relative has-icon-left mb-0">
+                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (Nom, Code)...">
+                        <div class="form-control-position">
+                            <i class="bx bx-search"></i>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-8 d-flex align-items-center justify-content-end mt-sm-0 mt-1">
+                <button class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
+                    <i class="bx bx-plus-circle mr-50"></i> Nouvelle Direction
                 </button>
             </div>
+        </div>
+    </div>
 
-            <div class="table-container">
-                <table mat-table [dataSource]="dataSource" matSort>
-                    <ng-container matColumnDef="nom">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nom </th>
-                        <td mat-cell *matCellDef="let d"> {{d.nom}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="code">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Code </th>
-                        <td mat-cell *matCellDef="let d"> {{d.code}} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef> Actions </th>
-                        <td mat-cell *matCellDef="let d">
-                            <button mat-icon-button color="primary" (click)="openEditDialog(d)" matTooltip="Modifier">
-                                <mat-icon>edit</mat-icon>
-                            </button>
-                            <button mat-icon-button color="warn" (click)="deleteDirection(d)" matTooltip="Supprimer">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                </table>
-
-                <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    <div class="users-list-table">
+        <div class="card shadow-sm border-0">
+            <div class="card-content">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="py-2">Code</th>
+                                    <th class="py-2">Nom</th>
+                                    <th class="py-2 text-right px-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let d of dataSource.connect() | async">
+                                    <td class="py-2">
+                                        <span class="badge badge-light-primary text-uppercase font-weight-bold">{{d.code}}</span>
+                                    </td>
+                                    <td class="py-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-light-info mr-1">
+                                                <div class="avatar-content">
+                                                    <i class="bx bx-sitemap text-primary"></i>
+                                                </div>
+                                            </div>
+                                            <h6 class="mb-0 font-weight-bold">{{d.nom}}</h6>
+                                        </div>
+                                    </td>
+                                    
+                                    <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(d)" title="Modifier">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-icon btn-light-danger" (click)="deleteDirection(d)" title="Supprimer">
+                                            <i class="bx bx-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="dataSource.filteredData.length === 0">
+                                    <td colspan="3" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="bx bx-info-circle font-large-2 text-muted mb-1"></i>
+                                            <p class="text-muted">Aucune direction correspondante.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-2 d-flex justify-content-between align-items-center border-top">
+                        <small class="text-muted">Total: {{dataSource.filteredData.length}}</small>
+                        <mat-paginator [pageSizeOptions]="[5, 10, 15]" class="custom-paginator"></mat-paginator>
+                    </div>
+                </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-</div>
+        </div>
+    </div>
+</section>

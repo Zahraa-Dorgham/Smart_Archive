@@ -230,7 +230,7 @@ class Boitier(models.Model):
 class Dossier(models.Model):
     idDossier = models.AutoField(primary_key=True)
     nomDos = models.CharField(max_length=255, null=True, blank=True)
-    date_creation = models.DateField()
+    date_creation = models.DateField(null=True, blank=True, default=timezone.now)
     date_cloture = models.DateField(null=True, blank=True)
     boitier = models.ForeignKey(Boitier, on_delete=models.SET_NULL, null=True, blank=True, related_name='dossiers')
     calendrier = models.ForeignKey('calendrier.Calendrier', to_field='id', on_delete=models.SET_NULL, null=True, blank=True, related_name='dossiers')
@@ -295,16 +295,16 @@ class Document(models.Model):
     TYPE_DOCUMENT = [('CONTRAT', 'Contrat'), ('FACTURE', 'Facture'), ('RAPPORT', 'Rapport'), ('COURRIER', 'Courrier'), ('FORMULAIRE', 'Formulaire'), ('AUTRE', 'Autre')]
 
     idDoc = models.CharField(max_length=50, unique=True)
-    reference = models.CharField(max_length=100, unique=True)
+    reference = models.CharField(max_length=100, null=True, blank=True, unique=False)
     titre = models.CharField(max_length=500)
     dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='documents')
     # Foreign key to Calendrier (choice from calendrier app)
     calendrier = models.ForeignKey('calendrier.Calendrier', to_field='id', on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
-    phase_archive = models.ForeignKey(PhaseArchive, on_delete=models.PROTECT, related_name='documents')
-    date_creation = models.DateField()
+    phase_archive = models.ForeignKey(PhaseArchive, on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
+    date_creation = models.DateField(null=True, blank=True, default=timezone.now)
     niv_confidentialite = models.CharField(max_length=20, choices=NIV_CONFIDENTIALITE, default='INTERNE')
     version = models.IntegerField(default=1)
-    type_document = models.CharField(max_length=20, choices=TYPE_DOCUMENT, default='AUTRE')
+    type_document = models.CharField(max_length=20, choices=TYPE_DOCUMENT, default='AUTRE', null=True, blank=True)
     auteur = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
     date_pass_intermediaire = models.DateField(blank=True, null=True)
@@ -316,6 +316,7 @@ class Document(models.Model):
     sort_final_type = models.CharField(max_length=255, blank=True, null=True)
     sort_final_comment = models.TextField(blank=True, null=True)
     sort_final_security_years = models.IntegerField(blank=True, null=True)
+    action_finale = models.CharField(max_length=255, blank=True, null=True)
     fichier = models.FileField(upload_to='documents/%Y/%m/', null=True, blank=True)
     taille_fichier = models.BigIntegerField(null=True, blank=True)
     hash_fichier = models.CharField(max_length=64, blank=True)
@@ -342,7 +343,8 @@ class Document(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.reference} - {self.titre}"
+        ref = self.reference or self.idDoc
+        return f"{ref} - {self.titre}"
 
     def modifier_version(self, nouveau_fichier, utilisateur=None, commentaire=""):
         ancienne_version = {'version': self.version, 'fichier': self.fichier.name if self.fichier else None, 'date': str(timezone.now()), 'utilisateur': utilisateur.username if utilisateur else 'Système', 'commentaire': commentaire}

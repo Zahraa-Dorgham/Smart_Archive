@@ -1,40 +1,169 @@
-.form-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-	gap: 12px;
-	width: 100%;
-	box-sizing: border-box;
+/* Unified Frest Dialog Style - Documents */
+:host {
+	display: block;
+	border-radius: 8px;
+	overflow: hidden;
 }
-.full-width {
-	grid-column: 1 / -1;
-	min-width: 0;
+
+.modal-header {
+	background-color: #f2f4f4;
+	border-bottom: 1px solid #dfe3e7;
+	padding: 1rem 1.5rem !important;
 }
-.file-upload {
+
+.modal-title {
+	color: #475f7b !important;
+	font-weight: 600 !important;
+	font-size: 1.1rem;
 	display: flex;
-	flex-direction: column;
-	gap: 6px;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+}
+
+.btn-close-custom {
+	color: #475f7b !important;
+}
+
+.section-title {
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: #828d99;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin: 1.5rem 0 1rem 0;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #dfe3e7;
+}
+
+.form-label {
+	font-weight: 600;
+	color: #475f7b;
+	font-size: 0.85rem;
+	margin-bottom: 0.5rem;
+	display: block;
+}
+
+.form-control {
+	border-radius: 4px;
+	border: 1px solid #dfe3e7;
+	padding: 0.6rem 0.8rem;
+	color: #475f7b;
+}
+
+.form-control:focus {
+	border-color: #5a8dee;
+	box-shadow: 0 0 0 0.2rem rgba(90, 141, 238, 0.25);
+	color: #475f7b;
+}
+
+.icon-input-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.icon-input-wrapper i {
+	position: absolute;
+	top: 50% !important;
+	left: 12px !important;
+	transform: translateY(-50%) !important;
+	color: #828d99;
+	font-size: 1.1rem;
+	z-index: 2;
+	pointer-events: none;
+}
+
+.icon-input-wrapper .form-control,
+.icon-input-wrapper .form-select {
+	padding-left: 38px !important;
+}
+
+.dialog-actions {
+	padding: 1rem 1.5rem !important;
+	border-top: 1px solid #dfe3e7;
+	background: #fff;
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}
+
+.btn-primary.glow {
+	box-shadow: 0 4px 12px rgba(90, 141, 238, 0.4);
 }
 
 mat-dialog-content {
 	max-height: calc(90vh - 160px);
 	overflow-y: auto;
 	overflow-x: hidden;
-	padding-right: 8px;
+	background-color: #fff;
+	padding: 1.5rem;
 }
 
-mat-form-field {
+mat-form-field.form-field-style {
+	width: 100%;
+}
+
+mat-form-field.form-field-style ::ng-deep .mdc-text-field {
+	border-radius: 4px;
+}
+
+mat-form-field.form-field-style ::ng-deep .mdc-text-field__input {
+	color: #475f7b;
+}
+
+mat-form-field.form-field-style ::ng-deep .mat-mdc-floating-label {
+	color: #475f7b !important;
+	font-weight: 500;
+}
+
+mat-form-field.form-field-style ::ng-deep .mdc-notched-outline__leading,
+mat-form-field.form-field-style ::ng-deep .mdc-notched-outline__notch,
+mat-form-field.form-field-style ::ng-deep .mdc-notched-outline__trailing {
+	border-color: #dfe3e7 !important;
+}
+
+mat-form-field.form-field-style ::ng-deep .mat-mdc-form-field-focus-overlay {
+	background-color: rgba(90, 141, 238, 0.04);
+}
+
+.w-100 {
 	width: 100%;
 	box-sizing: border-box;
 }
 
-mat-dialog-actions {
+.file-upload {
 	display: flex;
+	flex-direction: column;
 	gap: 8px;
-	flex-wrap: wrap;
-	justify-content: flex-end;
+	padding: 0.75rem;
+	border: 1px solid #dfe3e7;
+	border-radius: 4px;
+	background-color: #f9f9fb;
+}
+
+.file-label {
+	font-weight: 600;
+	color: #475f7b;
+	font-size: 0.85rem;
+	display: block;
+	margin-bottom: 0.25rem;
+}
+
+.file-upload input[type="file"] {
+	padding: 0.5rem;
+	border: 1px solid #dfe3e7;
+	border-radius: 4px;
+	background-color: #fff;
+	cursor: pointer;
 }
 
 @media (max-width: 600px) {
-	.form-grid { gap: 8px; }
-	mat-dialog-content { max-height: calc(100vh - 120px); }
+	.modal-header,
+	mat-dialog-content,
+	.dialog-actions {
+		padding: 0.75rem 1rem !important;
+	}
+	mat-dialog-content {
+		max-height: calc(100vh - 120px);
+	}
 }

@@ -4,16 +4,16 @@ import { BaseModel } from './base.model';
 
 export interface Document extends BaseModel {
     idDoc: string;
-    reference: string;
+    // reference: string;
     titre: string;
     dossier: Dossier | number | string;
     calendrier?: string | null;
     calendrier_title?: string | null;
-    phase_archive: PhaseArchive | string;
-    date_creation: Date;
+    // phase_archive: PhaseArchive | string;
+    date_creation?: Date | null;
     niv_confidentialite: string;
     version: number;
-    type_document: string;
+    // type_document: string;
     auteur?: string;
     description?: string;
     conservation_active_period?: number | null;
@@ -30,14 +30,14 @@ export interface Document extends BaseModel {
 
 export interface DocumentCreate {
     idDoc: string;
-    reference: string;
+    reference?: string;
     titre: string;
     dossier: string | number;
     calendrier?: string | null;
-    phase_archive: string;
-    date_creation: Date;
+    phase_archive?: string;
+    date_creation?: Date;
     niv_confidentialite: string;
-    type_document: string;
+    type_document?: string;
     auteur?: string;
     description?: string;
     conservation_active_period?: number | null;

@@ -45,7 +45,12 @@ export class DossierService {
                 return;
             }
 
-            if (value === '') {
+            if (value === '' || value === null) {
+                // Ne pas envoyer les champs vides sauf si c'est intentionnel
+                if (key === 'date_creation' || key === 'date_cloture') {
+                    // Pour les dates, ne pas envoyer si vides - backend utilisera la valeur par défaut
+                    return;
+                }
                 payload[key] = null;
                 return;
             }

@@ -25,13 +25,32 @@ export class DocumentService {
         const formData = new FormData();
         // Ajouter tous les champs simples
         formData.append('idDoc', data.idDoc);
-        formData.append('reference', data.reference);
+        // Générer une référence unique avec timestamp (optionnel)
+        if (data.reference) {
+            formData.append('reference', data.reference);
+        } else {
+            const uniqueReference = `${data.idDoc}-${Date.now()}`;
+            formData.append('reference', uniqueReference);
+        }
         formData.append('titre', data.titre);
         formData.append('dossier', String(data.dossier));
-        formData.append('phase_archive', data.phase_archive);
-        formData.append('date_creation', data.date_creation.toISOString().split('T')[0]); // format YYYY-MM-DD
+        // phase_archive et type_document sont maintenant optionnels
+        if (data.phase_archive) formData.append('phase_archive', data.phase_archive);
+        
+        // Gérer la date - peut être Date object, string, ou vide
+        if (data.date_creation) {
+            let dateStr: string;
+            if (data.date_creation instanceof Date) {
+                dateStr = data.date_creation.toISOString().split('T')[0];
+            } else {
+                dateStr = String(data.date_creation);
+            }
+            formData.append('date_creation', dateStr); // format YYYY-MM-DD
+        }
+        // Si date_creation est vide/null, le backend utilisera la valeur par défaut
+        
         formData.append('niv_confidentialite', data.niv_confidentialite);
-        formData.append('type_document', data.type_document);
+        if (data.type_document) formData.append('type_document', data.type_document);
         if (data.calendrier) formData.append('calendrier', data.calendrier);
         if (data.auteur) formData.append('auteur', data.auteur);
         if (data.description) formData.append('description', data.description);

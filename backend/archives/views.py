@@ -184,13 +184,27 @@ class DossierViewSet(viewsets.ModelViewSet):
     serializer_class = DossierSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['phaseArchive', 'boitier', 'calendrier']
-    search_fields = ['idDossier', 'description']
+    search_fields = ['idDossier', 'nomDos']
     ordering_fields = ['date_creation']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
         return [EstArchiviste()]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            if not serializer.is_valid():
+                # Afficher les erreurs de validation en détail
+                return Response({'errors': serializer.errors}, status=400)
+            serializer.save()
+            return Response(serializer.data, status=201)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Error creating dossier: {str(e)}")
+            return Response({'error': str(e), 'type': type(e).__name__}, status=400)
 
     @action(detail=True, methods=['post'])
     def ajouter_document(self, request, pk=None):
@@ -231,6 +245,20 @@ class DocumentViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
         return [EstArchiviste()]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            if not serializer.is_valid():
+                # Afficher les erreurs de validation en détail
+                return Response({'errors': serializer.errors}, status=400)
+            serializer.save()
+            return Response(serializer.data, status=201)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Error creating document: {str(e)}")
+            return Response({'error': str(e), 'type': type(e).__name__}, status=400)
 
     @action(detail=True, methods=['post'])
     def changer_phase(self, request, pk=None):

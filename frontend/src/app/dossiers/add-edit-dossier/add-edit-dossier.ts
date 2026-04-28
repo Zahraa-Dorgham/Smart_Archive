@@ -53,9 +53,10 @@ export interface DialogData {
 export class AddEditDossierComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
-  boitiers: Boitier[] = [];
-  calendriers: Calendrier[] = [];
+  boitiers: any[] = [];     // à remplir depuis un service
+  calendriers: any[] = [];
   phases: PhaseArchive[] = [];
+  nomDosInvalid = false;
 
   constructor(
     private fb: FormBuilder,
@@ -72,9 +73,9 @@ export class AddEditDossierComponent implements OnInit {
       nomDos: ['', Validators.required],
       boitier: [null],
       calendrier: [null],
-      phaseArchive: [null, Validators.required],
-      phaseType: ['COURANTE', Validators.required],
-      date_creation: ['', Validators.required],
+      phaseArchive: [null],
+      phaseType: ['COURANTE'],
+      date_creation: [''],
       date_cloture: [null],
       dureeCourant: [3, [Validators.required, Validators.min(0)]],
       dureeIntermediaire: [10, [Validators.required, Validators.min(0)]],

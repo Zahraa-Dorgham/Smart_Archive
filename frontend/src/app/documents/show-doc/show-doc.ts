@@ -61,7 +61,7 @@ export class ShowDocumentComponent implements OnInit {
   }
 
   dataSource = new MatTableDataSource<Document>([]);
-  displayedColumns: string[] = ['idDoc', 'reference', 'titre', 'dossier', 'calendrier', 'phase', 'date', 'confidentialite', 'actions'];
+  displayedColumns: string[] = ['idDoc', 'titre', 'dossier', 'calendrier', 'phase', 'date', 'confidentialite', 'actions'];
   filterForm: FormGroup;
 
   constructor(
@@ -98,7 +98,7 @@ export class ShowDocumentComponent implements OnInit {
     const search = this.filterForm.value.search?.toLowerCase().trim() || '';
     this.dataSource.filterPredicate = (data: Document, filter: string) => {
       return data.titre.toLowerCase().includes(filter) ||
-        data.reference.toLowerCase().includes(filter) ||
+        // data.reference.toLowerCase().includes(filter) ||
         data.idDoc.toLowerCase().includes(filter);
     };
     this.dataSource.filter = search;
@@ -111,12 +111,12 @@ export class ShowDocumentComponent implements OnInit {
     return (doc as any).dossier_nom || (doc as any).dossier_reference || 'N/A';
   }
 
-  getPhaseNom(doc: Document): string {
-    if (typeof doc.phase_archive === 'object') {
-      return doc.phase_archive.nom;
-    }
-    return (doc as any).phase_nom || 'N/A';
-  }
+  // getPhaseNom(doc: Document): string {
+  //   if (typeof doc.phase_archive === 'object') {
+  //     return doc.phase_archive.nom;
+  //   }
+  //   return (doc as any).phase_nom || 'N/A';
+  // }
 
   getConfidentialiteColor(niveau: string): string {
     switch (niveau) {
@@ -157,7 +157,7 @@ export class ShowDocumentComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Confirmation',
-        message: `Supprimer le document ${document.reference} ?`,
+        // message: `Supprimer le document ${document.reference} ?`,
         confirmText: 'Supprimer',
         cancelText: 'Annuler'
       }

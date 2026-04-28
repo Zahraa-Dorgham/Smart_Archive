@@ -1,127 +1,177 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Modifier' : 'Ajouter' }} un document</h2>
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx text-primary" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier le document' : 'Nouveau document' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-3"></i>
+    </button>
+</div>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <mat-dialog-content>
-        <div class="form-grid">
-            <mat-form-field appearance="outline">
-                <mat-label>ID Document *</mat-label>
-                <input matInput formControlName="idDoc">
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
+    <mat-dialog-content class="px-3 pb-2 pt-1">
+        <div class="section-title">Identification du Document</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Code Document <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-hash"></i>
+                    <input type="text" class="form-control" formControlName="idDoc" placeholder="ex: DOC-001">
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Référence *</mat-label>
-                <input matInput formControlName="reference">
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Titre <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-file"></i>
+                    <input type="text" class="form-control" formControlName="titre" placeholder="Titre du document">
+                </div>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Titre *</mat-label>
-                <input matInput formControlName="titre">
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
+        <div class="section-title">Classification</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Dossier <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-folder"></i>
+                    <select class="form-control" formControlName="dossier">
+                        <option [value]="null" disabled selected>Sélectionner le dossier...</option>
+                        <option *ngFor="let d of dossiers" [value]="d.idDossier">
+                            {{ d.idDossier }} - {{ d.nomDos || 'Sans nom' }}
+                        </option>
+                    </select>
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Dossier *</mat-label>
-                <mat-select formControlName="dossier">
-                    <mat-option *ngFor="let d of dossiers" [value]="d.idDossier">
-                        {{ d.idDossier }} - {{ d.nomDos || 'Sans nom' }}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="form.get('dossier')?.hasError('required')">Requis</mat-error>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Calendrier</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-calendar"></i>
+                    <select class="form-control" formControlName="calendrier">
+                        <option [value]="null">Aucun</option>
+                        <option *ngFor="let c of calendriers" [value]="c.id">{{ c.code }} - {{ c.title }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Calendrier</mat-label>
-                <mat-select formControlName="calendrier">
-                    <mat-option [value]="null">Aucun</mat-option>
-                    <mat-option *ngFor="let c of calendriers" [value]="c.id">{{ c.code }} - {{ c.title }}</mat-option>
-                </mat-select>
-            </mat-form-field>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Phase</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-layer"></i>
+                    <select class="form-control" formControlName="phase_archive">
+                        <option [value]="null">Aucune</option>
+                        <option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</option>
+                    </select>
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Phase *</mat-label>
-                <mat-select formControlName="phase_archive">
-                    <mat-option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</mat-option>
-                </mat-select>
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Confidentialité <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-lock"></i>
+                    <select class="form-control" formControlName="niv_confidentialite">
+                        <option value="INTERNE" selected>Interne</option>
+                        <option value="PUBLIC">Public</option>
+                        <option value="CONFIDENTIEL">Confidentiel</option>
+                        <option value="SECRET">Secret</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Date création *</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="date_creation">
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-                <mat-error>Requis</mat-error>
-            </mat-form-field>
+        <div class="section-title">Métadonnées</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Date création <span class="text-danger">*</span></label>
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <input matInput [matDatepicker]="picker" formControlName="date_creation">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Confidentialité *</mat-label>
-                <mat-select formControlName="niv_confidentialite">
-                    <mat-option value="PUBLIC">Public</mat-option>
-                    <mat-option value="INTERNE">Interne</mat-option>
-                    <mat-option value="CONFIDENTIEL">Confidentiel</mat-option>
-                    <mat-option value="SECRET">Secret</mat-option>
-                </mat-select>
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Auteur</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-user"></i>
+                    <input type="text" class="form-control" formControlName="auteur" placeholder="Nom de l'auteur">
+                </div>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Type *</mat-label>
-                <mat-select formControlName="type_document">
-                    <mat-option value="CONTRAT">Contrat</mat-option>
-                    <mat-option value="FACTURE">Facture</mat-option>
-                    <mat-option value="RAPPORT">Rapport</mat-option>
-                    <mat-option value="COURRIER">Courrier</mat-option>
-                    <mat-option value="AUTRE">Autre</mat-option>
-                </mat-select>
-            </mat-form-field>
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" formControlName="description" rows="2"
+                    placeholder="Description du document"></textarea>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Auteur</mat-label>
-                <input matInput formControlName="auteur">
-            </mat-form-field>
+        <div class="section-title">Gestion de Conservation</div>
+        <div class="row">
+            <div class="col-md-4 mb-1">
+                <label class="form-label">Conservation active (ans)</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-time"></i>
+                    <input type="number" class="form-control" formControlName="conservation_active_period"
+                        placeholder="0">
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea matInput formControlName="description" rows="3"></textarea>
-            </mat-form-field>
+            <div class="col-md-4 mb-1">
+                <label class="form-label">Conservation semi-active (ans)</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-time"></i>
+                    <input type="number" class="form-control" formControlName="conservation_semi_active_period"
+                        placeholder="0">
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Conservation active (ans)</mat-label>
-                <input matInput type="number" formControlName="conservation_active_period">
-            </mat-form-field>
+            <div class="col-md-4 mb-1">
+                <label class="form-label">Délai sécurité (ans)</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-shield"></i>
+                    <input type="number" class="form-control" formControlName="sort_final_security_years"
+                        placeholder="0">
+                </div>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Conservation semi-active (ans)</mat-label>
-                <input matInput type="number" formControlName="conservation_semi_active_period">
-            </mat-form-field>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Sort final</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-trash"></i>
+                    <input type="text" class="form-control" formControlName="sort_final_type"
+                        placeholder="ex: Destruction">
+                </div>
+            </div>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Sort final</mat-label>
-                <input matInput formControlName="sort_final_type">
-            </mat-form-field>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Commentaire sort final</label>
+                <textarea class="form-control" formControlName="sort_final_comment" rows="2"
+                    placeholder="Commentaires..."></textarea>
+            </div>
+        </div>
 
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Commentaire du sort final</mat-label>
-                <textarea matInput formControlName="sort_final_comment" rows="3"></textarea>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-                <mat-label>Delai de securite (ans)</mat-label>
-                <input matInput type="number" formControlName="sort_final_security_years">
-            </mat-form-field>
-
-            <div class="file-upload">
-                <label for="fichier">Fichier</label>
-                <input type="file" id="fichier" (change)="onFileSelected($event)">
+        <div class="section-title">Fichier Joint</div>
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <div class="file-upload">
+                    <label for="fichier" class="file-label">Joindre un fichier</label>
+                    <input type="file" id="fichier" (change)="onFileSelected($event)">
+                </div>
             </div>
         </div>
     </mat-dialog-content>
 
-    <mat-dialog-actions align="end">
-        <button mat-button type="button" mat-dialog-close>Annuler</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Modifier' : 'Créer' }}
+    <div class="dialog-actions">
+        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
-    </mat-dialog-actions>
+    </div>
 </form>

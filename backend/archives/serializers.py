@@ -32,21 +32,28 @@ class BatimentSerializer(serializers.ModelSerializer):
 # Serializer pour Salle
 class SalleSerializer(serializers.ModelSerializer):
     batiment_nom = serializers.CharField(source='batiment.nom', read_only=True)
+    nombre_armoires = serializers.SerializerMethodField()
     
     class Meta:
         model = Salle
         fields = ['id', 'nom', 'code', 'batiment', 'batiment_nom', 
-                  'etage', 'description']
+                  'etage', 'description', 'nombre_armoires']
+
+    def get_nombre_armoires(self, obj):
+        return obj.armoires.count()
 
 # Serializer pour Armoire
 class ArmoireSerializer(serializers.ModelSerializer):
     salle_nom = serializers.CharField(source='salle.nom', read_only=True)
+    nombre_etageres = serializers.SerializerMethodField()
     
     class Meta:
         model = Armoire
         fields = ['id', 'code', 'salle', 'salle_nom', 
-                   
-                  'code_barres']
+                  'code_barres', 'nombre_etageres']
+
+    def get_nombre_etageres(self, obj):
+        return obj.etageres.count()
 
 # Serializer pour Etagere
 class EtagereSerializer(serializers.ModelSerializer):
@@ -112,6 +119,9 @@ class DossierSerializer(serializers.ModelSerializer):
     phaseArchive_nom = serializers.CharField(source='phaseArchive.nom', read_only=True)
     nombre_documents = serializers.IntegerField(read_only=True)
     volume_total = serializers.IntegerField(read_only=True)
+    
+    # Marquer date_creation comme optionnel
+    date_creation = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
         model = Dossier
@@ -130,10 +140,16 @@ class DossierSerializer(serializers.ModelSerializer):
 class DocumentSerializer(serializers.ModelSerializer):
     dossier_reference = serializers.CharField(source='dossier.idDossier', read_only=True)
     dossier_nom = serializers.CharField(source='dossier.nomDos', read_only=True)
-    phase_archive_nom = serializers.CharField(source='phase_archive.nom', read_only=True)
+    phase_archive_nom = serializers.CharField(source='phase_archive.nom', read_only=True, required=False)
     taille_fichier_lisible = serializers.SerializerMethodField()
-    calendrier_code = serializers.CharField(source='calendrier.code', read_only=True)
-    calendrier_title = serializers.CharField(source='calendrier.title', read_only=True)
+    calendrier_code = serializers.CharField(source='calendrier.code', read_only=True, required=False)
+    calendrier_title = serializers.CharField(source='calendrier.title', read_only=True, required=False)
+    
+    # Marquer les champs optionnels
+    reference = serializers.CharField(required=False, allow_blank=True)
+    phase_archive = serializers.PrimaryKeyRelatedField(queryset=PhaseArchive.objects.all(), required=False, allow_null=True)
+    type_document = serializers.CharField(required=False, allow_blank=True)
+    date_creation = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
         model = Document
@@ -146,10 +162,10 @@ class DocumentSerializer(serializers.ModelSerializer):
             'date_pass_intermediaire_real', 'date_pass_final_real',
             'conservation_active_period', 'conservation_semi_active_period',
             'sort_final_type', 'sort_final_comment', 'sort_final_security_years',
-            'fichier', 'taille_fichier', 'taille_fichier_lisible',
+            'action_finale', 'fichier', 'taille_fichier', 'taille_fichier_lisible',
             'hash_fichier', 'date_entree', 'date_modification'
         ]
-        read_only_fields = ['date_entree', 'date_modification', 'hash_fichier']
+        read_only_fields = ['date_entree', 'date_modification', 'hash_fichier', 'id', 'version']
 
     def get_taille_fichier_lisible(self, obj):
         if obj.taille_fichier:

@@ -81,7 +81,7 @@ export class ShowDossierComponent implements OnInit {
   }
 
   dataSource = new MatTableDataSource<Dossier>([]);
-  displayedColumns: string[] = ['idDossier', 'nomDos', 'calendrier', 'phase', 'boitier', 'phaseType', 'date_creation', 'nb_docs', 'actions'];
+  displayedColumns: string[] = ['idDossier', 'nomDos', 'calendrier', 'phase', 'boitier', 'date_creation', 'nb_docs', 'actions'];
   filterForm: FormGroup;
   phases: PhaseArchive[] = [];
 

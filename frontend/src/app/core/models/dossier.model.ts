@@ -14,7 +14,7 @@ export interface Dossier extends BaseModel {
     phaseArchive?: PhaseArchive | string | null;
     phaseArchive_nom?: string;
     phaseType: string;
-    date_creation: Date;
+    date_creation?: Date | null;
     date_cloture?: Date | null;
     dureeCourant: number;
     dureeIntermediaire: number;
@@ -33,7 +33,7 @@ export interface DossierCreate {
     calendrier?: string | null;
     phaseArchive?: string | null;
     phaseType: string;
-    date_creation: Date;
+    date_creation?: Date | null;
     date_cloture?: Date | null;
     dureeCourant?: number;
     dureeIntermediaire?: number;

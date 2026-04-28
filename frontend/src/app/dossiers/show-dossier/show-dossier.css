@@ -1,0 +1,72 @@
+/* show-dossier.css */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-light-primary {
+    background-color: #e2ecff !important;
+}
+
+.bg-light-success {
+    background-color: #d1f0d9 !important;
+}
+
+.table thead th {
+    background-color: #f8f9fb;
+    border-top: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #475f7b;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(90, 141, 238, 0.04) !important;
+}
+
+.has-icon-left .form-control {
+    padding-left: 35px;
+    border-radius: 8px;
+}
+
+.form-control-position {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #828d99;
+}
+
+::ng-deep .custom-paginator {
+    background: transparent !important;
+}
+
+::ng-deep .custom-paginator .mat-mdc-paginator-container {
+    padding: 0 !important;
+    min-height: auto !important;
+}
