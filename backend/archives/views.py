@@ -303,9 +303,24 @@ class ConsultationViewSet(viewsets.ModelViewSet):
 
 # ========== TRANSFERTS ==========
 class TransfertViewSet(viewsets.ModelViewSet):
-    queryset = Transfert.objects.all()
+    queryset = Transfert.objects.all().prefetch_related('transfert_boitiers__boitier')
     serializer_class = TransfertSerializer
-    permission_classes = [EstResponsable]  # ou EstArchiviste
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['statut', 'typeTransfer']
+    search_fields = ['reference', 'bordereauxReference']
+    ordering_fields = ['date_demande', 'date_execution', 'reference']
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [EstLectureAutorisee()]
+        return [EstResponsable()]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({'errors': serializer.errors}, status=400)
+        serializer.save()
+        return Response(serializer.data, status=201)
 
     @action(detail=True, methods=['post'])
     def valider(self, request, pk=None):

@@ -52,6 +52,7 @@ export const routes: Routes = [
           { path: 'boitiers', loadComponent: () => import('./boitiers/show-boitier/show-boitier').then(m => m.ShowBoitierComponent) },
           { path: 'dossiers', loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent) },
           { path: 'documents', loadComponent: () => import('./documents/show-doc/show-doc').then(m => m.ShowDocumentComponent) },
+          { path: 'transferts', loadComponent: () => import('./transferts/show-transfert/show-transfert').then(m => m.ShowTransfertComponent) },
           { path: '', redirectTo: 'batiments', pathMatch: 'full' }
         ]
       },
@@ -73,7 +74,8 @@ export const routes: Routes = [
       { path: 'calendrier', redirectTo: '/archiviste/calendrier' },
       { path: 'boitiers', redirectTo: '/archiviste/boitiers' },
       { path: 'dossiers', redirectTo: '/archiviste/dossiers' },
-      { path: 'documents', redirectTo: '/archiviste/documents' }
+      { path: 'documents', redirectTo: '/archiviste/documents' },
+      { path: 'transferts', redirectTo: '/archiviste/transferts' }
       ,{ path: 'directions', redirectTo: '/archiviste/directions' }
     ]
   },

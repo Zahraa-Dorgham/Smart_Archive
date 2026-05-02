@@ -1,0 +1,95 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx text-primary" [ngClass]="isEditMode ? 'bx-edit' : 'bx-plus-circle'"></i>
+        {{ isEditMode ? 'Modifier le transfert' : 'Nouveau transfert' }}
+    </h5>
+    <button mat-icon-button mat-dialog-close class="btn-close-custom">
+        <i class="bx bx-x font-medium-3"></i>
+    </button>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-dialog-content class="px-3 pb-2 pt-1">
+        <div class="section-title">Informations</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Reference</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-transfer"></i>
+                    <input type="text" class="form-control" formControlName="reference" placeholder="Ex: TR-2026-001">
+                </div>
+            </div>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Reference bordereau</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-receipt"></i>
+                    <input type="text" class="form-control" formControlName="bordereauxReference" placeholder="Ex: BRD-10">
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Classification</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Type de transfert <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-shuffle"></i>
+                    <select class="form-control" formControlName="typeTransfer">
+                        <option *ngFor="let option of typeOptions" [ngValue]="option">{{ option }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Statut <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-flag"></i>
+                    <select class="form-control" formControlName="statut">
+                        <option *ngFor="let option of statusOptions" [ngValue]="option">{{ option }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Dates</div>
+        <div class="row">
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Date demande <span class="text-danger">*</span></label>
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <input matInput [matDatepicker]="pickerDemande" formControlName="date_demande">
+                    <mat-datepicker-toggle matSuffix [for]="pickerDemande"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerDemande></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-6 mb-1">
+                <label class="form-label">Date execution</label>
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <input matInput [matDatepicker]="pickerExecution" formControlName="date_execution">
+                    <mat-datepicker-toggle matSuffix [for]="pickerExecution"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerExecution></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="section-title">Boitiers lies</div>
+        <div class="row">
+            <div class="col-md-12 mb-1">
+                <label class="form-label">Boitiers <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-box"></i>
+                    <select class="form-control multi-select" formControlName="boitier_ids" multiple>
+                        <option *ngFor="let b of boitiers" [ngValue]="b.id">{{ b.idboit }} - {{ b.titre }}</option>
+                    </select>
+                </div>
+                <small class="text-muted d-block mt-50">Maintenez Ctrl ou Cmd pour selectionner plusieurs boitiers.</small>
+            </div>
+        </div>
+    </mat-dialog-content>
+
+    <div class="dialog-actions">
+        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
+            {{ isEditMode ? 'Enregistrer' : 'Creer' }}
+        </button>
+    </div>
+</form>

@@ -1,0 +1,107 @@
+<div class="content-header row">
+    <div class="content-header-left col-12 mb-2 mt-1">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h5 class="content-header-title float-left pr-1 mb-0">Gestion des Transferts</h5>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb p-0 mb-0">
+                        <li class="breadcrumb-item"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item active">Transferts</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="users-list-wrapper">
+    <div class="users-list-filter px-1">
+        <div class="row border rounded py-2 mb-2 bg-white shadow-sm mx-0">
+            <div class="col-12 col-lg-4 d-flex align-items-center mb-1 mb-lg-0">
+                <div [formGroup]="filterForm" class="w-100">
+                    <fieldset class="form-group position-relative has-icon-left mb-0">
+                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (reference, bordereau, boitier)...">
+                        <div class="form-control-position">
+                            <i class="bx bx-search"></i>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="col-12 col-lg-8 d-flex align-items-center justify-content-end">
+                <button class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
+                    <i class="bx bx-plus-circle mr-50"></i> Nouveau Transfert
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="users-list-table">
+        <div class="card shadow-sm border-0">
+            <div class="card-content">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="py-2">Reference</th>
+                                    <th class="py-2">Bordereau</th>
+                                    <th class="py-2">Type</th>
+                                    <th class="py-2">Boitiers</th>
+                                    <th class="py-2">Date demande</th>
+                                    <th class="py-2">Statut</th>
+                                    <th class="py-2 text-right px-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let t of dataSource.connect() | async">
+                                    <td class="py-2">
+                                        <span class="badge badge-light-info text-uppercase font-weight-bold">{{ t.reference || ('TR-' + t.id) }}</span>
+                                    </td>
+                                    <td class="py-2">
+                                        <h6 class="mb-0 font-weight-bold">{{ t.bordereauxReference || '-' }}</h6>
+                                        <small class="text-muted">{{ t.typeTransfer }}</small>
+                                    </td>
+                                    <td class="py-2">
+                                        <small class="text-muted">{{ t.typeTransfer }}</small>
+                                    </td>
+                                    <td class="py-2">
+                                        <small class="text-muted">{{ getBoitiersLabel(t) }}</small>
+                                    </td>
+                                    <td class="py-2">
+                                        <small class="text-muted">{{ t.date_demande | date:'shortDate' }}</small>
+                                    </td>
+                                    <td class="py-2">
+                                        <span [class]="getStatusBadgeClass(t.statut)">{{ t.statut }}</span>
+                                    </td>
+                                    <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-success mr-1" (click)="validateTransfert(t)" title="Valider" [disabled]="t.statut === 'VALIDE'">
+                                            <i class="bx bx-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(t)" title="Modifier">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-icon btn-light-danger" (click)="deleteTransfert(t)" title="Supprimer">
+                                            <i class="bx bx-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="dataSource.filteredData.length === 0">
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="bx bx-info-circle font-large-2 text-muted mb-1"></i>
+                                            <p class="text-muted">Aucun transfert correspondant.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-2 d-flex justify-content-between align-items-center border-top">
+                        <small class="text-muted">Total: {{ dataSource.filteredData.length }}</small>
+                        <mat-paginator [pageSizeOptions]="[5, 10, 15]" class="custom-paginator"></mat-paginator>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -427,14 +427,23 @@ class Transfert(models.Model):
     date_demande = models.DateTimeField(default=timezone.now)
     date_execution = models.DateTimeField(null=True, blank=True)
     statut = models.CharField(max_length=20, default='EN_ATTENTE')
-    document = models.ForeignKey(Document, on_delete=models.SET_NULL, null=True, blank=True)
-    dossier = models.ForeignKey(Dossier, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = "Transfert"
 
     def __str__(self):
         return self.reference if self.reference else f"Transfert {self.id}"
+
+
+class TransfertBoitier(models.Model):
+    transfert = models.ForeignKey(Transfert, on_delete=models.CASCADE, related_name='transfert_boitiers')
+    boitier = models.ForeignKey(Boitier, on_delete=models.CASCADE, related_name='transfert_boitiers')
+
+    class Meta:
+        verbose_name = "Transfert Boitier"
+
+    def __str__(self):
+        return f"TransfertBoitier {self.id}"
 
 # ========== BORDEREAU ==========
 class Bordereau(models.Model):

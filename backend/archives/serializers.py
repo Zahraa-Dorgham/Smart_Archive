@@ -1,7 +1,7 @@
 # archives/serializers.py - Version avec uniquement les modèles existants
 from rest_framework import serializers
 from .models import (
-    ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, Consultation
+    ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, TransfertBoitier, Consultation
     # Retirez Boitier, Dossier, Document, Service s'ils n'existent pas
 )
 
@@ -199,9 +199,74 @@ class ConsultationSerializer(serializers.ModelSerializer):
 
 # --- Transfert ---
 class TransfertSerializer(serializers.ModelSerializer):
+    boitier_ids = serializers.ListField(
+        child=serializers.IntegerField(min_value=1),
+        required=False
+    )
+    boitiers_detail = serializers.SerializerMethodField()
+
     class Meta:
         model = Transfert
-        fields = '__all__'
+        fields = [
+            'id', 'reference', 'bordereauxReference', 'typeTransfer',
+            'date_demande', 'date_execution', 'statut',
+            'boitier_ids', 'boitiers_detail'
+        ]
+
+    def get_boitiers_detail(self, obj):
+        return [
+            {
+                'id': link.boitier.id,
+                'idboit': link.boitier.idboit,
+                'titre': link.boitier.titre,
+                'code_barre': link.boitier.code_barre,
+            }
+            for link in obj.transfert_boitiers.select_related('boitier').all()
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['boitier_ids'] = list(
+            instance.transfert_boitiers.values_list('boitier_id', flat=True)
+        )
+        return data
+
+    def validate_boitier_ids(self, value):
+        boitier_ids = list(dict.fromkeys(value))
+        existing_ids = set(Boitier.objects.filter(id__in=boitier_ids).values_list('id', flat=True))
+        missing_ids = [boitier_id for boitier_id in boitier_ids if boitier_id not in existing_ids]
+
+        if missing_ids:
+            raise serializers.ValidationError(f"Boitier(s) introuvable(s): {missing_ids}")
+
+        return boitier_ids
+
+    def create(self, validated_data):
+        boitier_ids = validated_data.pop('boitier_ids', [])
+        transfert = Transfert.objects.create(**validated_data)
+        self._sync_boitiers(transfert, boitier_ids)
+        return transfert
+
+    def update(self, instance, validated_data):
+        boitier_ids = validated_data.pop('boitier_ids', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if boitier_ids is not None:
+            self._sync_boitiers(instance, boitier_ids)
+
+        return instance
+
+    def _sync_boitiers(self, transfert, boitier_ids):
+        TransfertBoitier.objects.filter(transfert=transfert).delete()
+        if boitier_ids:
+            TransfertBoitier.objects.bulk_create([
+                TransfertBoitier(transfert=transfert, boitier_id=boitier_id)
+                for boitier_id in boitier_ids
+            ])
 
 # --- Bordereau ---
 class BordereauSerializer(serializers.ModelSerializer):
