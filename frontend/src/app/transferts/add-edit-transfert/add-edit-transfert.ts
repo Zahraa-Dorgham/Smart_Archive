@@ -66,8 +66,6 @@ export class AddEditTransfertComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadBoitiers();
-
     if (this.isEditMode && this.data.transfert) {
       this.form.patchValue({
         reference: this.data.transfert.reference ?? '',
@@ -79,14 +77,28 @@ export class AddEditTransfertComponent implements OnInit {
         boitier_ids: this.data.transfert.boitier_ids ?? []
       });
     }
+
+    this.form.get('typeTransfer')?.valueChanges.subscribe(() => {
+      this.loadBoitiers();
+    });
+
+    this.loadBoitiers();
   }
 
   loadBoitiers(): void {
     const transfertId = this.isEditMode && this.data.transfert ? String(this.data.transfert.id) : undefined;
+    const typeTransfer = this.form.get('typeTransfer')?.value || 'INTERMEDIAIRE';
 
-    this.transfertService.getAvailableBoitiers(transfertId).subscribe({
+    this.transfertService.getAvailableBoitiers(typeTransfer, transfertId).subscribe({
       next: (response) => {
         this.boitiers = response;
+        const allowedIds = new Set(response.map((item: Boitier) => Number(item.id)));
+        const currentSelection = (this.form.get('boitier_ids')?.value || []) as number[];
+        const filteredSelection = currentSelection.filter(id => allowedIds.has(Number(id)));
+
+        if (filteredSelection.length !== currentSelection.length) {
+          this.form.patchValue({ boitier_ids: filteredSelection }, { emitEvent: false });
+        }
       },
       error: () => {
         this.snackBar.open('Erreur chargement des boitiers', 'Fermer', { duration: 3000 });

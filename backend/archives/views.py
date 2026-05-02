@@ -335,20 +335,27 @@ class TransfertViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def available_boitiers(self, request):
         transfert_id = request.query_params.get('transfert_id')
+        transfer_type = request.query_params.get('type_transfer')
         linked_boitiers = TransfertBoitier.objects.all()
 
+        current_ids = []
         if transfert_id:
-            linked_boitiers = linked_boitiers.exclude(transfert_id=transfert_id)
             current_ids = list(
                 TransfertBoitier.objects.filter(transfert_id=transfert_id).values_list('boitier_id', flat=True)
             )
-        else:
-            current_ids = []
+
+        if transfer_type:
+            linked_boitiers = linked_boitiers.filter(transfert__typeTransfer=transfer_type)
+
+        if transfert_id:
+            linked_boitiers = linked_boitiers.exclude(transfert_id=transfert_id)
 
         unavailable_ids = list(linked_boitiers.values_list('boitier_id', flat=True))
-        boitiers = Boitier.objects.filter(
-            Q(id__in=current_ids) | ~Q(id__in=unavailable_ids)
-        ).distinct().order_by('idboit')
+        available_filter = ~Q(id__in=unavailable_ids)
+        if current_ids:
+            available_filter = Q(id__in=current_ids) | available_filter
+
+        boitiers = Boitier.objects.filter(available_filter).distinct().order_by('idboit')
 
         return Response(BoitierSerializer(boitiers, many=True).data)
 

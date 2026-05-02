@@ -16,8 +16,13 @@ export class TransfertService {
         return this.api.get<PaginatedResponse<Transfert>>(this.endpoint, params);
     }
 
-    getAvailableBoitiers(transfertId?: string): Observable<any[]> {
-        const params = transfertId ? { transfert_id: transfertId } : {};
+    getAvailableBoitiers(typeTransfer: string, transfertId?: string): Observable<any[]> {
+        const params: Record<string, string> = {
+            type_transfer: typeTransfer
+        };
+        if (transfertId) {
+            params['transfert_id'] = transfertId;
+        }
         return this.api.get<any[]>(`${this.endpoint}available_boitiers/`, params);
     }
 

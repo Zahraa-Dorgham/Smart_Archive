@@ -244,14 +244,17 @@ class TransfertSerializer(serializers.ModelSerializer):
         if missing_ids:
             raise serializers.ValidationError(f"Boitier(s) introuvable(s): {missing_ids}")
 
+        transfer_type = self.initial_data.get('typeTransfer') or getattr(self.instance, 'typeTransfer', None)
         linked_elsewhere = TransfertBoitier.objects.filter(boitier_id__in=boitier_ids)
+        if transfer_type:
+            linked_elsewhere = linked_elsewhere.filter(transfert__typeTransfer=transfer_type)
         if self.instance:
             linked_elsewhere = linked_elsewhere.exclude(transfert=self.instance)
 
         conflict_ids = list(dict.fromkeys(linked_elsewhere.values_list('boitier_id', flat=True)))
         if conflict_ids:
             raise serializers.ValidationError(
-                f"Boitier(s) deja lies a un autre transfert: {conflict_ids}"
+                f"Boitier(s) deja lies a un autre transfert de type {transfer_type}: {conflict_ids}"
             )
 
         return boitier_ids
