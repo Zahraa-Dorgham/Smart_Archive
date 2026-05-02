@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,8 +11,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Boitier } from '../../core/models/boitier.model';
-import { Transfert } from '../../core/models/transfert.model';
+import { BlockingTransferPayload, Transfert } from '../../core/models/transfert.model';
 import { TransfertService } from '../../core/services/transfert.service';
+import { BlockingTransferDialogComponent } from '../blocking-transfer-dialog/blocking-transfer-dialog';
 
 export interface TransfertDialogData {
   mode: 'add' | 'edit';
@@ -46,6 +48,7 @@ export class AddEditTransfertComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private transfertService: TransfertService,
+    private dialog: MatDialog,
     private dialogRef: MatDialogRef<AddEditTransfertComponent>,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: TransfertDialogData
@@ -105,7 +108,7 @@ export class AddEditTransfertComponent implements OnInit {
           this.snackBar.open('Transfert modifie', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 })
+        error: (error) => this.handleSubmitError(error, 'Erreur modification')
       });
       return;
     }
@@ -115,7 +118,33 @@ export class AddEditTransfertComponent implements OnInit {
         this.snackBar.open('Transfert cree', 'Fermer', { duration: 3000 });
         this.dialogRef.close(true);
       },
-      error: () => this.snackBar.open('Erreur creation', 'Fermer', { duration: 3000 })
+      error: (error) => this.handleSubmitError(error, 'Erreur creation')
     });
+  }
+
+  private handleSubmitError(error: any, fallbackMessage: string): void {
+    const responseBody = error?.error;
+    const blockingPayload =
+      responseBody?.errors?.blocking_transfer ||
+      responseBody?.blocking_transfer ||
+      responseBody?.errors?.non_field_errors?.[0]?.blocking_transfer ||
+      responseBody?.non_field_errors?.[0]?.blocking_transfer as BlockingTransferPayload | undefined;
+
+    if (blockingPayload?.boitiers?.length) {
+      this.dialog.open(BlockingTransferDialogComponent, {
+        width: '850px',
+        maxWidth: '95vw',
+        data: blockingPayload
+      });
+      return;
+    }
+
+    const firstError =
+      responseBody?.errors?.boitier_ids?.[0] ||
+      responseBody?.boitier_ids?.[0] ||
+      responseBody?.errors?.typeTransfer?.[0] ||
+      responseBody?.typeTransfer?.[0];
+
+    this.snackBar.open(firstError || fallbackMessage, 'Fermer', { duration: 4000 });
   }
 }

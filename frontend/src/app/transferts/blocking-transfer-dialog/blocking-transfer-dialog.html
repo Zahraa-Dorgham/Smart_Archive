@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="bx bx-error-circle text-warning"></i>
+        {{ getDialogTitle() }}
+    </h5>
+</div>
+
+<mat-dialog-content class="dialog-body">
+    <p class="summary-text">{{ data.message }}</p>
+    <p class="summary-subtext">
+        Champ controle: <strong>{{ data.date_field }}</strong>
+        <span class="mx-50">|</span>
+        Date de reference: <strong>{{ data.today | date:'shortDate' }}</strong>
+    </p>
+
+    <div class="tree-wrapper" *ngFor="let boitier of data.boitiers">
+        <div class="tree-boitier">
+            <i class="bx bx-box"></i>
+            <div>
+                <div class="tree-title">{{ boitier.idboit }} - {{ boitier.titre }}</div>
+                <small class="text-muted">{{ boitier.dossiers.length }} dossier(s) bloquant(s)</small>
+            </div>
+        </div>
+
+        <div class="tree-dossier" *ngFor="let dossier of boitier.dossiers">
+            <div class="tree-line"></div>
+            <div class="tree-node">
+                <i class="bx bx-folder"></i>
+                <div class="tree-content">
+                    <div class="tree-title">
+                        Dossier {{ dossier.idDossier }}{{ dossier.nomDos ? ' - ' + dossier.nomDos : '' }}
+                    </div>
+                    <small class="text-danger">{{ data.date_field }}: {{ getDateValue(dossier) }}</small>
+                </div>
+            </div>
+
+            <div class="tree-document" *ngFor="let document of dossier.documents">
+                <div class="tree-line child"></div>
+                <div class="tree-node document-node">
+                    <i class="bx bx-file"></i>
+                    <div class="tree-content">
+                        <div class="tree-title">
+                            {{ document.reference || document.idDoc }} - {{ document.titre }}
+                        </div>
+                        <small class="text-danger">{{ data.date_field }}: {{ getDateValue(document) }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<div class="dialog-actions">
+    <button class="btn btn-light-secondary" mat-dialog-close>Fermer</button>
+</div>

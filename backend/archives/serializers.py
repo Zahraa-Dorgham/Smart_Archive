@@ -1,4 +1,6 @@
 # archives/serializers.py - Version avec uniquement les modèles existants
+from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 from .models import (
     ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, TransfertBoitier, Consultation
@@ -199,6 +201,8 @@ class ConsultationSerializer(serializers.ModelSerializer):
 
 # --- Transfert ---
 class TransfertSerializer(serializers.ModelSerializer):
+    PHASE_INTERMEDIAIRE_ID = 2
+    PHASE_FINALE_ID = 3
     TYPE_TRANSFER_VALUES = {'INTERMEDIAIRE', 'FINAL'}
     boitier_ids = serializers.ListField(
         child=serializers.IntegerField(min_value=1),
@@ -257,22 +261,54 @@ class TransfertSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Le type de transfert doit etre INTERMEDIAIRE ou FINAL.")
         return value
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        boitier_ids = attrs.get('boitier_ids')
+        transfer_type = attrs.get('typeTransfer', getattr(self.instance, 'typeTransfer', None))
+
+        if boitier_ids is None and self.instance:
+            boitier_ids = list(self.instance.transfert_boitiers.values_list('boitier_id', flat=True))
+
+        if boitier_ids and transfer_type:
+            blocking_tree = self._build_blocking_tree(transfer_type, boitier_ids)
+            if blocking_tree:
+                raise serializers.ValidationError({
+                    'blocking_transfer': {
+                        'message': "Certains elements ne peuvent pas etre transferes pour le moment.",
+                        'transfer_type': transfer_type,
+                        'date_field': self._get_rule_config(transfer_type)['date_field'],
+                        'today': timezone.localdate(),
+                        'boitiers': blocking_tree,
+                    }
+                })
+
+        return attrs
+
     def create(self, validated_data):
         boitier_ids = validated_data.pop('boitier_ids', [])
-        transfert = Transfert.objects.create(**validated_data)
-        self._sync_boitiers(transfert, boitier_ids)
+        with transaction.atomic():
+            transfert = Transfert.objects.create(**validated_data)
+            self._sync_boitiers(transfert, boitier_ids)
+            self._apply_transfert_effects(transfert, validated_data.get('typeTransfer', transfert.typeTransfer), boitier_ids)
         return transfert
 
     def update(self, instance, validated_data):
         boitier_ids = validated_data.pop('boitier_ids', None)
+        next_type = validated_data.get('typeTransfer', instance.typeTransfer)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+        with transaction.atomic():
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
 
-        instance.save()
+            instance.save()
 
-        if boitier_ids is not None:
-            self._sync_boitiers(instance, boitier_ids)
+            selected_boitiers = boitier_ids
+            if boitier_ids is not None:
+                self._sync_boitiers(instance, boitier_ids)
+            else:
+                selected_boitiers = list(instance.transfert_boitiers.values_list('boitier_id', flat=True))
+
+            self._apply_transfert_effects(instance, next_type, selected_boitiers)
 
         return instance
 
@@ -283,6 +319,87 @@ class TransfertSerializer(serializers.ModelSerializer):
                 TransfertBoitier(transfert=transfert, boitier_id=boitier_id)
                 for boitier_id in boitier_ids
             ])
+
+    def _get_rule_config(self, transfer_type):
+        if transfer_type == 'INTERMEDIAIRE':
+            return {
+                'date_field': 'date_pass_intermediaire',
+                'real_date_field': 'date_pass_intermediaire_real',
+                'phase_field': 'phaseArchive_id',
+                'document_phase_field': 'phase_archive_id',
+                'phase_id': self.PHASE_INTERMEDIAIRE_ID,
+            }
+
+        return {
+            'date_field': 'date_pass_final',
+            'real_date_field': 'date_pass_final_real',
+            'phase_field': 'phaseArchive_id',
+            'document_phase_field': 'phase_archive_id',
+            'phase_id': self.PHASE_FINALE_ID,
+        }
+
+    def _build_blocking_tree(self, transfer_type, boitier_ids):
+        config = self._get_rule_config(transfer_type)
+        today = timezone.localdate()
+        boitiers = Boitier.objects.filter(id__in=boitier_ids).prefetch_related('dossiers__documents')
+        tree = []
+
+        for boitier in boitiers:
+            dossier_nodes = []
+            for dossier in boitier.dossiers.all():
+                dossier_date = getattr(dossier, config['date_field'], None)
+                blocked_documents = []
+
+                for document in dossier.documents.all():
+                    document_date = getattr(document, config['date_field'], None)
+                    if document_date is None or document_date >= today:
+                        blocked_documents.append({
+                            'id': document.id,
+                            'idDoc': document.idDoc,
+                            'reference': document.reference,
+                            'titre': document.titre,
+                            config['date_field']: document_date,
+                        })
+
+                dossier_blocked = dossier_date is None or dossier_date >= today
+                if dossier_blocked or blocked_documents:
+                    dossier_nodes.append({
+                        'idDossier': dossier.idDossier,
+                        'nomDos': dossier.nomDos,
+                        config['date_field']: dossier_date,
+                        'documents': blocked_documents,
+                    })
+
+            if dossier_nodes:
+                tree.append({
+                    'id': boitier.id,
+                    'idboit': boitier.idboit,
+                    'titre': boitier.titre,
+                    'dossiers': dossier_nodes,
+                })
+
+        return tree
+
+    def _apply_transfert_effects(self, transfert, transfer_type, boitier_ids):
+        if not boitier_ids:
+            return
+
+        config = self._get_rule_config(transfer_type)
+        today = timezone.localdate()
+
+        for boitier in Boitier.objects.filter(id__in=boitier_ids).prefetch_related('dossiers__documents'):
+            for dossier in boitier.dossiers.all():
+                dossier_updates = {
+                    config['real_date_field']: today,
+                    config['phase_field']: config['phase_id'],
+                }
+                type(dossier).objects.filter(pk=dossier.pk).update(**dossier_updates)
+
+                document_updates = {
+                    config['real_date_field']: today,
+                    config['document_phase_field']: config['phase_id'],
+                }
+                dossier.documents.update(**document_updates)
 
 # --- Bordereau ---
 class BordereauSerializer(serializers.ModelSerializer):

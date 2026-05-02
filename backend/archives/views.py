@@ -323,6 +323,15 @@ class TransfertViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=201)
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        if not serializer.is_valid():
+            return Response({'errors': serializer.errors}, status=400)
+        serializer.save()
+        return Response(serializer.data)
+
     @action(detail=False, methods=['get'])
     def available_boitiers(self, request):
         transfert_id = request.query_params.get('transfert_id')
