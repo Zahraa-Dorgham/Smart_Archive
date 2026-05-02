@@ -11,7 +11,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Boitier } from '../../core/models/boitier.model';
 import { Transfert } from '../../core/models/transfert.model';
-import { BoitierService } from '../../core/services/boitier.service';
 import { TransfertService } from '../../core/services/transfert.service';
 
 export interface TransfertDialogData {
@@ -41,13 +40,12 @@ export class AddEditTransfertComponent implements OnInit {
   isEditMode: boolean;
   boitiers: Boitier[] = [];
 
-  readonly typeOptions = ['INTERNE', 'EXTERNE'];
+  readonly typeOptions = ['INTERMEDIAIRE', 'FINAL'];
   readonly statusOptions = ['EN_ATTENTE', 'VALIDE', 'ANNULE', 'EXECUTE'];
 
   constructor(
     private fb: FormBuilder,
     private transfertService: TransfertService,
-    private boitierService: BoitierService,
     private dialogRef: MatDialogRef<AddEditTransfertComponent>,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: TransfertDialogData
@@ -56,7 +54,7 @@ export class AddEditTransfertComponent implements OnInit {
     this.form = this.fb.group({
       reference: [''],
       bordereauxReference: [''],
-      typeTransfer: ['INTERNE', Validators.required],
+      typeTransfer: ['INTERMEDIAIRE', Validators.required],
       statut: ['EN_ATTENTE', Validators.required],
       date_demande: [new Date(), Validators.required],
       date_execution: [null],
@@ -71,7 +69,7 @@ export class AddEditTransfertComponent implements OnInit {
       this.form.patchValue({
         reference: this.data.transfert.reference ?? '',
         bordereauxReference: this.data.transfert.bordereauxReference ?? '',
-        typeTransfer: this.data.transfert.typeTransfer ?? 'INTERNE',
+        typeTransfer: this.data.transfert.typeTransfer ?? 'INTERMEDIAIRE',
         statut: this.data.transfert.statut ?? 'EN_ATTENTE',
         date_demande: this.data.transfert.date_demande ? new Date(this.data.transfert.date_demande) : new Date(),
         date_execution: this.data.transfert.date_execution ? new Date(this.data.transfert.date_execution) : null,
@@ -81,9 +79,11 @@ export class AddEditTransfertComponent implements OnInit {
   }
 
   loadBoitiers(): void {
-    this.boitierService.getBoitiers({ page_size: 1000 }).subscribe({
+    const transfertId = this.isEditMode && this.data.transfert ? String(this.data.transfert.id) : undefined;
+
+    this.transfertService.getAvailableBoitiers(transfertId).subscribe({
       next: (response) => {
-        this.boitiers = response.results;
+        this.boitiers = response;
       },
       error: () => {
         this.snackBar.open('Erreur chargement des boitiers', 'Fermer', { duration: 3000 });

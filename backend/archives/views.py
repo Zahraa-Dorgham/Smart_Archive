@@ -5,13 +5,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
 from .models import (
     Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive,
     ArchiveCourant, ArchiveIntermediaire, ArchiveDefinitive,
-    Boitier, Dossier, Document, Transfert,
+    Boitier, Dossier, Document, Transfert, TransfertBoitier,
     Consultation, 
     # DemandeConsultation, 
     Bordereau
@@ -321,6 +322,26 @@ class TransfertViewSet(viewsets.ModelViewSet):
             return Response({'errors': serializer.errors}, status=400)
         serializer.save()
         return Response(serializer.data, status=201)
+
+    @action(detail=False, methods=['get'])
+    def available_boitiers(self, request):
+        transfert_id = request.query_params.get('transfert_id')
+        linked_boitiers = TransfertBoitier.objects.all()
+
+        if transfert_id:
+            linked_boitiers = linked_boitiers.exclude(transfert_id=transfert_id)
+            current_ids = list(
+                TransfertBoitier.objects.filter(transfert_id=transfert_id).values_list('boitier_id', flat=True)
+            )
+        else:
+            current_ids = []
+
+        unavailable_ids = list(linked_boitiers.values_list('boitier_id', flat=True))
+        boitiers = Boitier.objects.filter(
+            Q(id__in=current_ids) | ~Q(id__in=unavailable_ids)
+        ).distinct().order_by('idboit')
+
+        return Response(BoitierSerializer(boitiers, many=True).data)
 
     @action(detail=True, methods=['post'])
     def valider(self, request, pk=None):

@@ -58,7 +58,7 @@ export class ShowTransfertComponent implements OnInit {
   dataSource = new MatTableDataSource<Transfert>([]);
   filterForm: FormGroup;
 
-  readonly typeOptions = ['INTERNE', 'EXTERNE'];
+  readonly typeOptions = ['INTERMEDIAIRE', 'FINAL'];
   readonly statusOptions = ['EN_ATTENTE', 'VALIDE', 'ANNULE', 'EXECUTE'];
 
   constructor(
