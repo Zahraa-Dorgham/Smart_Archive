@@ -10,34 +10,39 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='armoire',
-            name='date_installation',
-            field=models.DateField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='armoire',
-            name='description',
-            field=models.TextField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='armoire',
-            name='type_armoire',
-            field=models.CharField(default='METAL', max_length=50),
-        ),
-        migrations.AddField(
-            model_name='etagere',
-            name='capacite_max_boites',
-            field=models.IntegerField(default=10),
-        ),
-        migrations.AddField(
-            model_name='etagere',
-            name='description',
-            field=models.TextField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='etagere',
-            name='occupation_actuelle',
-            field=models.IntegerField(default=0),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.AddField(
+                    model_name='armoire',
+                    name='date_installation',
+                    field=models.DateField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='armoire',
+                    name='description',
+                    field=models.TextField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='armoire',
+                    name='type_armoire',
+                    field=models.CharField(default='METAL', max_length=50),
+                ),
+                migrations.AddField(
+                    model_name='etagere',
+                    name='capacite_max_boites',
+                    field=models.IntegerField(default=10),
+                ),
+                migrations.AddField(
+                    model_name='etagere',
+                    name='description',
+                    field=models.TextField(blank=True, null=True),
+                ),
+                migrations.AddField(
+                    model_name='etagere',
+                    name='occupation_actuelle',
+                    field=models.IntegerField(default=0),
+                ),
+            ],
         ),
     ]

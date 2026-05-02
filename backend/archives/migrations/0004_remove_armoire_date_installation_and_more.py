@@ -10,29 +10,34 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='armoire',
-            name='date_installation',
-        ),
-        migrations.RemoveField(
-            model_name='armoire',
-            name='description',
-        ),
-        migrations.RemoveField(
-            model_name='armoire',
-            name='type_armoire',
-        ),
-        migrations.RemoveField(
-            model_name='etagere',
-            name='capacite_max_boites',
-        ),
-        migrations.RemoveField(
-            model_name='etagere',
-            name='description',
-        ),
-        migrations.RemoveField(
-            model_name='etagere',
-            name='occupation_actuelle',
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name='armoire',
+                    name='date_installation',
+                ),
+                migrations.RemoveField(
+                    model_name='armoire',
+                    name='description',
+                ),
+                migrations.RemoveField(
+                    model_name='armoire',
+                    name='type_armoire',
+                ),
+                migrations.RemoveField(
+                    model_name='etagere',
+                    name='capacite_max_boites',
+                ),
+                migrations.RemoveField(
+                    model_name='etagere',
+                    name='description',
+                ),
+                migrations.RemoveField(
+                    model_name='etagere',
+                    name='occupation_actuelle',
+                ),
+            ],
         ),
         migrations.AddField(
             model_name='salle',
