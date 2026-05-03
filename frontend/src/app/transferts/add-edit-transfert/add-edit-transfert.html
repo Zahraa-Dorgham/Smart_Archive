@@ -75,13 +75,13 @@
         <div class="row">
             <div class="col-md-12 mb-1">
                 <label class="form-label">Boitiers <span class="text-danger">*</span></label>
-                <div class="icon-input-wrapper">
-                    <i class="bx bx-box"></i>
-                    <select class="form-control multi-select" formControlName="boitier_ids" multiple>
-                        <option *ngFor="let b of boitiers" [ngValue]="b.id">{{ b.idboit }} - {{ b.titre }}</option>
-                    </select>
-                </div>
-                <small class="text-muted d-block mt-50">Maintenez Ctrl ou Cmd pour selectionner plusieurs boitiers.</small>
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <mat-select formControlName="boitier_ids" multiple>
+                        <mat-option *ngFor="let b of boitiers" [value]="b.id.toString()">
+                            {{ b.idboit }} - {{ b.titre }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
         </div>
     </mat-dialog-content>

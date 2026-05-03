@@ -8,6 +8,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Boitier } from '../../core/models/boitier.model';
@@ -31,6 +32,7 @@ export interface TransfertDialogData {
     MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatNativeDateModule,
     MatSnackBarModule
   ],
@@ -74,7 +76,7 @@ export class AddEditTransfertComponent implements OnInit {
         statut: this.data.transfert.statut ?? 'EN_ATTENTE',
         date_demande: this.data.transfert.date_demande ? new Date(this.data.transfert.date_demande) : new Date(),
         date_execution: this.data.transfert.date_execution ? new Date(this.data.transfert.date_execution) : null,
-        boitier_ids: this.data.transfert.boitier_ids ?? []
+        boitier_ids: (this.data.transfert.boitier_ids ?? []).map(id => String(id))
       });
     }
 
@@ -92,13 +94,11 @@ export class AddEditTransfertComponent implements OnInit {
     this.transfertService.getAvailableBoitiers(typeTransfer, transfertId).subscribe({
       next: (response) => {
         this.boitiers = response;
-        const allowedIds = new Set(response.map((item: Boitier) => Number(item.id)));
-        const currentSelection = (this.form.get('boitier_ids')?.value || []) as number[];
-        const filteredSelection = currentSelection.filter(id => allowedIds.has(Number(id)));
+        const allowedIds = new Set(response.map((item: Boitier) => String(item.id)));
+        const currentSelection = ((this.form.get('boitier_ids')?.value || []) as Array<string | number>).map(id => String(id));
+        const filteredSelection = currentSelection.filter(id => allowedIds.has(id));
 
-        if (filteredSelection.length !== currentSelection.length) {
-          this.form.patchValue({ boitier_ids: filteredSelection }, { emitEvent: false });
-        }
+        this.form.patchValue({ boitier_ids: filteredSelection }, { emitEvent: false });
       },
       error: () => {
         this.snackBar.open('Erreur chargement des boitiers', 'Fermer', { duration: 3000 });
@@ -112,7 +112,11 @@ export class AddEditTransfertComponent implements OnInit {
       return;
     }
 
-    const payload = this.form.getRawValue();
+    const formValue = this.form.getRawValue();
+    const payload = {
+      ...formValue,
+      boitier_ids: (formValue.boitier_ids || []).map((id: string | number) => Number(id))
+    };
 
     if (this.isEditMode && this.data.transfert) {
       this.transfertService.updateTransfert(String(this.data.transfert.id), payload).subscribe({
