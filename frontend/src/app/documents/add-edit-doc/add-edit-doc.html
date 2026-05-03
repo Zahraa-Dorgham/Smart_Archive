@@ -33,26 +33,26 @@
         <div class="row">
             <div class="col-md-6 mb-1">
                 <label class="form-label">Dossier <span class="text-danger">*</span></label>
-                <div class="icon-input-wrapper">
-                    <i class="bx bx-folder"></i>
-                    <select class="form-control" formControlName="dossier">
-                        <option [value]="null" disabled selected>Sélectionner le dossier...</option>
-                        <option *ngFor="let d of dossiers" [value]="d.idDossier">
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <mat-select formControlName="dossier">
+                        <mat-option [value]="null" disabled>Selectionner le dossier...</mat-option>
+                        <mat-option *ngFor="let d of dossiers" [value]="d.idDossier.toString()">
                             {{ d.idDossier }} - {{ d.nomDos || 'Sans nom' }}
-                        </option>
-                    </select>
-                </div>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
 
             <div class="col-md-6 mb-1">
                 <label class="form-label">Calendrier</label>
-                <div class="icon-input-wrapper">
-                    <i class="bx bx-calendar"></i>
-                    <select class="form-control" formControlName="calendrier">
-                        <option [value]="null">Aucun</option>
-                        <option *ngFor="let c of calendriers" [value]="c.id">{{ c.code }} - {{ c.title }}</option>
-                    </select>
-                </div>
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <mat-select formControlName="calendrier">
+                        <mat-option [value]="null">Aucun</mat-option>
+                        <mat-option *ngFor="let c of calendriers" [value]="c.id.toString()">
+                            {{ c.code }} - {{ c.title }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
         </div>
 
@@ -62,13 +62,13 @@
                 <mat-form-field appearance="outline" class="form-field-style w-100">
                     <mat-select formControlName="phase_archive">
                         <mat-option [value]="null">Aucune</mat-option>
-                        <mat-option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</mat-option>
+                        <mat-option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</mat-option>
                     </mat-select>
                 </mat-form-field>
             </div>
 
             <div class="col-md-6 mb-1">
-                <label class="form-label">Confidentialité <span class="text-danger">*</span></label>
+                <label class="form-label">Confidentialite <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-lock"></i>
                     <select class="form-control" formControlName="niv_confidentialite">
@@ -81,10 +81,10 @@
             </div>
         </div>
 
-        <div class="section-title">Métadonnées</div>
+        <div class="section-title">Metadonnees</div>
         <div class="row">
             <div class="col-md-6 mb-1">
-                <label class="form-label">Date création <span class="text-danger">*</span></label>
+                <label class="form-label">Date creation <span class="text-danger">*</span></label>
                 <mat-form-field appearance="outline" class="form-field-style w-100">
                     <input matInput [matDatepicker]="picker" formControlName="date_creation">
                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -130,7 +130,7 @@
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Délai sécurité (ans)</label>
+                <label class="form-label">Delai securite (ans)</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-shield"></i>
                     <input type="number" class="form-control" formControlName="sort_final_security_years"
@@ -170,7 +170,7 @@
     <div class="dialog-actions">
         <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
         <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
+            {{ isEditMode ? 'Enregistrer' : 'Creer' }}
         </button>
     </div>
 </form>

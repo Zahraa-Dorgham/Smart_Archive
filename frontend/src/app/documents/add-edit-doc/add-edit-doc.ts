@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { forkJoin, Observable } from 'rxjs';
 
 import { DocumentService } from '../../core/services/document.service';
 import { DossierService } from '../../core/services/dossier.service';
@@ -16,6 +17,9 @@ import { PhaseArchiveService } from '../../core/services/phase-archive.service';
 import { CalendrierService } from '../../core/services/calendrier.service';
 import { Document } from '../../core/models/document.model';
 import { Dossier } from '../../core/models/dossier.model';
+import { PaginatedResponse } from '../../core/models/base.model';
+import { PhaseArchive } from '../../core/models/phase-archive.model';
+import { Calendrier } from '../../core/models/calendrier.model';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -56,6 +60,7 @@ export class AddEditDocumentComponent implements OnInit {
     private calendrierService: CalendrierService,
     private dialogRef: MatDialogRef<AddEditDocumentComponent>,
     private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.isEditMode = data.mode === 'edit';
@@ -80,47 +85,40 @@ export class AddEditDocumentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadDossiers();
-    this.loadPhases();
-    this.loadCalendriers();
     this.form.get('calendrier')?.valueChanges.subscribe(value => this.onCalendrierChange(value));
-    if (this.isEditMode && this.data.document) {
-      const doc = this.data.document;
-      const currentCalendrier = doc.calendrier as { id?: string } | string | null | undefined;
-      const currentDossier = doc.dossier as Dossier | number | string;
-      const calendrierValue =
-        currentCalendrier && typeof currentCalendrier === 'object'
-          ? currentCalendrier.id ?? null
-          : currentCalendrier;
-      const dossierValue =
-        currentDossier && typeof currentDossier === 'object'
-          ? currentDossier.idDossier
-          : currentDossier;
-      const currentPhase = doc.phase_archive as { id?: string | number } | string | number | null | undefined;
-      const phaseValue =
-        currentPhase && typeof currentPhase === 'object'
-          ? currentPhase.id ?? null
-          : currentPhase ?? null;
 
-      this.form.patchValue({
-        ...doc,
-        dossier: dossierValue,
-        calendrier: calendrierValue,
-        phase_archive: phaseValue
-      });
-    }
+    forkJoin({
+      dossiers: this.loadDossiers(),
+      phases: this.loadPhases(),
+      calendriers: this.loadCalendriers()
+    }).subscribe({
+      next: ({ dossiers, phases, calendriers }) => {
+        this.dossiers = dossiers.results;
+        this.phases = phases.results;
+        this.calendriers = calendriers.results;
+
+        if (this.isEditMode && this.data.document) {
+          this.patchDocumentForm(this.data.document);
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.snackBar.open('Erreur chargement des donnees du formulaire', 'Fermer', { duration: 3000 });
+      }
+    });
   }
 
-  loadDossiers(): void {
-    this.dossierService.getDossiers({ page_size: 1000 }).subscribe(res => this.dossiers = res.results);
+  loadDossiers(): Observable<PaginatedResponse<Dossier>> {
+    return this.dossierService.getDossiers({ page_size: 1000 });
   }
 
-  loadPhases(): void {
-    this.phaseService.getPhases().subscribe(res => this.phases = res.results);
+  loadPhases(): Observable<PaginatedResponse<PhaseArchive>> {
+    return this.phaseService.getPhases({ page_size: 1000 });
   }
 
-  loadCalendriers(): void {
-    this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe(res => this.calendriers = res.results);
+  loadCalendriers(): Observable<PaginatedResponse<Calendrier>> {
+    return this.calendrierService.getCalendriers({ page_size: 1000 });
   }
 
   onCalendrierChange(calendrierId: string | null): void {
@@ -144,6 +142,32 @@ export class AddEditDocumentComponent implements OnInit {
 
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
+  }
+
+  private patchDocumentForm(doc: Document): void {
+    const currentCalendrier = doc.calendrier as { id?: string | number } | string | number | null | undefined;
+    const currentDossier = doc.dossier as Dossier | number | string;
+    const currentPhase = doc.phase_archive as { id?: string | number } | string | number | null | undefined;
+
+    const calendrierValue =
+      currentCalendrier && typeof currentCalendrier === 'object'
+        ? currentCalendrier.id ?? null
+        : currentCalendrier ?? null;
+    const dossierValue =
+      currentDossier && typeof currentDossier === 'object'
+        ? currentDossier.idDossier
+        : currentDossier;
+    const phaseValue =
+      currentPhase && typeof currentPhase === 'object'
+        ? currentPhase.id ?? null
+        : currentPhase ?? null;
+
+    this.form.patchValue({
+      ...doc,
+      dossier: dossierValue != null ? String(dossierValue) : null,
+      calendrier: calendrierValue != null ? String(calendrierValue) : null,
+      phase_archive: phaseValue != null ? String(phaseValue) : null
+    });
   }
 
   onSubmit(): void {
