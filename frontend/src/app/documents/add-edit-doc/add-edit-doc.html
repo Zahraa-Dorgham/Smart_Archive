@@ -59,13 +59,12 @@
         <div class="row">
             <div class="col-md-6 mb-1">
                 <label class="form-label">Phase</label>
-                <div class="icon-input-wrapper">
-                    <i class="bx bx-layer"></i>
-                    <select class="form-control" formControlName="phase_archive">
-                        <option [value]="null">Aucune</option>
-                        <option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</option>
-                    </select>
-                </div>
+                <mat-form-field appearance="outline" class="form-field-style w-100">
+                    <mat-select formControlName="phase_archive">
+                        <mat-option [value]="null">Aucune</mat-option>
+                        <mat-option *ngFor="let p of phases" [value]="p.id">{{ p.nom }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
 
             <div class="col-md-6 mb-1">

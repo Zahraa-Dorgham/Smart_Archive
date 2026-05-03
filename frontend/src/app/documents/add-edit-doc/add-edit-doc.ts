@@ -65,7 +65,7 @@ export class AddEditDocumentComponent implements OnInit {
       titre: ['', Validators.required],
       dossier: ['', Validators.required],
       calendrier: [null],
-      // phase_archive: ['', Validators.required],
+      phase_archive: [null],
       date_creation: [''],
       niv_confidentialite: ['INTERNE', Validators.required],
       // type_document: ['AUTRE', Validators.required],
@@ -96,12 +96,17 @@ export class AddEditDocumentComponent implements OnInit {
         currentDossier && typeof currentDossier === 'object'
           ? currentDossier.idDossier
           : currentDossier;
+      const currentPhase = doc.phase_archive as { id?: string | number } | string | number | null | undefined;
+      const phaseValue =
+        currentPhase && typeof currentPhase === 'object'
+          ? currentPhase.id ?? null
+          : currentPhase ?? null;
 
       this.form.patchValue({
         ...doc,
         dossier: dossierValue,
         calendrier: calendrierValue,
-        // phase_archive: typeof doc.phase_archive === 'object' ? doc.phase_archive.id : doc.phase_archive
+        phase_archive: phaseValue
       });
     }
   }

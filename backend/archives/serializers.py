@@ -96,6 +96,13 @@ class ArchiveDefinitiveSerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 from .models import Boitier, Dossier, Document, Armoire, Etagere, PhaseArchive
 
+
+class NullablePrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def to_internal_value(self, data):
+        if data in ('', 'null', 'None', 'undefined'):
+            return None
+        return super().to_internal_value(data)
+
 class BoitierSerializer(serializers.ModelSerializer):
     armoire_nom = serializers.CharField(source='armoire.code', read_only=True)
     etagere_numero = serializers.IntegerField(source='etagere.numero', read_only=True)
@@ -149,7 +156,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     
     # Marquer les champs optionnels
     reference = serializers.CharField(required=False, allow_blank=True)
-    phase_archive = serializers.PrimaryKeyRelatedField(queryset=PhaseArchive.objects.all(), required=False, allow_null=True)
+    phase_archive = NullablePrimaryKeyRelatedField(queryset=PhaseArchive.objects.all(), required=False, allow_null=True)
     type_document = serializers.CharField(required=False, allow_blank=True)
     date_creation = serializers.DateField(required=False, allow_null=True)
 

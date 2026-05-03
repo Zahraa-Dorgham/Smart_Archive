@@ -9,7 +9,8 @@ export interface Document extends BaseModel {
     dossier: Dossier | number | string;
     calendrier?: string | null;
     calendrier_title?: string | null;
-    // phase_archive: PhaseArchive | string;
+    phase_archive?: PhaseArchive | string | number | null;
+    phase_archive_nom?: string | null;
     date_creation?: Date | null;
     niv_confidentialite: string;
     version: number;
