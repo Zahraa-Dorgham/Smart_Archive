@@ -48,7 +48,7 @@
                 <mat-form-field appearance="outline" class="form-field-style w-100">
                     <mat-select formControlName="calendrier">
                         <mat-option [value]="null">Aucun</mat-option>
-                        <mat-option *ngFor="let c of calendriers" [value]="c.id.toString()">
+                        <mat-option *ngFor="let c of filteredCalendriers" [value]="c.id.toString()">
                             {{ c.code }} - {{ c.title }}
                         </mat-option>
                     </mat-select>

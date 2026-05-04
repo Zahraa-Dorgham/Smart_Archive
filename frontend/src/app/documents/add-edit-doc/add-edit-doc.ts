@@ -49,7 +49,8 @@ export class AddEditDocumentComponent implements OnInit {
   isEditMode: boolean;
   dossiers: Dossier[] = [];
   phases: any[] = [];
-  calendriers: any[] = [];
+  calendriers: Calendrier[] = [];
+  filteredCalendriers: Calendrier[] = [];
   selectedFile: File | null = null;
 
   constructor(
@@ -86,6 +87,7 @@ export class AddEditDocumentComponent implements OnInit {
 
   ngOnInit(): void {
     this.form.get('calendrier')?.valueChanges.subscribe(value => this.onCalendrierChange(value));
+    this.form.get('dossier')?.valueChanges.subscribe(value => this.onDossierChange(value));
 
     forkJoin({
       dossiers: this.loadDossiers(),
@@ -96,9 +98,12 @@ export class AddEditDocumentComponent implements OnInit {
         this.dossiers = dossiers.results;
         this.phases = phases.results;
         this.calendriers = calendriers.results;
+        this.filteredCalendriers = [];
 
         if (this.isEditMode && this.data.document) {
           this.patchDocumentForm(this.data.document);
+        } else {
+          this.onDossierChange(this.form.get('dossier')?.value ?? null);
         }
 
         this.cdr.detectChanges();
@@ -144,6 +149,22 @@ export class AddEditDocumentComponent implements OnInit {
     this.selectedFile = event.target.files[0];
   }
 
+  onDossierChange(dossierId: string | null): void {
+    const selectedDossier = this.dossiers.find(item => String(item.idDossier) === String(dossierId));
+    const allowedCalendrierIds = this.getAllowedCalendrierIds(selectedDossier);
+
+    this.filteredCalendriers = this.calendriers.filter(item => allowedCalendrierIds.has(String(item.id)));
+
+    const currentCalendrier = this.form.get('calendrier')?.value;
+    if (currentCalendrier && !allowedCalendrierIds.has(String(currentCalendrier))) {
+      this.form.patchValue({ calendrier: null }, { emitEvent: false });
+    }
+
+    if (!currentCalendrier && this.filteredCalendriers.length === 1) {
+      this.form.patchValue({ calendrier: String(this.filteredCalendriers[0].id) }, { emitEvent: true });
+    }
+  }
+
   private patchDocumentForm(doc: Document): void {
     const currentCalendrier = doc.calendrier as { id?: string | number } | string | number | null | undefined;
     const currentDossier = doc.dossier as Dossier | number | string;
@@ -167,7 +188,47 @@ export class AddEditDocumentComponent implements OnInit {
       dossier: dossierValue != null ? String(dossierValue) : null,
       calendrier: calendrierValue != null ? String(calendrierValue) : null,
       phase_archive: phaseValue != null ? String(phaseValue) : null
-    });
+    }, { emitEvent: false });
+
+    this.onDossierChange(dossierValue != null ? String(dossierValue) : null);
+    this.onCalendrierChange(calendrierValue != null ? String(calendrierValue) : null);
+  }
+
+  private getAllowedCalendrierIds(dossier?: Dossier): Set<string> {
+    if (!dossier?.calendrier) {
+      return new Set<string>();
+    }
+
+    const rootId =
+      typeof dossier.calendrier === 'object'
+        ? dossier.calendrier.id
+        : dossier.calendrier;
+
+    if (!rootId) {
+      return new Set<string>();
+    }
+
+    const allowedIds = new Set<string>([String(rootId)]);
+    const pendingIds = [String(rootId)];
+
+    while (pendingIds.length > 0) {
+      const currentId = pendingIds.shift();
+      if (!currentId) {
+        continue;
+      }
+
+      const childIds = this.calendriers
+        .filter(item => item.parent != null && String(item.parent) === currentId)
+        .map(item => String(item.id))
+        .filter(id => !allowedIds.has(id));
+
+      childIds.forEach(id => {
+        allowedIds.add(id);
+        pendingIds.push(id);
+      });
+    }
+
+    return allowedIds;
   }
 
   onSubmit(): void {

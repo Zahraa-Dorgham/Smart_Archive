@@ -95,6 +95,7 @@ class ArchiveDefinitiveSerializer(serializers.ModelSerializer):
 # archives/serializers.py
 from rest_framework import serializers
 from .models import Boitier, Dossier, Document, Armoire, Etagere, PhaseArchive
+from calendrier.models import Calendrier
 
 
 class NullablePrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
@@ -185,6 +186,46 @@ class DocumentSerializer(serializers.ModelSerializer):
                 size /= 1024
             return f"{size:.2f} To"
         return None
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        dossier = attrs.get('dossier') or getattr(self.instance, 'dossier', None)
+        calendrier = attrs.get('calendrier', serializers.empty)
+
+        if calendrier is serializers.empty:
+            calendrier = getattr(self.instance, 'calendrier', None)
+
+        if dossier and calendrier:
+            allowed_ids = self._get_allowed_calendrier_ids(dossier)
+            if str(calendrier.id) not in allowed_ids:
+                raise serializers.ValidationError({
+                    'calendrier': "Le calendrier selectionne doit appartenir au dossier choisi ou a l'un de ses calendriers descendants."
+                })
+
+        if dossier and calendrier is None and dossier.calendrier_id is None:
+            return attrs
+
+        return attrs
+
+    def _get_allowed_calendrier_ids(self, dossier):
+        if not dossier.calendrier_id:
+            return set()
+
+        allowed_ids = {str(dossier.calendrier_id)}
+        pending_ids = [dossier.calendrier_id]
+
+        while pending_ids:
+            child_ids = list(
+                Calendrier.objects.filter(parent_id__in=pending_ids).values_list('id', flat=True)
+            )
+            new_ids = [child_id for child_id in child_ids if str(child_id) not in allowed_ids]
+            if not new_ids:
+                break
+            allowed_ids.update(str(child_id) for child_id in new_ids)
+            pending_ids = new_ids
+
+        return allowed_ids
 
 
 
