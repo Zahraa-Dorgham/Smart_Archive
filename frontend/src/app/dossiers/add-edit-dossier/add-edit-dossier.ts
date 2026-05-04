@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { forkJoin, Observable } from 'rxjs';
 
 import { DossierService } from '../../core/services/dossier.service';
 import { BoitierService } from '../../core/services/boitier.service';
@@ -18,6 +19,7 @@ import { Calendrier } from '../../core/models/calendrier.model';
 import { Dossier } from '../../core/models/dossier.model';
 import { Boitier } from '../../core/models/boitier.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
+import { PaginatedResponse } from '../../core/models/base.model';
 
 function isBoitier(obj: unknown): obj is Boitier {
   return !!obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
@@ -66,6 +68,7 @@ export class AddEditDossierComponent implements OnInit {
     private phaseService: PhaseArchiveService,
     private dialogRef: MatDialogRef<AddEditDossierComponent>,
     private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.isEditMode = data.mode === 'edit';
@@ -89,37 +92,36 @@ export class AddEditDossierComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadBoitiers();
-    this.loadCalendriers();
-    this.loadPhases();
     this.form.get('calendrier')?.valueChanges.subscribe(value => this.onCalendrierChange(value));
 
-    if (this.isEditMode && this.data.dossier) {
-      const dossier = this.data.dossier;
-      const patchValues: Record<string, unknown> = { ...dossier };
+    forkJoin({
+      boitiers: this.loadBoitiers(),
+      calendriers: this.loadCalendriers(),
+      phases: this.loadPhases()
+    }).subscribe({
+      next: ({ boitiers, calendriers, phases }) => {
+        this.boitiers = boitiers.results;
+        this.calendriers = calendriers.results;
+        this.phases = phases.results;
 
-      if (dossier.boitier && isBoitier(dossier.boitier)) {
-        patchValues['boitier'] = dossier.boitier.id;
+        if (this.isEditMode && this.data.dossier) {
+          this.patchDossierForm(this.data.dossier);
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.snackBar.open('Erreur chargement des donnees du formulaire', 'Fermer', { duration: 3000 });
       }
-
-      if (dossier.calendrier && typeof dossier.calendrier === 'object') {
-        patchValues['calendrier'] = dossier.calendrier.id;
-      }
-
-      if (dossier.phaseArchive && isPhaseArchive(dossier.phaseArchive)) {
-        patchValues['phaseArchive'] = dossier.phaseArchive.id;
-      }
-
-      this.form.patchValue(patchValues);
-    }
+    });
   }
 
-  loadBoitiers(): void {
-    this.boitierService.getBoitiers({ page_size: 1000 }).subscribe(res => this.boitiers = res.results);
+  loadBoitiers(): Observable<PaginatedResponse<Boitier>> {
+    return this.boitierService.getBoitiers({ page_size: 1000 });
   }
 
-  loadCalendriers(): void {
-    this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe(res => this.calendriers = res.results);
+  loadCalendriers(): Observable<PaginatedResponse<Calendrier>> {
+    return this.calendrierService.getCalendriers({ page_size: 1000 });
   }
 
   onCalendrierChange(calendrierId: string | null): void {
@@ -141,8 +143,38 @@ export class AddEditDossierComponent implements OnInit {
     }, { emitEvent: false });
   }
 
-  loadPhases(): void {
-    this.phaseService.getPhases({ page_size: 1000 }).subscribe(res => this.phases = res.results);
+  loadPhases(): Observable<PaginatedResponse<PhaseArchive>> {
+    return this.phaseService.getPhases({ page_size: 1000 });
+  }
+
+  private patchDossierForm(dossier: Dossier): void {
+    const patchValues: Record<string, unknown> = { ...dossier };
+
+    if (dossier.boitier && isBoitier(dossier.boitier)) {
+      patchValues['boitier'] = String(dossier.boitier.id);
+    } else if (dossier.boitier != null) {
+      patchValues['boitier'] = String(dossier.boitier);
+    } else {
+      patchValues['boitier'] = null;
+    }
+
+    if (dossier.calendrier && typeof dossier.calendrier === 'object') {
+      patchValues['calendrier'] = String(dossier.calendrier.id);
+    } else if (dossier.calendrier != null) {
+      patchValues['calendrier'] = String(dossier.calendrier);
+    } else {
+      patchValues['calendrier'] = null;
+    }
+
+    if (dossier.phaseArchive && isPhaseArchive(dossier.phaseArchive)) {
+      patchValues['phaseArchive'] = String(dossier.phaseArchive.id);
+    } else if (dossier.phaseArchive != null) {
+      patchValues['phaseArchive'] = String(dossier.phaseArchive);
+    } else {
+      patchValues['phaseArchive'] = null;
+    }
+
+    this.form.patchValue(patchValues);
   }
 
   onSubmit(): void {
