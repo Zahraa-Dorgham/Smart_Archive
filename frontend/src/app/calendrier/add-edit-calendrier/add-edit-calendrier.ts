@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { forkJoin } from 'rxjs';
 
 import { CalendrierService } from '../../core/services/calendrier.service';
 import { DirectionService } from '../../core/services/direction.service';
@@ -71,40 +72,41 @@ export class AddEditCalendrierComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.directionService.getDirections().subscribe({
-      next: (res) => { this.directions = res.results || []; },
-      error: () => { this.directions = []; }
-    });
+    const directions$ = this.directionService.getDirections();
+    const calendriers$ = this.calendrierService.getCalendriers({ page_size: 1000 });
 
-    // Load possible parent calendriers
-    this.calendrierService.getCalendriers({ page_size: 1000 }).subscribe({
-      next: (res: any) => {
-        const list = res.results || [];
-        // if editing, exclude the current calendrier from parent list
+    forkJoin({
+      directions: directions$,
+      calendriers: calendriers$
+    }).subscribe({
+      next: ({ directions, calendriers }) => {
+        this.directions = directions.results || [];
+        const list = calendriers.results || [];
+
         if (this.isEditMode && this.data.calendrier) {
           this.parents = list.filter((p: any) => String(p.id) !== String(this.data.calendrier?.id));
+          
+          // Patch form after data is loaded
+          const c = this.data.calendrier as any;
+          const patch = {
+            ...c,
+            parent: this.extractId(c.parent) || this.extractId(c.parent_detail),
+            direction: this.extractId(c.direction) || this.extractId(c.direction_detail)
+          };
+
+          if (patch.direction) {
+            patch.direction = Number(patch.direction);
+          }
+          this.form.patchValue(patch);
         } else {
           this.parents = list;
         }
       },
-      error: () => { this.parents = []; }
-    });
-
-    if (this.isEditMode && this.data.calendrier) {
-      const c = this.data.calendrier as any;
-      const patch = {
-        ...c,
-        parent: this.extractId(c.parent) || this.extractId(c.parent_detail),
-        direction: this.extractId(c.direction) || this.extractId(c.direction_detail)
-      };
-
-      // Ensure direction is a number if it exists
-      if (patch.direction) {
-        patch.direction = Number(patch.direction);
+      error: (err) => {
+        console.error('Error loading form data', err);
+        this.snackBar.open('Erreur de chargement des données', 'Fermer', { duration: 3000 });
       }
-
-      this.form.patchValue(patch);
-    }
+    });
   }
 
   private extractId(val: any): any {

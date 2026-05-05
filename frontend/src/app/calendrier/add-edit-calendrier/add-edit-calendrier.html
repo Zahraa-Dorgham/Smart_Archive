@@ -84,7 +84,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-briefcase"></i>
                     <select class="form-control" formControlName="direction">
-                        <option [value]="null">Aucune</option>
+                        <!-- <option [value]="null" disabled selected>Sélectionner la direction...</option> -->
                         <option *ngFor="let d of directions" [value]="d.id">{{ d.nom }}</option>
                     </select>
                 </div>
