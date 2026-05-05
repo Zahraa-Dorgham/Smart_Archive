@@ -130,3 +130,25 @@ mat-dialog-content {
 		max-height: calc(100vh - 120px);
 	}
 }
+
+.gap-3 {
+	gap: 1rem !important;
+}
+
+.border-left {
+	border-left: 1px solid #dfe3e7;
+}
+
+.custom-option-radio {
+	padding: 10px 15px;
+	border-radius: 6px;
+	transition: background 0.2s;
+}
+
+.custom-option-radio:hover {
+	background-color: #f8f9fa;
+}
+
+.bg-light {
+	background-color: #f9fbfd !important;
+}
