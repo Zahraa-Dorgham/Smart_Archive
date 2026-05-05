@@ -82,6 +82,9 @@
                                         <i class="bx bx-archive mr-25"></i> {{b.capacite}}
                                     </td>
                                     <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-success mr-1" [routerLink]="['/archiviste/dossiers']" [queryParams]="{boitier: b.id}" title="Voir les Dossiers">
+                                            <i class="bx bx-folder"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(b)" title="Modifier">
                                             <i class="bx bx-edit-alt"></i>
                                         </button>
