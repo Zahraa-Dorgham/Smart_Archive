@@ -1,64 +1,85 @@
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
-            <h3 class="mb-0">Modifier l'utilisateur</h3>
-        </div>
-        <div class="card-body">
-            <div *ngIf="loading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Chargement...</span>
+<div class="container py-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header pt-4">
+            <div class="d-flex align-items-center">
+                <div class="avatar-preview">
+                    <i class="bx bx-edit-alt"></i>
                 </div>
-                <p class="mt-3 text-muted">Chargement des donnees...</p>
+                <div>
+                    <h3 class="mb-0 fw-bold" style="color: #475f7b;">Modifier l'Utilisateur</h3>
+                    <p class="text-muted small mb-0">Mettez à jour les informations et les accès de l'utilisateur.</p>
+                </div>
             </div>
-            <form (ngSubmit)="onSubmit()" *ngIf="!loading">
-                <div class="row g-3">
+        </div>
+
+        <div class="card-body p-4">
+            <div *ngIf="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-3 text-muted">Chargement des données de l'utilisateur...</p>
+            </div>
+
+            <form (ngSubmit)="onSubmit()" *ngIf="!loading" class="animate__animated animate__fadeIn">
+                <div class="section-title">Informations Générales</div>
+                
+                <div class="row g-4 mb-4">
                     <div class="col-md-6">
-                        <label class="form-label">Prenom *</label>
-                        <input type="text" class="form-control" [(ngModel)]="userData.first_name" name="first_name"
-                            required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Nom *</label>
-                        <input type="text" class="form-control" [(ngModel)]="userData.last_name" name="last_name"
-                            required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Email *</label>
-                        <input type="email" class="form-control" [(ngModel)]="userData.email" name="email" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Nouveau mot de passe</label>
-                        <input type="password" class="form-control" [(ngModel)]="userData.password" name="password">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Statut</label>
-                        <div class="form-check form-switch mt-2">
-                            <input class="form-check-input" type="checkbox" [(ngModel)]="userData.is_active"
-                                name="is_active">
-                            <label class="form-check-label">{{ userData.is_active ? 'Actif' : 'Inactif' }}</label>
+                        <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bx bx-user text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" [(ngModel)]="userData.first_name" name="first_name" required>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Role(s)</label>
-                        <select multiple class="form-select" [(ngModel)]="selectedGroupIds" name="groups">
-                            <option *ngFor="let group of allGroups" [ngValue]="group.id">{{ group.name }}</option>
-                        </select>
+                        <label class="form-label">Nom <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [(ngModel)]="userData.last_name" name="last_name" required>
                     </div>
-                    <div class="col-12">
-                        <label class="form-label">Permissions directes</label>
-                        <select multiple class="form-select" [(ngModel)]="selectedPermissionIds" name="user_permissions">
-                            <option *ngFor="let permission of allPermissions" [ngValue]="permission.id">
-                                {{ permission.app_label }} / {{ permission.model }} / {{ permission.codename }}
-                            </option>
-                        </select>
+                    <div class="col-md-6">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bx bx-envelope text-muted"></i></span>
+                            <input type="email" class="form-control border-start-0" [(ngModel)]="userData.email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Réinitialiser le mot de passe</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bx bx-lock-alt text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0" [(ngModel)]="userData.password" name="password" placeholder="Laisser vide pour ne pas changer">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Statut du compte</label>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" [(ngModel)]="userData.is_active" name="is_active" 
+                                id="statusEditSwitch" (click)="onStatusChange($event)">
+                            <label class="form-check-label fw-bold" for="statusEditSwitch" [class.text-success]="userData.is_active" [class.text-danger]="!userData.is_active">
+                                {{ userData.is_active ? 'Actif' : 'Inactif' }}
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4 gap-2">
-                    <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
-                    <button type="submit" class="btn btn-primary" [disabled]="submitting">
-                        {{ submitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+                <div class="row g-4 mb-4">
+                    <div class="col-md-12">
+                        <div class="section-title">Attribution de Rôle(s)</div>
+                        <label class="form-label">Sélectionner les groupes d'appartenance</label>
+                        <select multiple class="form-select" [(ngModel)]="selectedGroupIds" name="groups" style="height: 150px;">
+                            <option *ngFor="let group of allGroups" [ngValue]="group.id">{{ group.nom || group.name }}</option>
+                        </select>
+                        <small class="text-muted d-block mt-2">Le rôle détermine les accès de l'utilisateur. Maintenez Ctrl pour sélectionner plusieurs rôles.</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 border-top pt-4">
+                    <button type="button" class="btn btn-outline-danger px-4" (click)="deleteUser()">
+                        <i class="bx bx-trash mr-50"></i> Supprimer l'utilisateur
                     </button>
+                    <div class="gap-2 d-flex">
+                        <button type="button" class="btn btn-light-secondary px-4" (click)="cancel()">Annuler</button>
+                        <button type="submit" class="btn btn-primary glow px-5 shadow-sm" [disabled]="submitting">
+                            <i class="bx bx-save mr-50"></i> {{ submitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

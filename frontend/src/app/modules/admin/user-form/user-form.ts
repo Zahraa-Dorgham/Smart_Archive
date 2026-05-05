@@ -5,8 +5,6 @@ import { Router } from '@angular/router';
 
 import { ApiService } from '../../../core/services/api.service';
 
-declare var bootstrap: any;
-
 @Component({
   selector: 'app-user-form',
   standalone: true,
@@ -17,6 +15,7 @@ declare var bootstrap: any;
 export class UserFormComponent implements OnInit {
   currentStep = 1;
   submitting = false;
+  showPassword = false;
 
   userData = {
     first_name: '',
@@ -28,43 +27,38 @@ export class UserFormComponent implements OnInit {
   };
 
   roles: any[] = [];
-  allPermissions: any[] = [];
-  selectedPermissionId: number | null = null;
-  customPermissions: any[] = [];
 
   constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadRoles();
-    this.loadPermissions();
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   loadRoles(): void {
-    this.api.get('/roles/').subscribe({
+    this.api.get('/groups/').subscribe({
       next: (data: any) => {
         this.roles = data.results || data || [];
+        // Ensure we have name field (Django Group uses 'name')
+        this.roles = this.roles.map(r => ({ ...r, nom: r.name || r.nom }));
       },
       error: (err) => console.error('Erreur chargement roles', err)
     });
   }
 
-  loadPermissions(): void {
-    this.api.get('/permissions/').subscribe({
-      next: (data: any) => {
-        this.allPermissions = data.results || data || [];
-      },
-      error: (err) => console.error('Erreur chargement permissions', err)
-    });
-  }
+
 
   goToStep(step: number): void {
-    if (step >= 1 && step <= 3) {
+    if (step >= 1 && step <= 2) {
       this.currentStep = step;
     }
   }
 
   nextStep(): void {
-    if (this.currentStep < 3) {
+    if (this.currentStep < 2) {
       this.currentStep++;
     }
   }
@@ -72,37 +66,6 @@ export class UserFormComponent implements OnInit {
   prevStep(): void {
     if (this.currentStep > 1) {
       this.currentStep--;
-    }
-  }
-
-  addPermission(): void {
-    if (!this.selectedPermissionId) {
-      return;
-    }
-
-    const permission = this.allPermissions.find((item) => item.id === Number(this.selectedPermissionId));
-    if (!permission) {
-      return;
-    }
-
-    const alreadySelected = this.customPermissions.some((item) => item.id === permission.id);
-    if (!alreadySelected) {
-      this.customPermissions = [...this.customPermissions, permission];
-    }
-
-    this.selectedPermissionId = null;
-  }
-
-  removePermission(index: number): void {
-    this.customPermissions.splice(index, 1);
-    this.customPermissions = [...this.customPermissions];
-  }
-
-  preview(): void {
-    const modalElement = document.getElementById('previewModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
     }
   }
 
@@ -127,7 +90,6 @@ export class UserFormComponent implements OnInit {
       last_name: this.userData.last_name,
       is_active: this.userData.is_active,
       groups: [this.userData.role_id],
-      user_permissions: this.customPermissions.map((permission) => permission.id),
       password: this.userData.password
     };
 

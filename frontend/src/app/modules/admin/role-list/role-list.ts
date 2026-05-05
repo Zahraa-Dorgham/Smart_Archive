@@ -93,12 +93,40 @@ export class RoleListComponent implements OnInit {
   }
 
   delete(id: number): void {
-    if (confirm('Delete this role?')) {
-      this.api.delete(`/groups/${id}/`).subscribe({ // Also update delete endpoint
-        next: () => this.loadRoles(),
-        error: (err) => console.error('Erreur', err)
-      });
-    }
+    (window as any).Swal.fire({
+      title: 'Supprimer ce rôle ?',
+      text: 'Les utilisateurs ayant ce rôle perdront les permissions associées.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ff5b5c',
+      cancelButtonColor: '#828d99',
+      confirmButtonText: 'Oui, supprimer !',
+      cancelButtonText: 'Annuler',
+      reverseButtons: true
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        this.api.delete(`/groups/${id}/`).subscribe({
+          next: () => {
+            (window as any).Swal.fire({
+              title: 'Supprimé !',
+              text: 'Le rôle a été supprimé avec succès.',
+              icon: 'success',
+              confirmButtonColor: '#5a8dee'
+            });
+            this.loadRoles();
+          },
+          error: (err) => {
+            console.error('Erreur', err);
+            (window as any).Swal.fire({
+              title: 'Erreur',
+              text: 'Impossible de supprimer ce rôle.',
+              icon: 'error',
+              confirmButtonColor: '#5a8dee'
+            });
+          }
+        });
+      }
+    });
   }
 
   toggleModuleExpand(role: RoleData): void {

@@ -48,16 +48,24 @@ export class UserListComponent implements OnInit {
         const results = Array.isArray(data?.results) ? data.results : data;
         this.users = (results || []).map((user: any) => {
           const groups = Array.isArray(user.groups) ? user.groups : [];
-          const roleNames = Array.isArray(user.roles)
-            ? user.roles
-            : groups.map((group: any) => group?.name).filter(Boolean);
+          
+          // Aggregate unique role names from groups_detail, groups (if strings), and roles field
+          const roleNames = Array.from(new Set([
+            ...(Array.isArray(user.groups_detail) ? user.groups_detail.map((g: any) => g.name || g.nom) : []),
+            ...(Array.isArray(user.groups) ? user.groups.filter((g: any) => typeof g === 'string') : []),
+            ...(Array.isArray(user.roles) ? user.roles : [])
+          ])).filter(Boolean);
+
+          const firstName = user.first_name || '';
+          const lastName = user.last_name || '';
+          const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || user.username.substring(0, 2).toUpperCase();
 
           return {
             ...user,
             groups,
             roles: roleNames,
-            role: user.primary_role || roleNames[0] || 'Employe',
-            full_name: user.full_name || [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username,
+            initials: initials,
+            full_name: user.full_name || [firstName, lastName].filter(Boolean).join(' ') || user.username,
             role_permissions: Array.isArray(user.role_permissions) ? user.role_permissions : [],
             direct_permissions: Array.isArray(user.direct_permissions) ? user.direct_permissions : [],
           };
@@ -73,6 +81,15 @@ export class UserListComponent implements OnInit {
         this.loadingUsers = false;
       }
     });
+  }
+
+  getRoleBadgeClass(roleName: string): string {
+    const name = (roleName || '').toLowerCase();
+    if (name.includes('admin')) return 'badge-light-danger';
+    if (name.includes('archiviste')) return 'badge-light-primary';
+    if (name.includes('responsable')) return 'badge-light-warning';
+    if (name.includes('employe') || name.includes('employé')) return 'badge-light-info';
+    return 'badge-light-secondary';
   }
 
   computeStats(): void {
@@ -105,7 +122,13 @@ export class UserListComponent implements OnInit {
 
     this.page = 1;
     this.updateTotalPages();
-    this.selectedUser = this.filteredUsers[0] || null;
+    
+    // Auto-select first result if search changed
+    if (this.filteredUsers.length > 0) {
+        this.selectedUser = this.filteredUsers[0];
+    } else {
+        this.selectedUser = null;
+    }
   }
 
   updateTotalPages(): void {
@@ -147,14 +170,46 @@ export class UserListComponent implements OnInit {
   }
 
   delete(id: number): void {
-    if (!confirm('Supprimer définitivement cet utilisateur ?')) {
-      return;
-    }
-
-    this.api.delete(`/users/${id}/`).subscribe({
-      next: () => this.loadUsers(),
-      error: (err) => console.error('Erreur suppression', err)
+    (window as any).Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: 'Voulez-vous vraiment supprimer définitivement cet utilisateur ? Cette action est irréversible.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ff5b5c',
+      cancelButtonColor: '#828d99',
+      confirmButtonText: 'Oui, supprimer !',
+      cancelButtonText: 'Annuler',
+      reverseButtons: true
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        this.api.delete(`/users/${id}/`).subscribe({
+          next: () => {
+            (window as any).Swal.fire({
+              title: 'Supprimé !',
+              text: 'L\'utilisateur a été supprimé.',
+              icon: 'success',
+              confirmButtonColor: '#5a8dee'
+            });
+            this.loadUsers();
+          },
+          error: (err) => {
+            console.error('Erreur suppression', err);
+            (window as any).Swal.fire({
+              title: 'Erreur',
+              text: 'Impossible de supprimer cet utilisateur.',
+              icon: 'error',
+              confirmButtonColor: '#5a8dee'
+            });
+          }
+        });
+      }
     });
+  }
+
+  getPageRange(): string {
+    const start = (this.page - 1) * this.pageSize + 1;
+    const end = Math.min(this.page * this.pageSize, this.filteredUsers.length);
+    return `${start} - ${end}`;
   }
 
   trackByPermission(_: number, permission: any): string {

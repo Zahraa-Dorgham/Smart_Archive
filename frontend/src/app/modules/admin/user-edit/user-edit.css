@@ -1,0 +1,62 @@
+/* Frest Inspired User Edit Styling */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: #fff;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #dfe3e7;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #475f7b;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 4px;
+    border: 1px solid #dfe3e7;
+    padding: 0.6rem 0.8rem;
+    color: #475f7b;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #5a8dee;
+    box-shadow: 0 3px 8px rgba(90, 141, 238, 0.15);
+}
+
+.btn-primary.glow {
+    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.4);
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #828d99;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #dfe3e7;
+    padding-bottom: 8px;
+}
+
+.avatar-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e7edf3;
+    color: #5a8dee;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-right: 1.5rem;
+}
