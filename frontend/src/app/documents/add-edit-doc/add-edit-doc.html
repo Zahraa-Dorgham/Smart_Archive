@@ -47,7 +47,7 @@
                 <label class="form-label">Calendrier</label>
                 <mat-form-field appearance="outline" class="form-field-style w-100">
                     <mat-select formControlName="calendrier">
-                        <mat-option [value]="null">Aucun</mat-option>
+                        <!-- <mat-option [value]="null">Aucun</mat-option> -->
                         <mat-option *ngFor="let c of filteredCalendriers" [value]="c.id.toString()">
                             {{ c.code }} - {{ c.title }}
                         </mat-option>
@@ -61,7 +61,7 @@
                 <label class="form-label">Phase</label>
                 <mat-form-field appearance="outline" class="form-field-style w-100">
                     <mat-select formControlName="phase_archive">
-                        <mat-option [value]="null">Aucune</mat-option>
+                        <!-- <mat-option [value]="null">Aucune</mat-option> -->
                         <mat-option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -101,18 +101,18 @@
             </div>
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-12 mb-1">
                 <label class="form-label">Description</label>
                 <textarea class="form-control" formControlName="description" rows="2"
                     placeholder="Description du document"></textarea>
             </div>
-        </div>
+        </div> -->
 
-        <div class="section-title">Gestion de Conservation</div>
+        <div class="section-title">Gestion de Conservation (ans)</div>
         <div class="row">
             <div class="col-md-4 mb-1">
-                <label class="form-label">Conservation active (ans)</label>
+                <label class="form-label">Durée Courante</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time"></i>
                     <input type="number" class="form-control" formControlName="conservation_active_period"
@@ -121,7 +121,7 @@
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Conservation semi-active (ans)</label>
+                <label class="form-label">Durée Intermédiere</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time"></i>
                     <input type="number" class="form-control" formControlName="conservation_semi_active_period"
@@ -130,7 +130,7 @@
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Delai securite (ans)</label>
+                <label class="form-label">Delai securite</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-shield"></i>
                     <input type="number" class="form-control" formControlName="sort_final_security_years"
