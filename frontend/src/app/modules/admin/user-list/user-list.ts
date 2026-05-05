@@ -1,20 +1,32 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatTableModule, MatPaginatorModule, MatSortModule],
   templateUrl: './user-list.html',
   styleUrls: ['./user-list.css']
 })
 export class UserListComponent implements OnInit {
+  dataSource = new MatTableDataSource<any>([]);
+  
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.dataSource.paginator = mp;
+  }
+  
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.dataSource.sort = ms;
+  }
+
   users: any[] = [];
-  filteredUsers: any[] = [];
   selectedUser: any = null;
 
   totalUsers = 0;
@@ -72,6 +84,7 @@ export class UserListComponent implements OnInit {
         });
 
         this.computeStats();
+        this.dataSource.data = this.users;
         this.applyFilter();
         this.loadingUsers = false;
         this.cd.detectChanges();
@@ -102,58 +115,18 @@ export class UserListComponent implements OnInit {
 
   applyFilter(): void {
     const term = this.searchTerm.toLowerCase().trim();
-    this.filteredUsers = term
-      ? this.users.filter((user) => {
-          const haystack = [
-            user.first_name,
-            user.last_name,
-            user.full_name,
-            user.email,
-            user.username,
-            ...(user.roles || []),
-          ]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase();
-
-          return haystack.includes(term);
-        })
-      : [...this.users];
-
-    this.page = 1;
-    this.updateTotalPages();
+    this.dataSource.filter = term;
     
-    // Auto-select first result if search changed
-    if (this.filteredUsers.length > 0) {
-        this.selectedUser = this.filteredUsers[0];
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+    
+    // Update selected user based on filtered results
+    const filteredData = this.dataSource.filteredData;
+    if (filteredData.length > 0) {
+        this.selectedUser = filteredData[0];
     } else {
         this.selectedUser = null;
-    }
-  }
-
-  updateTotalPages(): void {
-    this.totalPages = Math.max(1, Math.ceil(this.filteredUsers.length / this.pageSize));
-  }
-
-  get paginatedUsers(): any[] {
-    const start = (this.page - 1) * this.pageSize;
-    return this.filteredUsers.slice(start, start + this.pageSize);
-  }
-
-  onPageSizeChange(): void {
-    this.page = 1;
-    this.updateTotalPages();
-  }
-
-  previousPage(): void {
-    if (this.page > 1) {
-      this.page--;
-    }
-  }
-
-  nextPage(): void {
-    if (this.page < this.totalPages) {
-      this.page++;
     }
   }
 
@@ -204,12 +177,6 @@ export class UserListComponent implements OnInit {
         });
       }
     });
-  }
-
-  getPageRange(): string {
-    const start = (this.page - 1) * this.pageSize + 1;
-    const end = Math.min(this.page * this.pageSize, this.filteredUsers.length);
-    return `${start} - ${end}`;
   }
 
   trackByPermission(_: number, permission: any): string {

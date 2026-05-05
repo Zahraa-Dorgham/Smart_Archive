@@ -46,7 +46,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h4 class="fw-bold mb-1" style="color: #475f7b;">Gestion des Utilisateurs</h4>
-                <p class="text-muted small mb-0">Consultez et gérez les comptes utilisateurs et leurs permissions.</p>
+                <p class="text-muted small mb-0">Consultez et gérez les comptes utilisateurs.</p>
             </div>
             <button class="btn btn-primary glow px-4 shadow-sm" (click)="openCreate()">
                 <i class="bx bx-user-plus mr-50"></i> Nouvel Utilisateur
@@ -73,7 +73,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let user of paginatedUsers" [class.table-active]="selectedUser?.id === user.id"
+                    <tr *ngFor="let user of dataSource.connect() | async" [class.table-active]="selectedUser?.id === user.id"
                         (click)="selectUser(user)">
                         <td>
                             <div class="d-flex align-items-center">
@@ -116,35 +116,16 @@
                             <span class="text-muted">Chargement...</span>
                         </td>
                     </tr>
-                    <tr *ngIf="!loadingUsers && filteredUsers.length === 0">
+                    <tr *ngIf="!loadingUsers && dataSource.filteredData.length === 0">
                         <td colspan="5" class="text-center py-5 text-muted">Aucun utilisateur trouvé</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-4 pt-2 border-top" *ngIf="filteredUsers.length > 0">
-            <div class="d-flex align-items-center">
-                <small class="text-muted mr-1">Éléments par page:</small>
-                <select class="form-select form-select-sm w-auto border-0 bg-transparent fw-bold" style="cursor: pointer;" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-                    <option [value]="5">5</option>
-                    <option [value]="10">10</option>
-                    <option [value]="25">25</option>
-                </select>
-            </div>
-            <div class="d-flex align-items-center gap-4">
-                <small class="text-muted fw-500">
-                    {{ getPageRange() }} sur {{ filteredUsers.length }}
-                </small>
-                <div class="pagination-actions d-flex gap-2">
-                    <button class="btn btn-sm btn-icon-custom" [class.disabled]="page === 1" (click)="previousPage()" [disabled]="page === 1" title="Précédent">
-                        <i class="bx bx-chevron-left"></i>
-                    </button>
-                    <button class="btn btn-sm btn-icon-custom" [class.disabled]="page === totalPages" (click)="nextPage()" [disabled]="page === totalPages" title="Suivant">
-                        <i class="bx bx-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
+        <div class="p-2 d-flex justify-content-between align-items-center border-top mt-3" [hidden]="dataSource.data.length === 0">
+            <small class="text-muted">Total: {{dataSource.filteredData.length}}</small>
+            <mat-paginator [pageSizeOptions]="[5, 10, 25]" class="custom-paginator"></mat-paginator>
         </div>
     </div>
 

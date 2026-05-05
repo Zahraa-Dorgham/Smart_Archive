@@ -71,13 +71,23 @@ export class UserFormComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.userData.first_name || !this.userData.last_name || !this.userData.email || !this.userData.password) {
-      alert('Veuillez remplir les champs obligatoires');
+      (window as any).Swal.fire({
+        title: 'Champs manquants',
+        text: 'Veuillez remplir tous les champs obligatoires (Prénom, Nom, Email et Mot de passe).',
+        icon: 'warning',
+        confirmButtonColor: '#5a8dee'
+      });
       this.currentStep = 1;
       return;
     }
 
     if (!this.userData.role_id) {
-      alert('Veuillez selectionner un role');
+      (window as any).Swal.fire({
+        title: 'Rôle requis',
+        text: 'Veuillez sélectionner un rôle pour cet utilisateur.',
+        icon: 'warning',
+        confirmButtonColor: '#5a8dee'
+      });
       this.currentStep = 2;
       return;
     }
@@ -96,12 +106,24 @@ export class UserFormComponent implements OnInit {
     this.api.post('/users/', payload).subscribe({
       next: () => {
         this.submitting = false;
-        this.router.navigate(['/admin/users']);
+        (window as any).Swal.fire({
+          title: 'Succès !',
+          text: 'L\'utilisateur a été créé avec succès.',
+          icon: 'success',
+          confirmButtonColor: '#5a8dee'
+        }).then(() => {
+          this.router.navigate(['/admin/users']);
+        });
       },
       error: (err) => {
         this.submitting = false;
         console.error('Erreur creation utilisateur', err);
-        alert('Erreur lors de la creation de l utilisateur');
+        (window as any).Swal.fire({
+          title: 'Erreur',
+          text: 'Une erreur est survenue lors de la création de l\'utilisateur. Vérifiez si l\'email est déjà utilisé.',
+          icon: 'error',
+          confirmButtonColor: '#5a8dee'
+        });
       }
     });
   }
