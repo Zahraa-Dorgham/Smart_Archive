@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
@@ -63,25 +63,34 @@ export class ShowDocumentComponent implements OnInit {
   dataSource = new MatTableDataSource<Document>([]);
   displayedColumns: string[] = ['idDoc', 'titre', 'dossier', 'calendrier', 'phase', 'date', 'confidentialite', 'actions'];
   filterForm: FormGroup;
+  dossierFilter: string | null = null;
 
   constructor(
     private documentService: DocumentService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private route: ActivatedRoute
   ) {
     this.filterForm = this.fb.group({ search: [''] });
   }
 
   ngOnInit(): void {
-    this.loadDocuments();
+    this.route.queryParams.subscribe(params => {
+      this.dossierFilter = params['dossier'] || null;
+      this.loadDocuments();
+    });
     this.filterForm.valueChanges.subscribe(() => this.applyFilter());
   }
 
   loadDocuments(): void {
     this.loadingService.show();
-    this.documentService.getDocuments().subscribe({
+    const params: any = { page_size: 1000 };
+    if (this.dossierFilter) {
+      params.dossier = this.dossierFilter;
+    }
+    this.documentService.getDocuments(params).subscribe({
       next: (response: PaginatedResponse<Document>) => {
         this.dataSource.data = response.results;
         this.loadingService.hide();

@@ -74,3 +74,6 @@
 table {
     width: 100%;
 }
+.p-0 {
+    padding: 6px !important;
+}

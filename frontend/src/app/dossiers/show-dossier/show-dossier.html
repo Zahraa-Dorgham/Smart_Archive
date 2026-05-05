@@ -76,6 +76,9 @@
                                         <span class="badge badge-light-success">{{ d.nombre_documents || 0 }}</span>
                                     </td>
                                     <td class="py-2 text-right px-2">
+                                        <button class="btn btn-sm btn-icon btn-light-success mr-1" (click)="viewDocuments(d)" title="Voir les Documents">
+                                            <i class="bx bx-file"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(d)" title="Modifier">
                                             <i class="bx bx-edit-alt"></i>
                                         </button>

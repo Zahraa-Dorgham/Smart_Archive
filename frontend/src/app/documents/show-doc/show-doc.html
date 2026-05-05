@@ -2,10 +2,16 @@
     <div class="content-header-left col-12 mb-2 mt-1">
         <div class="row breadcrumbs-top">
             <div class="col-12">
-                <h5 class="content-header-title float-left pr-1 mb-0">Gestion des Documents</h5>
+                <h5 class="content-header-title float-left pr-1 mb-0">
+                    <button *ngIf="dossierFilter" class="btn btn-sm btn-icon btn-light-secondary mr-50" routerLink="/archiviste/dossiers" title="Retour aux dossiers">
+                        <i class="bx bx-arrow-back"></i>
+                    </button>
+                    Gestion des Documents
+                </h5>
                 <div class="breadcrumb-wrapper col-12">
                     <ol class="breadcrumb p-0 mb-0">
                         <li class="breadcrumb-item"><a routerLink="/dashboard"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item" *ngIf="dossierFilter"><a routerLink="/archiviste/dossiers">Dossiers</a></li>
                         <li class="breadcrumb-item active">Documents</li>
                     </ol>
                 </div>
@@ -27,7 +33,13 @@
                     </fieldset>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 col-lg-8 d-flex align-items-center justify-content-end mt-sm-0 mt-1">
+            <div class="col-12 col-sm-6 col-lg-8 d-flex align-items-center justify-content-end mt-sm-0 mt-1 gap-2">
+                <!-- <span *ngIf="dossierFilter" class="badge badge-light-info d-flex align-items-center px-3 py-2" style="font-size: 0.85rem;">
+                    <i class="bx bx-filter-alt mr-50"></i> Dossier: {{ dossierFilter }}
+                    <a routerLink="/archiviste/documents" class="ml-1 text-danger" style="cursor:pointer; text-decoration:none;">
+                        <i class="bx bx-x"></i>
+                    </a>
+                </span> -->
                 <button class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
                     <i class="bx bx-plus-circle mr-50"></i> Nouveau Document
                 </button>
