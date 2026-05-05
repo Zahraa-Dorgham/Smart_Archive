@@ -56,7 +56,7 @@ export class AddEditCalendrierComponent implements OnInit {
       description: [''],
       unit_responsable: [''],
       parent: [null],
-      is_dossier: [false],
+      is_dossier: [null, Validators.required],
       direction: [null],
       exemplaire_type: [''],
       conservation_active_period: [null],
@@ -94,11 +94,23 @@ export class AddEditCalendrierComponent implements OnInit {
       const c = this.data.calendrier as any;
       const patch = {
         ...c,
-        parent: c.parent || (c.parent_detail ? (c.parent_detail.id || c.parent_detail) : null),
-        direction: c.direction || (c.direction_detail ? (c.direction_detail.id || c.direction_detail) : null)
+        parent: this.extractId(c.parent) || this.extractId(c.parent_detail),
+        direction: this.extractId(c.direction) || this.extractId(c.direction_detail)
       };
+
+      // Ensure direction is a number if it exists
+      if (patch.direction) {
+        patch.direction = Number(patch.direction);
+      }
+
       this.form.patchValue(patch);
     }
+  }
+
+  private extractId(val: any): any {
+    if (!val) return null;
+    if (typeof val === 'object') return val.id;
+    return val;
   }
 
   onSubmit(): void {
