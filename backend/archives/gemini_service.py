@@ -10,6 +10,7 @@ import urllib.request
 from django.conf import settings
 
 from calendrier.models import Calendrier
+from .models import Dossier
 
 
 class GeminiDocumentExtractionError(Exception):
@@ -68,7 +69,7 @@ class GeminiDocumentExtractionService:
             return ''
         return ''
 
-    def extract_document_metadata(self, uploaded_file, dossier):
+    def extract_document_metadata(self, uploaded_file, dossier=None, dossier_options=None):
         file_bytes = uploaded_file.read()
         if not file_bytes:
             raise GeminiDocumentExtractionError("Le fichier envoye est vide.")
@@ -76,8 +77,8 @@ class GeminiDocumentExtractionService:
         uploaded_file.seek(0)
 
         mime_type = uploaded_file.content_type or mimetypes.guess_type(uploaded_file.name)[0] or 'application/octet-stream'
-        allowed_calendriers = self._build_allowed_calendriers(dossier)
-        prompt = self._build_prompt(dossier, allowed_calendriers)
+        dossier_choices = self._build_dossier_choices(dossier, dossier_options)
+        prompt = self._build_prompt(dossier, dossier_choices)
 
         contents = [
             {
@@ -104,7 +105,7 @@ class GeminiDocumentExtractionService:
         )
 
         parsed = self._parse_model_response(response_data)
-        normalized = self._normalize_result(parsed, dossier, allowed_calendriers)
+        normalized = self._normalize_result(parsed, dossier, dossier_choices)
         return normalized
 
     def _build_file_part(self, filename, mime_type, file_bytes):
@@ -208,36 +209,98 @@ class GeminiDocumentExtractionService:
             for calendrier in calendriers
         ]
 
-    def _build_prompt(self, dossier, allowed_calendriers):
-        calendrier_choices = "\n".join(
-            f'- id: {item["id"]} | code: {item["code"]} | title: {item["title"]} | parent: {item["parent"] or "null"}'
-            for item in allowed_calendriers
-        ) or "- none"
+    def _build_dossier_choices(self, selected_dossier=None, dossier_options=None):
+        if selected_dossier is not None:
+            dossiers = [selected_dossier]
+        elif dossier_options:
+            dossier_ids = []
+            for item in dossier_options:
+                dossier_id = item.get('idDossier') or item.get('id')
+                if dossier_id is None:
+                    continue
+                dossier_ids.append(dossier_id)
+            dossiers = list(
+                Dossier.objects.select_related('calendrier')
+                .filter(idDossier__in=dossier_ids, calendrier__isnull=False)
+                .order_by('idDossier')
+            )
+        else:
+            dossiers = list(
+                Dossier.objects.select_related('calendrier').filter(calendrier__isnull=False).order_by('idDossier')
+            )
+
+        choices = []
+        for dossier in dossiers:
+            choices.append({
+                "id": str(dossier.idDossier),
+                "nomDos": dossier.nomDos or '',
+                "calendriers": self._build_allowed_calendriers(dossier),
+            })
+        return choices
+
+    def _build_prompt(self, selected_dossier, dossier_choices):
+        dossier_lines = []
+        for dossier_choice in dossier_choices:
+            calendrier_lines = "\n".join(
+                f'    - calendrier_id: {item["id"]} | code: {item["code"]} | title: {item["title"]} | parent: {item["parent"] or "null"}'
+                for item in dossier_choice["calendriers"]
+            ) or "    - none"
+            dossier_lines.append(
+                f'- dossier_id: {dossier_choice["id"]} | nom: {dossier_choice["nomDos"] or "Sans nom"}\n{calendrier_lines}'
+            )
+
+        dossier_choices_text = "\n".join(dossier_lines) or "- none"
+        dossier_instruction = (
+            f"Le dossier parent est deja choisi et doit rester dossier={selected_dossier.idDossier}.\n"
+            "Tu ne dois pas changer le dossier.\n"
+            if selected_dossier is not None
+            else "Tu dois choisir un dossier uniquement parmi la liste autorisee ci-dessous et retourner son id exact.\n"
+        )
 
         return (
             "Analyse ce fichier archive et retourne uniquement un JSON valide sans markdown.\n"
             "Remplis les champs document suivants a partir du contenu du fichier.\n"
-            f"Le dossier parent est deja choisi et doit rester dossier={dossier.idDossier}.\n"
-            "Tu ne dois pas changer le dossier.\n"
+            f"{dossier_instruction}"
             "La phase doit toujours etre fixee a 1.\n"
-            "Tu dois choisir un calendrier uniquement parmi la liste autorisee ci-dessous, sinon retourne null.\n"
+            "Tu dois choisir un calendrier uniquement parmi la liste autorisee pour le dossier retenu, sinon retourne null.\n"
             "Les valeurs autorisees pour niv_confidentialite sont: PUBLIC, INTERNE, CONFIDENTIEL, SECRET.\n"
             "Si tu es incertain, choisis la valeur la plus prudente parmi INTERNE, CONFIDENTIEL, SECRET.\n"
+            "Si une date de creation du document est visible, retourne-la au format YYYY-MM-DD, sinon null.\n"
             "La description doit etre courte, utile et factuelle.\n"
             "Retourne ce schema JSON exact:\n"
             "{"
             "\"titre\": string | null, "
+            "\"dossier\": string | {\"id\": string}, "
             "\"calendrier\": string | null, "
             "\"niv_confidentialite\": \"PUBLIC\" | \"INTERNE\" | \"CONFIDENTIEL\" | \"SECRET\", "
+            "\"auteur\": string | null, "
+            "\"date_creation\": string | null, "
             "\"description\": string | null, "
             "\"phase_archive\": 1, "
             "\"warnings\": string[]"
             "}\n"
-            f"Liste des calendriers autorises pour le dossier {dossier.idDossier}:\n{calendrier_choices}"
+            f"Liste des dossiers et calendriers autorises:\n{dossier_choices_text}"
         )
 
-    def _normalize_result(self, parsed, dossier, allowed_calendriers):
-        allowed_calendrier_ids = {item["id"] for item in allowed_calendriers}
+    def _normalize_result(self, parsed, selected_dossier, dossier_choices):
+        dossier_map = {item["id"]: item for item in dossier_choices}
+
+        raw_dossier = parsed.get("dossier")
+        if isinstance(raw_dossier, dict):
+            raw_dossier = raw_dossier.get("id") or raw_dossier.get("idDossier")
+
+        if selected_dossier is not None:
+            dossier_id = str(selected_dossier.idDossier)
+        else:
+            dossier_id = str(raw_dossier or "")
+            if dossier_id not in dossier_map:
+                raise GeminiDocumentExtractionError("Gemini n'a pas retourne de dossier valide.")
+
+        dossier_choice = dossier_map.get(dossier_id)
+        if dossier_choice is None:
+            raise GeminiDocumentExtractionError("Le dossier choisi n'est pas autorise.")
+
+        allowed_calendrier_ids = {item["id"] for item in dossier_choice["calendriers"]}
         calendrier_id = parsed.get("calendrier")
         if calendrier_id is not None:
             calendrier_id = str(calendrier_id)
@@ -260,15 +323,34 @@ class GeminiDocumentExtractionService:
         if description is not None:
             description = str(description).strip() or None
 
+        author = parsed.get("auteur")
+        if author is not None:
+            author = str(author).strip() or None
+
+        creation_date = parsed.get("date_creation")
+        if creation_date is not None:
+            creation_date = str(creation_date).strip() or None
+            if creation_date and not self._is_iso_date(creation_date):
+                warnings.append("La date extraite n'etait pas au format YYYY-MM-DD et a ete ignoree.")
+                creation_date = None
+
         return {
             "titre": title,
-            "dossier": str(dossier.idDossier),
+            "dossier": dossier_id,
             "calendrier": calendrier_id,
             "niv_confidentialite": confidentiality,
+            "auteur": author,
+            "date_creation": creation_date,
             "description": description,
             "phase_archive": "1",
             "warnings": warnings,
         }
+
+    def _is_iso_date(self, value):
+        if len(value) != 10:
+            return False
+        year, month, day = value.split('-', 2) if value.count('-') == 2 else ('', '', '')
+        return year.isdigit() and month.isdigit() and day.isdigit()
 
     def _parse_model_response(self, response_data):
         candidates = response_data.get("candidates") or []
