@@ -33,46 +33,49 @@
         <div class="row">
             <div class="col-md-6 mb-1">
                 <label class="form-label">Dossier <span class="text-danger">*</span></label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <mat-select formControlName="dossier">
-                        <mat-option [value]="null" disabled>Selectionner le dossier...</mat-option>
-                        <mat-option *ngFor="let d of dossiers" [value]="d.idDossier.toString()">
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-folder"></i>
+                    <select class="form-control" formControlName="dossier">
+                        <option [value]="null" disabled selected>Sélectionner le dossier...</option>
+                        <option *ngFor="let d of dossiers" [value]="d.idDossier.toString()">
                             {{ d.idDossier }} - {{ d.nomDos || 'Sans nom' }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-md-6 mb-1">
                 <label class="form-label">Calendrier</label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <mat-select formControlName="calendrier">
-                        <mat-option [value]="null">Aucun</mat-option>
-                        <mat-option *ngFor="let c of filteredCalendriers" [value]="c.id.toString()">
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-calendar-event"></i>
+                    <select class="form-control" formControlName="calendrier">
+                        <option [value]="null">Aucun calendrier</option>
+                        <option *ngFor="let c of filteredCalendriers" [value]="c.id.toString()">
                             {{ c.code }} - {{ c.title }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-1">
                 <label class="form-label">Phase</label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <mat-select formControlName="phase_archive">
-                        <mat-option [value]="null">Aucune</mat-option>
-                        <mat-option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-git-commit"></i>
+                    <select class="form-control" formControlName="phase_archive">
+                        <!-- <option [value]="null">Aucune phase</option> -->
+                        <option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-md-6 mb-1">
-                <label class="form-label">Confidentialite <span class="text-danger">*</span></label>
+                <label class="form-label">Confidentialité <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-lock"></i>
+                    <i class="bx bx-lock-alt"></i>
                     <select class="form-control" formControlName="niv_confidentialite">
-                        <option value="INTERNE" selected>Interne</option>
+                        <option value="INTERNE">Interne</option>
                         <option value="PUBLIC">Public</option>
                         <option value="CONFIDENTIEL">Confidentiel</option>
                         <option value="SECRET">Secret</option>
@@ -81,15 +84,14 @@
             </div>
         </div>
 
-        <div class="section-title">Metadonnees</div>
+        <div class="section-title">Métadonnées & Auteur</div>
         <div class="row">
             <div class="col-md-6 mb-1">
-                <label class="form-label">Date creation <span class="text-danger">*</span></label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <input matInput [matDatepicker]="picker" formControlName="date_creation">
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
+                <label class="form-label">Date création <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-calendar"></i>
+                    <input type="date" class="form-control" formControlName="date_creation">
+                </div>
             </div>
 
             <div class="col-md-6 mb-1">
@@ -99,42 +101,40 @@
                     <input type="text" class="form-control" formControlName="auteur" placeholder="Nom de l'auteur">
                 </div>
             </div>
-        </div>
-
-        <div class="row">
+            
             <div class="col-md-12 mb-1">
-                <label class="form-label">Description</label>
-                <textarea class="form-control" formControlName="description" rows="2"
-                    placeholder="Description du document"></textarea>
-            </div>
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" formControlName="description" rows="2"
+                                placeholder="Description du document"></textarea>
+                        </div>
+                    
         </div>
 
-        <div class="section-title">Gestion de Conservation</div>
+
+
+        <div class="section-title">Gestion de Conservation (ans)</div>
         <div class="row">
             <div class="col-md-4 mb-1">
-                <label class="form-label">Conservation active (ans)</label>
+                <label class="form-label">Durée Courante</label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-time"></i>
-                    <input type="number" class="form-control" formControlName="conservation_active_period"
-                        placeholder="0">
+                    <i class="bx bx-time-five"></i>
+                    <input type="number" class="form-control" formControlName="conservation_active_period" placeholder="0">
                 </div>
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Conservation semi-active (ans)</label>
+                <label class="form-label">Durée Intermédiaire</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time"></i>
-                    <input type="number" class="form-control" formControlName="conservation_semi_active_period"
-                        placeholder="0">
+                    <input type="number" class="form-control" formControlName="conservation_semi_active_period" placeholder="0">
                 </div>
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Delai securite (ans)</label>
+                <label class="form-label">Délai sécurité</label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-shield"></i>
-                    <input type="number" class="form-control" formControlName="sort_final_security_years"
-                        placeholder="0">
+                    <i class="bx bx-shield-quarter"></i>
+                    <input type="number" class="form-control" formControlName="sort_final_security_years" placeholder="0">
                 </div>
             </div>
         </div>
@@ -143,25 +143,33 @@
             <div class="col-md-6 mb-1">
                 <label class="form-label">Sort final</label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-trash"></i>
-                    <input type="text" class="form-control" formControlName="sort_final_type"
-                        placeholder="ex: Destruction">
+                    <i class="bx bx-export"></i>
+                    <input type="text" class="form-control" formControlName="sort_final_type" placeholder="ex: Destruction">
                 </div>
             </div>
 
             <div class="col-md-6 mb-1">
                 <label class="form-label">Commentaire sort final</label>
-                <textarea class="form-control" formControlName="sort_final_comment" rows="2"
-                    placeholder="Commentaires..."></textarea>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-comment-detail"></i>
+                    <textarea class="form-control" formControlName="sort_final_comment" rows="2" style="padding-left: 38px;" placeholder="Commentaires..."></textarea>
+                </div>
             </div>
         </div>
 
         <div class="section-title">Fichier Joint</div>
         <div class="row">
-            <div class="col-md-12 mb-1">
-                <div class="file-upload">
-                    <label for="fichier" class="file-label">Joindre un fichier</label>
-                    <input type="file" id="fichier" (change)="onFileSelected($event)">
+            <div class="col-md-12">
+                <div class="file-upload-wrapper">
+                    <label class="form-label">Document numérique</label>
+                    <div class="custom-file-input">
+                        <i class="bx bx-cloud-upload"></i>
+                        <input type="file" id="fichier" (change)="onFileSelected($event)" class="d-none">
+                        <label for="fichier" class="btn btn-outline-primary btn-sm mb-0">
+                            {{ selectedFile ? selectedFile.name : 'Choisir un fichier...' }}
+                        </label>
+                        <small class="text-muted ml-1" *ngIf="!selectedFile">PDF, Image, Doc...</small>
+                    </div>
                 </div>
                 <div class="mt-1 d-flex gap-1 align-items-center">
                     <button class="btn btn-outline-primary btn-sm" type="button" (click)="analyzeSelectedFile()"
@@ -178,9 +186,10 @@
     </mat-dialog-content>
 
     <div class="dialog-actions">
-        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
-        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Enregistrer' : 'Creer' }}
+        <button class="btn btn-light-secondary px-3" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow px-4 shadow-sm" type="submit" [disabled]="form.invalid">
+            <i class="bx" [ngClass]="isEditMode ? 'bx-save' : 'bx-check-circle'"></i>
+            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
     </div>
 </form>

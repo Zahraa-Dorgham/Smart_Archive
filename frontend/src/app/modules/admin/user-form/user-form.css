@@ -1,76 +1,106 @@
+/* Frest Inspired User Form Styling */
 .stepper {
-    .step {
-        flex: 1;
-        text-align: center;
-        cursor: pointer;
-        padding: 8px 0;
-        border-radius: 30px;
-        transition: all 0.2s;
-        background-color: #f8f9fa;
-        margin: 0 4px;
+    background-color: #f8f9fb;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 2.5rem !important;
+}
 
-        .step-icon {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
-            color: #6c757d;
-        }
+.step {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 12px 0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin: 0 5px;
+    position: relative;
+}
 
-        .step-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #6c757d;
-        }
+.step-icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+    color: #828d99;
+    display: block;
+}
 
-        &.active {
-            background-color: #e7f1ff;
+.step-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #828d99;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-            .step-icon,
-            .step-label {
-                color: #0d6efd;
-            }
-        }
+.step.active {
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(90, 141, 238, 0.15);
+}
 
-        &:hover:not(.active) {
-            background-color: #e9ecef;
-        }
-    }
+.step.active .step-icon {
+    color: #5a8dee;
+}
+
+.step.active .step-label {
+    color: #475f7b;
+}
+
+.step:hover:not(.active) {
+    background-color: #edf1f4;
+}
+
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .card-header {
-    border-bottom: none;
+    background-color: #fff;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #dfe3e7;
 }
 
 .form-label {
-    font-weight: 500;
+    font-weight: 600;
+    color: #475f7b;
     font-size: 0.85rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
 }
 
-.form-check-input:checked {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+.form-control, .form-select {
+    border-radius: 4px;
+    border: 1px solid #dfe3e7;
+    padding: 0.6rem 0.8rem;
+    color: #475f7b;
+    transition: all 0.2s;
 }
 
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+.form-control:focus, .form-select:focus {
+    border-color: #5a8dee;
+    box-shadow: 0 3px 8px rgba(90, 141, 238, 0.15);
+}
 
-    &:hover {
-        background-color: #0b5ed7;
-    }
+.btn-primary.glow {
+    box-shadow: 0 4px 12px rgba(90, 141, 238, 0.4);
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #828d99;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #dfe3e7;
+    padding-bottom: 8px;
 }
 
 @media (max-width: 768px) {
-    .stepper .step .step-label {
-        font-size: 0.7rem;
+    .step-label {
+        display: none;
     }
-
-    .btn {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-
-    .w-50 {
-        width: 100% !important;
+    .step-icon {
+        margin-bottom: 0;
     }
 }

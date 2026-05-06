@@ -10,6 +10,29 @@
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <mat-dialog-content class="px-3 pb-2 pt-1">
+        <div class="section-title">Type d'Application</div>
+        <div class="row mb-2">
+            <div class="col-12">
+                <div class="d-flex gap-3 justify-content-center p-1 bg-light rounded shadow-sm mb-1">
+                    <div class="form-check custom-option-radio">
+                        <input class="form-check-input" type="radio" name="is_dossier" id="type_dossier" [value]="true" formControlName="is_dossier">
+                        <label class="form-check-label d-flex align-items-center" for="type_dossier">
+                            <i class="bx bx-folder font-medium-3 mr-50 text-primary"></i>
+                            <span class="font-weight-bold">Calendrier pour Dossiers</span>
+                        </label>
+                    </div>
+                    <div class="border-left mx-2"></div>
+                    <div class="form-check custom-option-radio">
+                        <input class="form-check-input" type="radio" name="is_dossier" id="type_document" [value]="false" formControlName="is_dossier">
+                        <label class="form-check-label d-flex align-items-center" for="type_document">
+                            <i class="bx bx-file font-medium-3 mr-50 text-success"></i>
+                            <span class="font-weight-bold">Calendrier pour Documents</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="section-title">Identification</div>
         <div class="row">
             <div class="col-md-6 mb-1">
@@ -29,22 +52,22 @@
             </div>
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-12 mb-1">
                 <label class="form-label">Description</label>
                 <textarea class="form-control" formControlName="description" rows="2" placeholder="Description..."></textarea>
             </div>
-        </div>
+        </div> -->
 
         <div class="section-title">Classification</div>
         <div class="row">
-            <div class="col-md-6 mb-1">
+            <!-- <div class="col-md-6 mb-1">
                 <label class="form-label">Type d'exemplaire</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-shape-circle"></i>
                     <input type="text" class="form-control" formControlName="exemplaire_type" placeholder="Type">
                 </div>
-            </div>
+            </div> -->
 
             <div class="col-md-6 mb-1">
                 <label class="form-label">Unité responsable</label>
@@ -61,7 +84,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-briefcase"></i>
                     <select class="form-control" formControlName="direction">
-                        <option [value]="null">Aucune</option>
+                        <!-- <option [value]="null" disabled selected>Sélectionner la direction...</option> -->
                         <option *ngFor="let d of directions" [value]="d.id">{{ d.nom }}</option>
                     </select>
                 </div>
@@ -79,10 +102,10 @@
             </div>
         </div>
 
-        <div class="section-title">Gestion de Conservation</div>
+        <div class="section-title">Gestion de Conservation (ans)</div>
         <div class="row">
             <div class="col-md-4 mb-1">
-                <label class="form-label">Courant - Durée (ans)</label>
+                <label class="form-label">Durée Courante</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time"></i>
                     <input type="number" class="form-control" formControlName="conservation_active_period" placeholder="0">
@@ -90,7 +113,7 @@
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Intermédiaire - Durée (ans)</label>
+                <label class="form-label">Durée Intermédiaire</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time"></i>
                     <input type="number" class="form-control" formControlName="conservation_semi_active_period" placeholder="0">
@@ -98,7 +121,7 @@
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Délai sécurité (ans)</label>
+                <label class="form-label">Délai sécurité</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-shield"></i>
                     <input type="number" class="form-control" formControlName="sort_final_security_years" placeholder="0">
@@ -121,36 +144,13 @@
             </div>
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-12 mb-1">
                 <label class="form-label">Remarques</label>
                 <textarea class="form-control" formControlName="remarques" rows="2" placeholder="Remarques générales..."></textarea>
             </div>
-        </div>
+        </div> -->
 
-        <div class="section-title">Options</div>
-        <div class="row">
-            <div class="col-md-12 mb-1">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="is_dossier" formControlName="is_dossier">
-                    <label class="form-check-label" for="is_dossier">
-                        Dossier
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="validation_archive" formControlName="validation_archive">
-                    <label class="form-check-label" for="validation_archive">
-                        Validation archive
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="is_active" formControlName="is_active">
-                    <label class="form-check-label" for="is_active">
-                        Actif
-                    </label>
-                </div>
-            </div>
-        </div>
     </mat-dialog-content>
 
     <div class="dialog-actions">

@@ -5,8 +5,6 @@ import { Router } from '@angular/router';
 
 import { ApiService } from '../../../core/services/api.service';
 
-declare var bootstrap: any;
-
 @Component({
   selector: 'app-user-form',
   standalone: true,
@@ -17,6 +15,7 @@ declare var bootstrap: any;
 export class UserFormComponent implements OnInit {
   currentStep = 1;
   submitting = false;
+  showPassword = false;
 
   userData = {
     first_name: '',
@@ -28,43 +27,38 @@ export class UserFormComponent implements OnInit {
   };
 
   roles: any[] = [];
-  allPermissions: any[] = [];
-  selectedPermissionId: number | null = null;
-  customPermissions: any[] = [];
 
   constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadRoles();
-    this.loadPermissions();
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   loadRoles(): void {
-    this.api.get('/roles/').subscribe({
+    this.api.get('/groups/').subscribe({
       next: (data: any) => {
         this.roles = data.results || data || [];
+        // Ensure we have name field (Django Group uses 'name')
+        this.roles = this.roles.map(r => ({ ...r, nom: r.name || r.nom }));
       },
       error: (err) => console.error('Erreur chargement roles', err)
     });
   }
 
-  loadPermissions(): void {
-    this.api.get('/permissions/').subscribe({
-      next: (data: any) => {
-        this.allPermissions = data.results || data || [];
-      },
-      error: (err) => console.error('Erreur chargement permissions', err)
-    });
-  }
+
 
   goToStep(step: number): void {
-    if (step >= 1 && step <= 3) {
+    if (step >= 1 && step <= 2) {
       this.currentStep = step;
     }
   }
 
   nextStep(): void {
-    if (this.currentStep < 3) {
+    if (this.currentStep < 2) {
       this.currentStep++;
     }
   }
@@ -75,46 +69,25 @@ export class UserFormComponent implements OnInit {
     }
   }
 
-  addPermission(): void {
-    if (!this.selectedPermissionId) {
-      return;
-    }
-
-    const permission = this.allPermissions.find((item) => item.id === Number(this.selectedPermissionId));
-    if (!permission) {
-      return;
-    }
-
-    const alreadySelected = this.customPermissions.some((item) => item.id === permission.id);
-    if (!alreadySelected) {
-      this.customPermissions = [...this.customPermissions, permission];
-    }
-
-    this.selectedPermissionId = null;
-  }
-
-  removePermission(index: number): void {
-    this.customPermissions.splice(index, 1);
-    this.customPermissions = [...this.customPermissions];
-  }
-
-  preview(): void {
-    const modalElement = document.getElementById('previewModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }
-
   onSubmit(): void {
     if (!this.userData.first_name || !this.userData.last_name || !this.userData.email || !this.userData.password) {
-      alert('Veuillez remplir les champs obligatoires');
+      (window as any).Swal.fire({
+        title: 'Champs manquants',
+        text: 'Veuillez remplir tous les champs obligatoires (Prénom, Nom, Email et Mot de passe).',
+        icon: 'warning',
+        confirmButtonColor: '#5a8dee'
+      });
       this.currentStep = 1;
       return;
     }
 
     if (!this.userData.role_id) {
-      alert('Veuillez selectionner un role');
+      (window as any).Swal.fire({
+        title: 'Rôle requis',
+        text: 'Veuillez sélectionner un rôle pour cet utilisateur.',
+        icon: 'warning',
+        confirmButtonColor: '#5a8dee'
+      });
       this.currentStep = 2;
       return;
     }
@@ -127,19 +100,30 @@ export class UserFormComponent implements OnInit {
       last_name: this.userData.last_name,
       is_active: this.userData.is_active,
       groups: [this.userData.role_id],
-      user_permissions: this.customPermissions.map((permission) => permission.id),
       password: this.userData.password
     };
 
     this.api.post('/users/', payload).subscribe({
       next: () => {
         this.submitting = false;
-        this.router.navigate(['/admin/users']);
+        (window as any).Swal.fire({
+          title: 'Succès !',
+          text: 'L\'utilisateur a été créé avec succès.',
+          icon: 'success',
+          confirmButtonColor: '#5a8dee'
+        }).then(() => {
+          this.router.navigate(['/admin/users']);
+        });
       },
       error: (err) => {
         this.submitting = false;
         console.error('Erreur creation utilisateur', err);
-        alert('Erreur lors de la creation de l utilisateur');
+        (window as any).Swal.fire({
+          title: 'Erreur',
+          text: 'Une erreur est survenue lors de la création de l\'utilisateur. Vérifiez si l\'email est déjà utilisé.',
+          icon: 'error',
+          confirmButtonColor: '#5a8dee'
+        });
       }
     });
   }

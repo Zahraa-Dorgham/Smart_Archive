@@ -464,9 +464,20 @@ class BordereauSerializer(serializers.ModelSerializer):
 from django.contrib.auth.models import Group
 
 class GroupSerializer(serializers.ModelSerializer):
+    permissions_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Group
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'permissions', 'permissions_count']
+        
+    def get_permissions_count(self, obj):
+        return obj.permissions.count()
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        from django.contrib.auth.models import Permission
+        model = Permission
+        fields = ['id', 'name', 'codename', 'content_type']
 
 
 
@@ -477,10 +488,67 @@ from rest_framework import serializers
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-    groups = serializers.StringRelatedField(many=True, read_only=True)
+    groups_detail = GroupSerializer(source='groups', many=True, read_only=True)
+    password = serializers.CharField(write_only=True, required=False)
+    
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups', 'groups_detail', 'password', 'user_permissions']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        groups_data = validated_data.pop('groups', [])
+        permissions_data = validated_data.pop('user_permissions', [])
+        password = validated_data.pop('password', None)
+        
+        # Use create_user to ensure password hashing and correct initialization
+        user = User.objects.create_user(password=password, **validated_data)
+        
+        # Automatically set is_staff for users with 'Administrateur' or 'Admin' role
+        # This is often needed for access to certain parts of the system
+        if groups_data:
+            user.groups.set(groups_data)
+            group_names = [g.name.lower() for g in user.groups.all()]
+            if any(name in ['administrateur', 'admin'] for name in group_names):
+                user.is_staff = True
+                user.save()
+
+        if permissions_data:
+            user.user_permissions.set(permissions_data)
+            
+        return user
+
+    def update(self, instance, validated_data):
+        groups_data = validated_data.pop('groups', None)
+        permissions_data = validated_data.pop('user_permissions', None)
+        password = validated_data.pop('password', None)
+        
+        for attr, value in validated_data.items():
+            if attr != 'password':
+                setattr(instance, attr, value)
+            
+        if password:
+            instance.set_password(password)
+            
+        instance.save()
+        
+        if groups_data is not None:
+            instance.groups.set(groups_data)
+            group_names = [g.name.lower() for g in instance.groups.all()]
+            if any(name in ['administrateur', 'admin'] for name in group_names):
+                instance.is_staff = True
+            else:
+                # If they are not superuser, we might want to unset is_staff
+                if not instance.is_superuser:
+                    instance.is_staff = False
+            instance.save()
+
+        if permissions_data is not None:
+            instance.user_permissions.set(permissions_data)
+            
+        return instance
 		
 		
 		

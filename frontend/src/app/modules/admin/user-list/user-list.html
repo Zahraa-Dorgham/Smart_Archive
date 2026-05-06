@@ -1,187 +1,175 @@
 <div class="main-content">
     <div class="row g-3 mb-4">
         <div class="col">
-            <div class="card stat-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-primary bg-opacity-10 text-primary me-3"><i class="bi bi-people"></i></div>
-                    <div><small class="text-muted">Total Users</small>
-                        <h5 class="mb-0 fw-bold">{{ totalUsers }}</h5>
+            <div class="card stat-card p-0 overflow-hidden">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-light-primary"><i class="bx bx-group"></i></div>
+                        <div class="ms-3"><small class="text-muted d-block">Total Utilisateurs</small>
+                            <h5 class="mb-0 fw-bold">{{ totalUsers }}</h5>
+                        </div>
                     </div>
                 </div>
-                <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-primary" [style.width.%]="totalUsers ? 100 : 0"></div>
-                </div>
+                <div class="bg-primary" style="height: 4px; opacity: 0.2;"></div>
             </div>
         </div>
         <div class="col">
-            <div class="card stat-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-success bg-opacity-10 text-success me-3"><i class="bi bi-person-check"></i></div>
-                    <div><small class="text-muted">Active Users</small>
-                        <h5 class="mb-0 fw-bold">{{ activeUsers }}</h5>
+            <div class="card stat-card p-0 overflow-hidden">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-light-success"><i class="bx bx-user-check"></i></div>
+                        <div class="ms-3"><small class="text-muted d-block">Actifs</small>
+                            <h5 class="mb-0 fw-bold">{{ activeUsers }}</h5>
+                        </div>
                     </div>
                 </div>
-                <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-success" [style.width.%]="totalUsers ? (activeUsers / totalUsers) * 100 : 0"></div>
-                </div>
+                <div class="bg-success" style="height: 4px; opacity: 0.2;"></div>
             </div>
         </div>
         <div class="col">
-            <div class="card stat-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-danger bg-opacity-10 text-danger me-3"><i class="bi bi-person-x"></i></div>
-                    <div><small class="text-muted">Inactive Users</small>
-                        <h5 class="mb-0 fw-bold">{{ inactiveUsers }}</h5>
+            <div class="card stat-card p-0 overflow-hidden">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-light-danger"><i class="bx bx-user-x"></i></div>
+                        <div class="ms-3"><small class="text-muted d-block">Inactifs</small>
+                            <h5 class="mb-0 fw-bold">{{ inactiveUsers }}</h5>
+                        </div>
                     </div>
                 </div>
-                <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-danger" [style.width.%]="totalUsers ? (inactiveUsers / totalUsers) * 100 : 0"></div>
-                </div>
+                <div class="bg-danger" style="height: 4px; opacity: 0.2;"></div>
             </div>
         </div>
         <div class="col">
-            <div class="card stat-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-warning bg-opacity-10 text-warning me-3"><i class="bi bi-shield-lock"></i></div>
-                    <div><small class="text-muted">Total Roles</small>
-                        <h5 class="mb-0 fw-bold">{{ totalRoles }}</h5>
+            <div class="card stat-card p-0 overflow-hidden">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-light-warning"><i class="bx bx-key"></i></div>
+                        <div class="ms-3"><small class="text-muted d-block">Rôles</small>
+                            <h5 class="mb-0 fw-bold">{{ totalRoles }}</h5>
+                        </div>
                     </div>
                 </div>
-                <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-warning" [style.width.%]="(totalRoles / 4) * 100"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card stat-card p-3">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-info bg-opacity-10 text-info me-3"><i class="bi bi-building"></i></div>
-                    <div><small class="text-muted">Departments</small>
-                        <h5 class="mb-0 fw-bold">{{ totalDepartments }}</h5>
-                    </div>
-                </div>
-                <div class="progress mt-2" style="height: 4px;">
-                    <div class="progress-bar bg-info" [style.width.%]="0"></div>
-                </div>
+                <div class="bg-warning" style="height: 4px; opacity: 0.2;"></div>
             </div>
         </div>
     </div>
 
-    <div class="table-container">
-        <div class="d-flex justify-content-between mb-4">
-            <h4 class="fw-bold" style="color: #2d3748;">Gestion des Utilisateurs</h4>
-            <button class="btn btn-primary rounded-pill btn-sm px-4" (click)="openCreate()">
-                <i class="bi bi-person-plus me-2"></i>Nouvel Utilisateur
+    <div class="table-container shadow-sm border-0">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1" style="color: #475f7b;">Gestion des Utilisateurs</h4>
+                <p class="text-muted small mb-0">Consultez et gérez les comptes utilisateurs.</p>
+            </div>
+            <button class="btn btn-primary glow px-4 shadow-sm" (click)="openCreate()">
+                <i class="bx bx-user-plus mr-50"></i> Nouvel Utilisateur
             </button>
         </div>
 
-        <div class="mb-3 d-flex gap-2">
-            <div class="input-group w-25">
-                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control border-start-0" placeholder="Search Users"
+        <div class="mb-4 d-flex gap-2">
+            <div class="input-group" style="max-width: 350px;">
+                <span class="input-group-text bg-white border-end-0"><i class="bx bx-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0" placeholder="Rechercher un utilisateur..."
                     [(ngModel)]="searchTerm" (keyup)="applyFilter()">
             </div>
         </div>
 
-        <table class="table user-table align-middle">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of paginatedUsers" [class.table-active]="selectedUser?.id === user.id"
-                    (click)="selectUser(user)">
-                    <td>{{ user.first_name || '-' }}</td>
-                    <td>{{ user.last_name || '-' }}</td>
-                    <td class="small">{{ user.email }}</td>
-                    <td class="roles-cell">
-                        <span *ngFor="let group of user.groups" class="role-badge" [class]="(group.name || '').toLowerCase()">
-                            {{ group.name }}
-                        </span>
-                        <span *ngIf="!user.groups?.length" class="role-badge employee">Employe</span>
-                    </td>
-                    <td>
-                        <div class="form-check form-switch d-flex align-items-center">
-                            <input class="form-check-input me-2" type="checkbox" [checked]="user.is_active" disabled>
-                            <span class="badge" [class.bg-success-subtle]="user.is_active"
-                                [class.text-success]="user.is_active" [class.bg-danger-subtle]="!user.is_active"
-                                [class.text-danger]="!user.is_active">
-                                {{ user.is_active ? 'Active' : 'Inactive' }}
+        <div class="table-responsive">
+            <table class="table user-table">
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Rôles</th>
+                        <th>Statut</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of dataSource.connect() | async" [class.table-active]="selectedUser?.id === user.id"
+                        (click)="selectUser(user)">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar bg-light-primary mr-75">
+                                    {{ user.initials }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold" style="font-size: 0.9rem;">{{ user.full_name }}</h6>
+                                    <small class="text-muted">{{ user.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><small>{{ user.email || '-' }}</small></td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span *ngFor="let r of user.roles" class="badge" [ngClass]="getRoleBadgeClass(r)">
+                                    {{ r }}
+                                </span>
+                                <span *ngIf="!user.roles?.length" class="badge badge-light-secondary">Sans rôle</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge" [class.badge-light-success]="user.is_active" [class.badge-light-danger]="!user.is_active">
+                                <i class="bx bx-circle font-size-small mr-25" style="font-size: 8px;"></i>
+                                {{ user.is_active ? 'Actif' : 'Inactif' }}
                             </span>
-                        </div>
-                    </td>
-                    <td>
-                        <i class="bi bi-pencil-square" style="cursor: pointer; margin-right: 8px;"
-                            (click)="edit(user); $event.stopPropagation()"></i>
-                        <i class="bi bi-trash ms-2 text-danger" style="cursor: pointer;"
-                            (click)="delete(user.id); $event.stopPropagation()"></i>
-                    </td>
-                </tr>
-                <tr *ngIf="loadingUsers">
-                    <td colspan="6" class="text-center py-4 text-muted">Chargement des utilisateurs...</td>
-                </tr>
-                <tr *ngIf="!loadingUsers && filteredUsers.length === 0">
-                    <td colspan="6" class="text-center py-4 text-muted">Aucun utilisateur trouve</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="filteredUsers.length > 0">
-            <div class="pagination-info">
-                Items per page:
-                <select class="form-select form-select-sm w-auto d-inline-block" [(ngModel)]="pageSize"
-                    (change)="onPageSizeChange()">
-                    <option [value]="5">5</option>
-                    <option [value]="10">10</option>
-                    <option [value]="25">25</option>
-                </select>
-            </div>
-            <div class="pagination-controls">
-                <button class="btn btn-outline-secondary btn-sm" (click)="previousPage()" [disabled]="page === 1">Precedent</button>
-                <span class="mx-2">Page {{ page }} sur {{ totalPages }}</span>
-                <button class="btn btn-outline-secondary btn-sm" (click)="nextPage()"
-                    [disabled]="page === totalPages">Suivant</button>
-            </div>
+                        </td>
+                        <td class="text-right">
+                            <button class="btn btn-sm btn-icon-custom btn-light-primary" (click)="edit(user); $event.stopPropagation()" title="Modifier">
+                                <i class="bx bx-edit-alt"></i>
+                            </button>
+                            <button class="btn btn-sm btn-icon-custom btn-light-danger" (click)="delete(user.id); $event.stopPropagation()" title="Supprimer">
+                                <i class="bx bx-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="loadingUsers">
+                        <td colspan="5" class="text-center py-5">
+                            <div class="spinner-border text-primary spinner-border-sm mr-50"></div>
+                            <span class="text-muted">Chargement...</span>
+                        </td>
+                    </tr>
+                    <tr *ngIf="!loadingUsers && dataSource.filteredData.length === 0">
+                        <td colspan="5" class="text-center py-5 text-muted">Aucun utilisateur trouvé</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <div class="user-detail-panel mt-4" *ngIf="selectedUser">
-            <div class="row">
-                <div class="col-md-4 d-flex">
-                    <div class="avatar-circle me-3">{{ (selectedUser.first_name?.charAt(0) || '') +
-                        (selectedUser.last_name?.charAt(0) || '') }}</div>
+        <div class="p-2 d-flex justify-content-between align-items-center border-top mt-3" [hidden]="dataSource.data.length === 0">
+            <small class="text-muted">Total: {{dataSource.filteredData.length}}</small>
+            <mat-paginator [pageSizeOptions]="[5, 10, 25]" class="custom-paginator"></mat-paginator>
+        </div>
+    </div>
+
+    <!-- User Detail Panel -->
+    <div class="user-detail-panel shadow-sm border-0" *ngIf="selectedUser">
+        <div class="row align-items-start">
+            <div class="col-md-4">
+                <div class="detail-title">Informations de base</div>
+                <div class="d-flex mb-3">
+                    <div class="avatar bg-primary font-large-1 mr-1" style="width: 60px; height: 60px; border-radius: 12px;">
+                        {{ selectedUser.initials }}
+                    </div>
                     <div>
-                        <h6 class="mb-0 fw-bold">{{ selectedUser.first_name }} {{ selectedUser.last_name }}</h6>
-                        <p class="small text-muted mb-0">{{ selectedUser.email }}</p>
-                        <div class="mt-2 small">
-                            <strong>Username:</strong> {{ selectedUser.username }}<br>
-                            <strong>Role:</strong> {{ selectedUser.role || 'Employe' }}<br>
-                            <strong>Status:</strong> {{ selectedUser.is_active ? 'Active' : 'Inactive' }}
+                        <h5 class="mb-0 fw-bold">{{ selectedUser.full_name }}</h5>
+                        <p class="text-muted mb-2">{{ selectedUser.email }}</p>
+                        <div class="d-flex flex-column small gap-1">
+                            <span><strong class="text-muted">Identifiant:</strong> {{ selectedUser.username }}</span>
+                            <span><strong class="text-muted">ID Système:</strong> #{{ selectedUser.id }}</span>
+                            <div class="mt-2 d-flex flex-wrap gap-1">
+                                <span *ngFor="let r of selectedUser.roles" class="badge" [ngClass]="getRoleBadgeClass(r)">
+                                    {{ r }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-5">
-                    <h6 class="small fw-bold text-muted">Role Permissions</h6>
-                    <div class="d-flex flex-wrap">
-                        <span class="permission-badge" *ngFor="let perm of selectedUser.role_permissions || []; trackBy: trackByPermission">
-                            {{ perm.codename || perm.name }}
-                        </span>
-                        <span *ngIf="!selectedUser.role_permissions?.length" class="text-muted small">Aucune permission definie</span>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <h6 class="small fw-bold text-muted">Custom Permissions</h6>
-                    <div class="d-flex flex-wrap">
-                        <span class="permission-badge" *ngFor="let perm of selectedUser.direct_permissions || []; trackBy: trackByPermission">
-                            {{ perm.codename || perm.name }}
-                        </span>
-                        <span *ngIf="!selectedUser.direct_permissions?.length" class="text-muted small">Aucune permission directe</span>
-                    </div>
+            </div>
+            <div class="col-md-8">
+                <div class="detail-title">Résumé de l'Accès</div>
+                <p class="text-muted small mt-2">Cet utilisateur dispose des accès définis par ses rôles assignés ci-contre. Pour modifier ses permissions, veuillez ajuster la configuration des rôles correspondants dans le module "Gestion des Rôles".</p>
+                <div class="alert alert-light-primary mt-3 border-0">
+                    <i class="bx bx-info-circle mr-50"></i> Les permissions sont désormais gérées exclusivement au niveau des rôles pour plus de simplicité.
                 </div>
             </div>
         </div>

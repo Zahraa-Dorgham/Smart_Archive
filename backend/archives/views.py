@@ -414,3 +414,56 @@ class BordereauViewSet(viewsets.ModelViewSet):
     queryset = Bordereau.objects.all()
     serializer_class = BordereauSerializer
     permission_classes = [EstArchiviste]
+
+# ========== DASHBOARD STATS ==========
+from django.db.models import Count
+
+class DashboardStatsView(viewsets.ViewSet):
+    permission_classes = [EstLectureAutorisee]
+
+    def list(self, request):
+        # 1. Total users
+        total_users = User.objects.count()
+        active_users = User.objects.filter(is_active=True).count()
+
+        # 2. Stats per Batiment
+        batiment_stats = []
+        batiments = Batiment.objects.all()
+
+        for bat in batiments:
+            # We need to count dossiers/documents linked to this batiment
+            # Path: Batiment -> Salle -> Armoire -> Boitier -> Dossier -> Document
+            # Also Boitier -> Dossier
+            
+            # Count boitiers in this batiment
+            boitier_count = Boitier.objects.filter(armoire__salle__batiment=bat).count()
+            
+            # Count dossiers in this batiment
+            dossier_count = Dossier.objects.filter(boitier__armoire__salle__batiment=bat).count()
+            
+            # Count documents in this batiment
+            document_count = Document.objects.filter(dossier__boitier__armoire__salle__batiment=bat).count()
+
+            batiment_stats.append({
+                'id': bat.id,
+                'nom': bat.nom,
+                'code': bat.code,
+                'boitiers': boitier_count,
+                'dossiers': dossier_count,
+                'documents': document_count
+            })
+
+        # 3. Global totals
+        global_stats = {
+            'total_documents': Document.objects.count(),
+            'total_dossiers': Dossier.objects.count(),
+            'total_boitiers': Boitier.objects.count(),
+            'total_batiments': batiments.count(),
+            'total_users': total_users,
+            'active_users': active_users
+        }
+
+        return Response({
+            'global': global_stats,
+            'batiments': batiment_stats
+        })

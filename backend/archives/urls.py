@@ -23,6 +23,7 @@ router.register(r'consultations', views.ConsultationViewSet)
 router.register(r'transferts', views.TransfertViewSet)
 router.register(r'bordereaux', views.BordereauViewSet)
 router.register(r'users', views.UserViewSet)
+router.register(r'stats', views.DashboardStatsView, basename='stats')
 
 
 urlpatterns = [

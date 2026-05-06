@@ -13,8 +13,8 @@
                         <a class="dropdown-toggle nav-link dropdown-user-link" href="javascript:void(0)" data-toggle="dropdown">
                             <div class="user-nav d-sm-flex d-none flex-column text-right">
                                 <span class="user-status text-muted">{{ userRoles || '—' }}</span>
-                                <span class="user-name font-weight-bold">{{ userName }}</span>
-                                <span *ngIf="loginDate" class="user-login-date text-muted small">{{ loginDate | date:'short' }}</span>
+                                <!-- <span class="user-name font-weight-bold">{{ userName }}</span> -->
+                                <span *ngIf="loginDate" class="user-login-date text-muted small">{{ loginDate | date:'dd MMM, HH:mm' }}</span>
                             </div>
                             <span>
                                 <div class="avatar bg-rgba-secondary m-0 p-25">

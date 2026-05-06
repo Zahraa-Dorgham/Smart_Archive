@@ -174,3 +174,13 @@
     padding: 1rem;
     font-size: 1.1rem;
 }
+
+
+
+small,
+.small {
+    font-size: 80%;
+    font-weight: 400;
+    position: relative;
+    left: 16px;
+}

@@ -28,7 +28,7 @@
                 <i class="bx bx-folder"></i>
                 <div class="tree-content">
                     <div class="tree-title">
-                        Dossier {{ dossier.idDossier }}{{ dossier.nomDos ? ' - ' + dossier.nomDos : '' }}
+                    {{ dossier.nomDos}}
                     </div>
                     <small class="text-danger">{{ data.date_field }}: {{ getDateValue(dossier) }}</small>
                 </div>
@@ -40,7 +40,7 @@
                     <i class="bx bx-file"></i>
                     <div class="tree-content">
                         <div class="tree-title">
-                            {{ document.reference || document.idDoc }} - {{ document.titre }}
+                            {{ document.idDoc }} - {{ document.titre }}
                         </div>
                         <small class="text-danger">{{ data.date_field }}: {{ getDateValue(document) }}</small>
                     </div>

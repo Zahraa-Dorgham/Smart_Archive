@@ -1,14 +1,80 @@
-.dashboard-header h2 {
-    font-weight: 700;
+.dashboard-content {
+    padding: 0.5rem;
 }
-.stat-card {
-    border-radius: 0.5rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+
+.dashboard-header-modern h2 {
+    color: #475f7b;
+    letter-spacing: -0.5px;
 }
-.stat-number {
-    color: #5a8dee;
+
+.kpi-card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
 }
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Light Backgrounds */
+.bg-light-primary { background-color: #e2ecff !important; color: #5a8dee !important; }
+.bg-light-warning { background-color: #fff3e0 !important; color: #fdac41 !important; }
+.bg-light-success { background-color: #e2f8f0 !important; color: #39da8a !important; }
+.bg-light-danger { background-color: #ffeded !important; color: #ff5b5c !important; }
+
+/* Badges */
+.badge-light-primary { background-color: #e2ecff; color: #5a8dee; }
+.badge-light-success { background-color: #e2f8f0; color: #39da8a; }
+
+.meta-divider {
+    width: 1px;
+    height: 30px;
+    background-color: #dfe3e7;
+}
+
+.gap-3 { gap: 1rem; }
+
+.card-header {
+    border-bottom: 1px solid #f2f4f4 !important;
+}
+
+.table thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #828d99;
+}
+
+.table td {
+    vertical-align: middle;
+    color: #475f7b;
+    border-top: 1px solid #f2f4f4;
+}
+
+.font-large-1 { font-size: 1.5rem !important; }
+.font-small-3 { font-size: 0.9rem !important; }
+
 @media (max-width: 768px) {
-    .dashboard-header { flex-direction: column; align-items: flex-start; }
-    .text-right { text-align: left !important; margin-top: 0.5rem; }
+    .meta-divider { display: none; }
+    .header-meta { width: 100%; justify-content: space-between; }
+}
+
+.animate__fadeIn {
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }

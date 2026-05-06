@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
@@ -84,6 +84,7 @@ export class ShowDossierComponent implements OnInit {
   displayedColumns: string[] = ['idDossier', 'nomDos', 'calendrier', 'phase', 'boitier', 'date_creation', 'nb_docs', 'actions'];
   filterForm: FormGroup;
   phases: PhaseArchive[] = [];
+  boitierFilter: string | null = null;
 
   constructor(
     private dossierService: DossierService,
@@ -91,7 +92,9 @@ export class ShowDossierComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.filterForm = this.fb.group({
       search: [''],
@@ -102,7 +105,10 @@ export class ShowDossierComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPhases();
-    this.loadDossiers();
+    this.route.queryParams.subscribe(params => {
+      this.boitierFilter = params['boitier'] || null;
+      this.loadDossiers();
+    });
     this.filterForm.valueChanges.subscribe(() => this.applyFilter());
   }
 
@@ -117,7 +123,11 @@ export class ShowDossierComponent implements OnInit {
 
   loadDossiers(): void {
     this.loadingService.show();
-    this.dossierService.getDossiers({ page_size: 1000 }).subscribe({
+    const params: any = { page_size: 1000 };
+    if (this.boitierFilter) {
+      params.boitier = this.boitierFilter;
+    }
+    this.dossierService.getDossiers(params).subscribe({
       next: (response: PaginatedResponse<Dossier>) => {
         this.dataSource.data = response.results;
         this.loadingService.hide();
@@ -246,6 +256,12 @@ export class ShowDossierComponent implements OnInit {
           }
         });
       }
+    });
+  }
+
+  viewDocuments(dossier: Dossier): void {
+    this.router.navigate(['/archiviste/documents'], {
+      queryParams: { dossier: dossier.idDossier }
     });
   }
 }

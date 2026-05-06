@@ -15,7 +15,7 @@
             <div class="col-md-12 mb-1">
                 <label class="form-label">Nom du dossier <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-folder"></i>
+                    <i class="bx bx-folder-open"></i>
                     <input type="text" class="form-control" formControlName="nomDos" placeholder="Ex: Dossier RH 2026">
                 </div>
             </div>
@@ -24,71 +24,72 @@
         <div class="section-title">Classification</div>
         <div class="row">
             <div class="col-md-4 mb-1">
-                <label class="form-label">Boitier</label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <mat-select formControlName="boitier">
-                        <mat-option [value]="null">Aucun</mat-option>
-                        <mat-option *ngFor="let b of boitiers" [value]="b.id.toString()">{{ b.idboit }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <label class="form-label">Boîtier</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-box"></i>
+                    <select class="form-control" formControlName="boitier">
+                        <option [value]="null">Aucun boîtier</option>
+                        <option *ngFor="let b of boitiers" [value]="b.id.toString()">{{ b.idboit }}</option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-md-4 mb-1">
                 <label class="form-label">Calendrier</label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <mat-select formControlName="calendrier">
-                        <mat-option [value]="null">Aucun</mat-option>
-                        <mat-option *ngFor="let c of calendriers" [value]="c.id.toString()">
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-calendar-event"></i>
+                    <select class="form-control" formControlName="calendrier">
+                        <option [value]="null">Aucun calendrier</option>
+                        <option *ngFor="let c of calendriers" [value]="c.id.toString()">
                             {{ c.code }} - {{ c.title }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-md-4 mb-1">
                 <label class="form-label">Phase</label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <mat-select formControlName="phaseArchive">
-                        <mat-option [value]="null">Aucune</mat-option>
-                        <mat-option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-git-commit"></i>
+                    <select class="form-control" formControlName="phaseArchive">
+                        <option [value]="null">Aucune phase</option>
+                        <option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <div class="section-title">Dates</div>
+        <div class="section-title">Période de l'Affaire</div>
         <div class="row">
             <div class="col-md-6 mb-1">
-                <label class="form-label">Date creation <span class="text-danger">*</span></label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <input matInput [matDatepicker]="picker" formControlName="date_creation">
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
+                <label class="form-label">Date création <span class="text-danger">*</span></label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-calendar"></i>
+                    <input type="date" class="form-control" formControlName="date_creation">
+                </div>
             </div>
 
             <div class="col-md-6 mb-1">
-                <label class="form-label">Date Fin</label>
-                <mat-form-field appearance="outline" class="form-field-style w-100">
-                    <input matInput [matDatepicker]="picker2" formControlName="date_cloture">
-                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                    <mat-datepicker #picker2></mat-datepicker>
-                </mat-form-field>
+                <label class="form-label">Date Clôture</label>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-calendar-check"></i>
+                    <input type="date" class="form-control" formControlName="date_cloture">
+                </div>
             </div>
         </div>
 
-        <div class="section-title">Gestion de Conservation</div>
+        <div class="section-title">Gestion de Conservation (ans)</div>
         <div class="row">
             <div class="col-md-4 mb-1">
-                <label class="form-label">Conservation active (ans)</label>
+                <label class="form-label">Durée Courante</label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-time"></i>
+                    <i class="bx bx-time-five"></i>
                     <input type="number" class="form-control" formControlName="conservation_active_period" placeholder="0">
                 </div>
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Conservation semi-active (ans)</label>
+                <label class="form-label">Durée Intermédiaire</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time"></i>
                     <input type="number" class="form-control" formControlName="conservation_semi_active_period" placeholder="0">
@@ -96,9 +97,9 @@
             </div>
 
             <div class="col-md-4 mb-1">
-                <label class="form-label">Delai securite (ans)</label>
+                <label class="form-label">Délai sécurité</label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-shield"></i>
+                    <i class="bx bx-shield-quarter"></i>
                     <input type="number" class="form-control" formControlName="sort_final_security_years" placeholder="0">
                 </div>
             </div>
@@ -108,22 +109,26 @@
             <div class="col-md-6 mb-1">
                 <label class="form-label">Sort final</label>
                 <div class="icon-input-wrapper">
-                    <i class="bx bx-trash"></i>
+                    <i class="bx bx-export"></i>
                     <input type="text" class="form-control" formControlName="sort_final_type" placeholder="ex: Destruction">
                 </div>
             </div>
 
             <div class="col-md-6 mb-1">
                 <label class="form-label">Commentaire sort final</label>
-                <textarea class="form-control" formControlName="sort_final_comment" rows="2" placeholder="Commentaires..."></textarea>
+                <div class="icon-input-wrapper">
+                    <i class="bx bx-comment-detail"></i>
+                    <textarea class="form-control" formControlName="sort_final_comment" rows="2" style="padding-left: 38px;" placeholder="Commentaires..."></textarea>
+                </div>
             </div>
         </div>
     </mat-dialog-content>
 
     <div class="dialog-actions">
-        <button class="btn btn-light-secondary" type="button" mat-dialog-close>Annuler</button>
-        <button class="btn btn-primary glow shadow-sm" type="submit" [disabled]="form.invalid">
-            {{ isEditMode ? 'Enregistrer' : 'Creer' }}
+        <button class="btn btn-light-secondary px-3" type="button" mat-dialog-close>Annuler</button>
+        <button class="btn btn-primary glow px-4 shadow-sm" type="submit" [disabled]="form.invalid">
+            <i class="bx" [ngClass]="isEditMode ? 'bx-save' : 'bx-check-circle'"></i>
+            {{ isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
     </div>
 </form>
