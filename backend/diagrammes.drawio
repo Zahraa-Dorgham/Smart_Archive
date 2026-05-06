@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Django ERD">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+```
+    <!-- Batiment -->
+    <mxCell id="batiment" value="Batiment&#xa;- nom&#xa;- code&#xa;- adresse&#xa;- ville" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="40" width="200" height="120" as="geometry"/>
+    </mxCell>
+
+    <!-- Salle -->
+    <mxCell id="salle" value="Salle&#xa;- nom&#xa;- code&#xa;- etage&#xa;- batiment_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="300" y="40" width="220" height="120" as="geometry"/>
+    </mxCell>
+
+    <!-- Armoire -->
+    <mxCell id="armoire" value="Armoire&#xa;- code&#xa;- salle_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="560" y="40" width="200" height="100" as="geometry"/>
+    </mxCell>
+
+    <!-- Etagere -->
+    <mxCell id="etagere" value="Etagere&#xa;- numero&#xa;- armoire_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="800" y="40" width="200" height="100" as="geometry"/>
+    </mxCell>
+
+    <!-- Boitier -->
+    <mxCell id="boitier" value="Boitier&#xa;- idboit&#xa;- armoire_id (FK)&#xa;- etagere_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="560" y="200" width="220" height="120" as="geometry"/>
+    </mxCell>
+
+    <!-- Dossier -->
+    <mxCell id="dossier" value="Dossier&#xa;- idDossier&#xa;- boitier_id (FK)&#xa;- calendrier_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="300" y="220" width="240" height="140" as="geometry"/>
+    </mxCell>
+
+    <!-- Document -->
+    <mxCell id="document" value="Document&#xa;- idDoc&#xa;- dossier_id (FK)&#xa;- calendrier_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="220" width="240" height="140" as="geometry"/>
+    </mxCell>
+
+    <!-- Calendrier -->
+    <mxCell id="calendrier" value="Calendrier&#xa;- id&#xa;- parent_id (self FK)&#xa;- direction_id (FK)" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="420" width="240" height="140" as="geometry"/>
+    </mxCell>
+
+    <!-- Direction -->
+    <mxCell id="direction" value="Direction&#xa;- code&#xa;- nom" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="300" y="420" width="200" height="100" as="geometry"/>
+    </mxCell>
+
+    <!-- Transfert -->
+    <mxCell id="transfert" value="Transfert&#xa;- typeTransfer&#xa;- date_demande" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="560" y="420" width="200" height="100" as="geometry"/>
+    </mxCell>
+
+    <!-- Relations -->
+    <mxCell id="rel1" style="endArrow=block;" edge="1" parent="1" source="batiment" target="salle"/>
+    <mxCell id="rel2" style="endArrow=block;" edge="1" parent="1" source="salle" target="armoire"/>
+    <mxCell id="rel3" style="endArrow=block;" edge="1" parent="1" source="armoire" target="etagere"/>
+    <mxCell id="rel4" style="endArrow=block;" edge="1" parent="1" source="etagere" target="boitier"/>
+    <mxCell id="rel5" style="endArrow=block;" edge="1" parent="1" source="boitier" target="dossier"/>
+    <mxCell id="rel6" style="endArrow=block;" edge="1" parent="1" source="dossier" target="document"/>
+    <mxCell id="rel7" style="endArrow=block;" edge="1" parent="1" source="calendrier" target="dossier"/>
+    <mxCell id="rel8" style="endArrow=block;" edge="1" parent="1" source="calendrier" target="document"/>
+    <mxCell id="rel9" style="endArrow=block;" edge="1" parent="1" source="direction" target="calendrier"/>
+    <mxCell id="rel10" style="endArrow=block;" edge="1" parent="1" source="transfert" target="boitier"/>
+
+  </root>
+</mxGraphModel>
+```
+
+  </diagram>
+</mxfile>

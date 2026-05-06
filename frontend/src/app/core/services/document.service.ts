@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { Document, DocumentCreate, DocumentUpdate } from '../models/document.model';
+import { Document, DocumentCreate, DocumentUpdate, ExtractedDocumentMetadata } from '../models/document.model';
 import { PaginatedResponse } from '../models/base.model';
 
 @Injectable({
@@ -87,6 +87,13 @@ export class DocumentService {
         if (fichier) formData.append('fichier', fichier);
 
         return this.api.put<Document>(`${this.endpoint}${id}/`, formData);
+    }
+
+    extractDocumentMetadata(dossierId: string, fichier: File): Observable<ExtractedDocumentMetadata> {
+        const formData = new FormData();
+        formData.append('dossier', dossierId);
+        formData.append('file', fichier);
+        return this.api.post<ExtractedDocumentMetadata>(`${this.endpoint}extract-metadata/`, formData);
     }
 
     deleteDocument(id: string): Observable<void> {

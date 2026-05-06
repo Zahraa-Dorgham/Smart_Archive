@@ -3,6 +3,7 @@
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Q
@@ -30,6 +31,7 @@ from .serializers import (
 from .permissions import (
     EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable
 )
+from .gemini_service import GeminiDocumentExtractionError, GeminiDocumentExtractionService
 
 User = get_user_model()
 
@@ -260,6 +262,34 @@ class DocumentViewSet(viewsets.ModelViewSet):
             logger = logging.getLogger(__name__)
             logger.exception(f"Error creating document: {str(e)}")
             return Response({'error': str(e), 'type': type(e).__name__}, status=400)
+
+    @action(detail=False, methods=['post'], parser_classes=[MultiPartParser, FormParser], url_path='extract-metadata')
+    def extract_metadata(self, request):
+        dossier_id = request.data.get('dossier')
+        uploaded_file = request.FILES.get('file')
+
+        if not dossier_id:
+            return Response({'error': 'Le dossier est obligatoire pour analyser un fichier.'}, status=400)
+
+        if not uploaded_file:
+            return Response({'error': 'Aucun fichier a analyser n a ete envoye.'}, status=400)
+
+        try:
+            dossier = Dossier.objects.select_related('calendrier').get(idDossier=dossier_id)
+        except Dossier.DoesNotExist:
+            return Response({'error': 'Dossier introuvable.'}, status=404)
+
+        try:
+            extraction_service = GeminiDocumentExtractionService()
+            extracted = extraction_service.extract_document_metadata(uploaded_file, dossier)
+            return Response(extracted)
+        except GeminiDocumentExtractionError as exc:
+            return Response({'error': str(exc)}, status=400)
+        except Exception as exc:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.exception(f"Error extracting document metadata: {str(exc)}")
+            return Response({'error': 'Erreur pendant l analyse du fichier.', 'type': type(exc).__name__}, status=500)
 
     @action(detail=True, methods=['post'])
     def changer_phase(self, request, pk=None):

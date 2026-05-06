@@ -421,11 +421,9 @@ class Consultation(models.Model):
 
 # ========== TRANSFERT ==========
 class Transfert(models.Model):
-    TYPE_TRANSFER_CHOICES = [('INTERMEDIAIRE', 'Intermediaire'), ('FINAL', 'Final')]
-
     reference = models.CharField(max_length=100, unique=False, null=True, blank=True)  # nullable
     bordereauxReference = models.CharField(max_length=100, blank=True)
-    typeTransfer = models.CharField(max_length=50, choices=TYPE_TRANSFER_CHOICES, default='INTERMEDIAIRE')
+    typeTransfer = models.CharField(max_length=50, default='INTERNE')  # ← AJOUTER default
     date_demande = models.DateTimeField(default=timezone.now)
     date_execution = models.DateTimeField(null=True, blank=True)
     statut = models.CharField(max_length=20, default='EN_ATTENTE')
@@ -459,4 +457,3 @@ class Bordereau(models.Model):
 
     def __str__(self):
         return f"Bordereau {self.idBordereau}"
-

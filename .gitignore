@@ -8,3 +8,4 @@ backend/runserver.out.log
 backend/runserver.err.log
 frontend/ng-serve.out.log
 frontend/ng-serve.err.log
+backend/myapp/local_settings.py

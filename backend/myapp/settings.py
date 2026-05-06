@@ -197,3 +197,8 @@ STATIC_ROOT = Path(BASE_DIR) / 'staticfiles'
 FRONTEND_BUILD_PATH = Path(BASE_DIR).parent / 'frontend' / 'dist' / 'frontend' / 'browser'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

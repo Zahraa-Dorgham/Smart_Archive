@@ -15,7 +15,7 @@ import { DocumentService } from '../../core/services/document.service';
 import { DossierService } from '../../core/services/dossier.service';
 import { PhaseArchiveService } from '../../core/services/phase-archive.service';
 import { CalendrierService } from '../../core/services/calendrier.service';
-import { Document } from '../../core/models/document.model';
+import { Document, ExtractedDocumentMetadata } from '../../core/models/document.model';
 import { Dossier } from '../../core/models/dossier.model';
 import { PaginatedResponse } from '../../core/models/base.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
@@ -52,6 +52,8 @@ export class AddEditDocumentComponent implements OnInit {
   calendriers: Calendrier[] = [];
   filteredCalendriers: Calendrier[] = [];
   selectedFile: File | null = null;
+  isAnalyzingFile = false;
+  extractionWarnings: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -147,6 +149,37 @@ export class AddEditDocumentComponent implements OnInit {
 
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
+    this.extractionWarnings = [];
+  }
+
+  analyzeSelectedFile(): void {
+    const dossierId = this.form.get('dossier')?.value;
+
+    if (!dossierId) {
+      this.snackBar.open('Selectionnez d abord un dossier.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
+    if (!this.selectedFile) {
+      this.snackBar.open('Ajoutez d abord un fichier a analyser.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
+    this.isAnalyzingFile = true;
+    this.extractionWarnings = [];
+
+    this.documentService.extractDocumentMetadata(String(dossierId), this.selectedFile).subscribe({
+      next: (result) => {
+        this.applyExtractedMetadata(result);
+        this.isAnalyzingFile = false;
+        this.snackBar.open('Champs remplis a partir du fichier.', 'Fermer', { duration: 3000 });
+      },
+      error: (error) => {
+        const message = error?.error?.error || 'Erreur pendant l analyse du fichier';
+        this.isAnalyzingFile = false;
+        this.snackBar.open(message, 'Fermer', { duration: 4000 });
+      }
+    });
   }
 
   onDossierChange(dossierId: string | null): void {
@@ -192,6 +225,22 @@ export class AddEditDocumentComponent implements OnInit {
 
     this.onDossierChange(dossierValue != null ? String(dossierValue) : null);
     this.onCalendrierChange(calendrierValue != null ? String(calendrierValue) : null);
+  }
+
+  private applyExtractedMetadata(result: ExtractedDocumentMetadata): void {
+    const nextValues: Record<string, string | null> = {
+      titre: result.titre,
+      calendrier: result.calendrier,
+      niv_confidentialite: result.niv_confidentialite,
+      description: result.description,
+      phase_archive: result.phase_archive,
+    };
+
+    this.form.patchValue(nextValues, { emitEvent: false });
+    this.extractionWarnings = result.warnings || [];
+
+    this.onDossierChange(this.form.get('dossier')?.value ?? null);
+    this.onCalendrierChange(result.calendrier);
   }
 
   private getAllowedCalendrierIds(dossier?: Dossier): Set<string> {

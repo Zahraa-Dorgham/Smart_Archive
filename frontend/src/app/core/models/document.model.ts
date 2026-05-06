@@ -51,3 +51,13 @@ export interface DocumentCreate {
 export interface DocumentUpdate extends Partial<DocumentCreate> {
     id: string;
 }
+
+export interface ExtractedDocumentMetadata {
+    titre: string | null;
+    dossier: string;
+    calendrier: string | null;
+    niv_confidentialite: string;
+    description: string | null;
+    phase_archive: string;
+    warnings: string[];
+}
