@@ -45,7 +45,8 @@ export class AddEditTransfertComponent implements OnInit {
   boitiers: Boitier[] = [];
 
   readonly typeOptions = ['INTERMEDIAIRE', 'FINAL'];
-  readonly statusOptions = ['EN_ATTENTE', 'VALIDE', 'ANNULE', 'EXECUTE'];
+  statusOptions = ['EN_ATTENTE', 'VALIDE', 'ANNULE'];
+  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -58,24 +59,32 @@ export class AddEditTransfertComponent implements OnInit {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
       reference: [''],
-      bordereauxReference: [''],
       typeTransfer: ['INTERMEDIAIRE', Validators.required],
       statut: ['EN_ATTENTE', Validators.required],
-      date_demande: [new Date(), Validators.required],
-      date_execution: [null],
+      date_demande: [this.formatDate(new Date()), Validators.required],
+      date_execution: [''],
       boitier_ids: [[], Validators.required]
     });
+  }
+
+  private formatDate(date: Date | string | null | undefined): string {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    const month = '' + (d.getMonth() + 1);
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+    return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
   }
 
   ngOnInit(): void {
     if (this.isEditMode && this.data.transfert) {
       this.form.patchValue({
         reference: this.data.transfert.reference ?? '',
-        bordereauxReference: this.data.transfert.bordereauxReference ?? '',
         typeTransfer: this.data.transfert.typeTransfer ?? 'INTERMEDIAIRE',
         statut: this.data.transfert.statut ?? 'EN_ATTENTE',
-        date_demande: this.data.transfert.date_demande ? new Date(this.data.transfert.date_demande) : new Date(),
-        date_execution: this.data.transfert.date_execution ? new Date(this.data.transfert.date_execution) : null,
+        date_demande: this.formatDate(this.data.transfert.date_demande),
+        date_execution: this.formatDate(this.data.transfert.date_execution),
         boitier_ids: (this.data.transfert.boitier_ids ?? []).map(id => String(id))
       });
     }
@@ -85,6 +94,26 @@ export class AddEditTransfertComponent implements OnInit {
     });
 
     this.loadBoitiers();
+  }
+
+  get filteredBoitiers(): Boitier[] {
+    if (!this.searchTerm) return this.boitiers;
+    const term = this.searchTerm.toLowerCase();
+    return this.boitiers.filter(b =>
+      b.idboit.toLowerCase().includes(term) ||
+      b.titre.toLowerCase().includes(term)
+    );
+  }
+
+  getSelectedBoitiers(): Boitier[] {
+    const selectedIds = new Set(this.form.get('boitier_ids')?.value || []);
+    return this.boitiers.filter(b => selectedIds.has(String(b.id)));
+  }
+
+  removeBoitier(id: number | string): void {
+    const current = this.form.get('boitier_ids')?.value as string[];
+    const updated = current.filter(item => item !== String(id));
+    this.form.patchValue({ boitier_ids: updated });
   }
 
   loadBoitiers(): void {

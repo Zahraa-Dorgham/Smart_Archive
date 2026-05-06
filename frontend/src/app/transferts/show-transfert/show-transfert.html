@@ -20,7 +20,7 @@
             <div class="col-12 col-lg-4 d-flex align-items-center mb-1 mb-lg-0">
                 <div [formGroup]="filterForm" class="w-100">
                     <fieldset class="form-group position-relative has-icon-left mb-0">
-                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (reference, bordereau, boitier)...">
+                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (reference, boitier)...">
                         <div class="form-control-position">
                             <i class="bx bx-search"></i>
                         </div>
@@ -44,7 +44,7 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th class="py-2">Reference</th>
-                                    <th class="py-2">Bordereau</th>
+                                    <!-- <th class="py-2">Bordereau</th> -->
                                     <th class="py-2">Type</th>
                                     <th class="py-2">Boitiers</th>
                                     <th class="py-2">Date demande</th>
@@ -57,10 +57,10 @@
                                     <td class="py-2">
                                         <span class="badge badge-light-info text-uppercase font-weight-bold">{{ t.reference || ('TR-' + t.id) }}</span>
                                     </td>
-                                    <td class="py-2">
+                                    <!-- <td class="py-2">
                                         <h6 class="mb-0 font-weight-bold">{{ t.bordereauxReference || '-' }}</h6>
                                         <small class="text-muted">{{ t.typeTransfer }}</small>
-                                    </td>
+                                    </td> -->
                                     <td class="py-2">
                                         <small class="text-muted">{{ t.typeTransfer }}</small>
                                     </td>
@@ -74,7 +74,7 @@
                                         <span [class]="getStatusBadgeClass(t.statut)">{{ t.statut }}</span>
                                     </td>
                                     <td class="py-2 text-right px-2">
-                                        <button class="btn btn-sm btn-icon btn-light-success mr-1" (click)="validateTransfert(t)" title="Valider" [disabled]="t.statut === 'VALIDE'">
+                                        <button class="btn btn-sm btn-icon btn-success glow-success mr-1" (click)="validateTransfert(t)" title="Valider" [disabled]="t.statut === 'VALIDE'">
                                             <i class="bx bx-check"></i>
                                         </button>
                                         <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(t)" title="Modifier">

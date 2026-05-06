@@ -10,7 +10,7 @@
     <p class="summary-subtext">
         Champ controle: <strong>{{ data.date_field }}</strong>
         <span class="mx-50">|</span>
-        Date de reference: <strong>{{ data.today | date:'shortDate' }}</strong>
+        Date: <strong>{{ data.today | date:'dd-MM-yyyy' }}</strong>
     </p>
 
     <div class="tree-wrapper" *ngFor="let boitier of data.boitiers">
