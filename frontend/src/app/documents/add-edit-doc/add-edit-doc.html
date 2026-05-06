@@ -165,10 +165,10 @@
                 </div>
                 <div class="mt-1 d-flex gap-1 align-items-center">
                     <button class="btn btn-outline-primary btn-sm" type="button" (click)="analyzeSelectedFile()"
-                        [disabled]="!selectedFile || !form.get('dossier')?.value || isAnalyzingFile">
+                        [disabled]="!selectedFile || isAnalyzingFile">
                         {{ isAnalyzingFile ? 'Analyse en cours...' : 'Analyser avec Gemini' }}
                     </button>
-                    <small class="text-muted">Le dossier doit etre choisi avant l analyse.</small>
+                    <small class="text-muted">Gemini peut choisir un dossier disponible ou utiliser celui deja selectionne.</small>
                 </div>
                 <div *ngIf="extractionWarnings.length" class="alert alert-warning mt-1 mb-0">
                     <div *ngFor="let warning of extractionWarnings">{{ warning }}</div>

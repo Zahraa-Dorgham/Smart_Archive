@@ -155,11 +155,6 @@ export class AddEditDocumentComponent implements OnInit {
   analyzeSelectedFile(): void {
     const dossierId = this.form.get('dossier')?.value;
 
-    if (!dossierId) {
-      this.snackBar.open('Selectionnez d abord un dossier.', 'Fermer', { duration: 3000 });
-      return;
-    }
-
     if (!this.selectedFile) {
       this.snackBar.open('Ajoutez d abord un fichier a analyser.', 'Fermer', { duration: 3000 });
       return;
@@ -168,7 +163,16 @@ export class AddEditDocumentComponent implements OnInit {
     this.isAnalyzingFile = true;
     this.extractionWarnings = [];
 
-    this.documentService.extractDocumentMetadata(String(dossierId), this.selectedFile).subscribe({
+    const dossierOptions = this.dossiers.map(item => ({
+      idDossier: item.idDossier,
+      nomDos: item.nomDos ?? null,
+    }));
+
+    this.documentService.extractDocumentMetadata(
+      dossierId ? String(dossierId) : null,
+      this.selectedFile,
+      dossierOptions
+    ).subscribe({
       next: (result) => {
         this.applyExtractedMetadata(result);
         this.isAnalyzingFile = false;
@@ -230,8 +234,11 @@ export class AddEditDocumentComponent implements OnInit {
   private applyExtractedMetadata(result: ExtractedDocumentMetadata): void {
     const nextValues: Record<string, string | null> = {
       titre: result.titre,
+      dossier: result.dossier,
       calendrier: result.calendrier,
       niv_confidentialite: result.niv_confidentialite,
+      auteur: result.auteur,
+      date_creation: result.date_creation,
       description: result.description,
       phase_archive: result.phase_archive,
     };
@@ -239,7 +246,7 @@ export class AddEditDocumentComponent implements OnInit {
     this.form.patchValue(nextValues, { emitEvent: false });
     this.extractionWarnings = result.warnings || [];
 
-    this.onDossierChange(this.form.get('dossier')?.value ?? null);
+    this.onDossierChange(result.dossier);
     this.onCalendrierChange(result.calendrier);
   }
 

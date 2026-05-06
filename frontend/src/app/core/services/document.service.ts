@@ -89,9 +89,16 @@ export class DocumentService {
         return this.api.put<Document>(`${this.endpoint}${id}/`, formData);
     }
 
-    extractDocumentMetadata(dossierId: string, fichier: File): Observable<ExtractedDocumentMetadata> {
+    extractDocumentMetadata(
+        dossierId: string | null,
+        fichier: File,
+        dossiers: Array<{ idDossier: string | number; nomDos?: string | null }>
+    ): Observable<ExtractedDocumentMetadata> {
         const formData = new FormData();
-        formData.append('dossier', dossierId);
+        if (dossierId) {
+            formData.append('dossier', dossierId);
+        }
+        formData.append('dossiers', JSON.stringify(dossiers));
         formData.append('file', fichier);
         return this.api.post<ExtractedDocumentMetadata>(`${this.endpoint}extract-metadata/`, formData);
     }

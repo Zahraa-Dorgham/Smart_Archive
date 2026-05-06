@@ -1,5 +1,7 @@
 # archives/views.py (version complète)
 
+import json
+
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
@@ -267,21 +269,28 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def extract_metadata(self, request):
         dossier_id = request.data.get('dossier')
         uploaded_file = request.FILES.get('file')
-
-        if not dossier_id:
-            return Response({'error': 'Le dossier est obligatoire pour analyser un fichier.'}, status=400)
+        dossier_options_raw = request.data.get('dossiers')
 
         if not uploaded_file:
             return Response({'error': 'Aucun fichier a analyser n a ete envoye.'}, status=400)
 
-        try:
-            dossier = Dossier.objects.select_related('calendrier').get(idDossier=dossier_id)
-        except Dossier.DoesNotExist:
-            return Response({'error': 'Dossier introuvable.'}, status=404)
+        dossier = None
+        if dossier_id:
+            try:
+                dossier = Dossier.objects.select_related('calendrier').get(idDossier=dossier_id)
+            except Dossier.DoesNotExist:
+                return Response({'error': 'Dossier introuvable.'}, status=404)
+
+        dossier_options = None
+        if dossier_options_raw:
+            try:
+                dossier_options = json.loads(dossier_options_raw)
+            except json.JSONDecodeError:
+                return Response({'error': 'La liste des dossiers envoyee est invalide.'}, status=400)
 
         try:
             extraction_service = GeminiDocumentExtractionService()
-            extracted = extraction_service.extract_document_metadata(uploaded_file, dossier)
+            extracted = extraction_service.extract_document_metadata(uploaded_file, dossier, dossier_options=dossier_options)
             return Response(extracted)
         except GeminiDocumentExtractionError as exc:
             return Response({'error': str(exc)}, status=400)

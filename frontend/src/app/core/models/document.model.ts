@@ -57,6 +57,8 @@ export interface ExtractedDocumentMetadata {
     dossier: string;
     calendrier: string | null;
     niv_confidentialite: string;
+    auteur: string | null;
+    date_creation: string | null;
     description: string | null;
     phase_archive: string;
     warnings: string[];
