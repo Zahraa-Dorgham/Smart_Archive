@@ -57,6 +57,7 @@ export interface DialogData {
   styleUrls: ['./add-edit-dossier.css']
 })
 export class AddEditDossierComponent implements OnInit {
+  readonly defaultPhaseId = '1';
   form: FormGroup;
   isEditMode: boolean;
   boitiers: any[] = [];     // à remplir depuis un service
@@ -80,7 +81,7 @@ export class AddEditDossierComponent implements OnInit {
       nomDos: ['', Validators.required],
       boitier: [null],
       calendrier: [null],
-      phaseArchive: [null],
+      phaseArchive: [{ value: this.defaultPhaseId, disabled: true }],
       phaseType: ['COURANTE'],
       date_creation: [''],
       date_cloture: [null],
@@ -110,6 +111,8 @@ export class AddEditDossierComponent implements OnInit {
 
         if (this.isEditMode && this.data.dossier) {
           this.patchDossierForm(this.data.dossier);
+        } else {
+          this.form.patchValue({ phaseArchive: this.defaultPhaseId }, { emitEvent: false });
         }
 
         this.cdr.detectChanges();
@@ -175,7 +178,7 @@ export class AddEditDossierComponent implements OnInit {
     } else if (dossier.phaseArchive != null) {
       patchValues['phaseArchive'] = String(dossier.phaseArchive);
     } else {
-      patchValues['phaseArchive'] = null;
+      patchValues['phaseArchive'] = this.defaultPhaseId;
     }
 
     this.form.patchValue(patchValues);
@@ -187,7 +190,13 @@ export class AddEditDossierComponent implements OnInit {
       return;
     }
 
-    const formValue = this.form.getRawValue();
+    const rawValue = this.form.getRawValue();
+    const formValue = {
+      ...rawValue,
+      phaseArchive: this.isEditMode
+        ? (rawValue.phaseArchive || this.defaultPhaseId)
+        : this.defaultPhaseId
+    };
 
     if (this.isEditMode && this.data.dossier) {
       this.dossierService.updateDossier(String(this.data.dossier.idDossier), formValue).subscribe({

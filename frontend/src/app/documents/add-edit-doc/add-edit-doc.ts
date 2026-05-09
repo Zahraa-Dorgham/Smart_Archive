@@ -49,6 +49,7 @@ export interface DialogData {
   styleUrls: ['./add-edit-doc.css']
 })
 export class AddEditDocumentComponent implements OnInit {
+  readonly defaultPhaseId = '1';
   form: FormGroup;
   isEditMode: boolean;
   dossiers: Dossier[] = [];
@@ -77,7 +78,7 @@ export class AddEditDocumentComponent implements OnInit {
       titre: ['', Validators.required],
       dossier: ['', Validators.required],
       calendrier: [null],
-      phase_archive: [null],
+      phase_archive: [{ value: this.defaultPhaseId, disabled: true }],
       date_creation: [''],
       niv_confidentialite: ['INTERNE', Validators.required],
       // type_document: ['AUTRE', Validators.required],
@@ -109,6 +110,7 @@ export class AddEditDocumentComponent implements OnInit {
         if (this.isEditMode && this.data.document) {
           this.patchDocumentForm(this.data.document);
         } else {
+          this.form.patchValue({ phase_archive: this.defaultPhaseId }, { emitEvent: false });
           this.onDossierChange(this.form.get('dossier')?.value ?? null);
         }
 
@@ -221,14 +223,14 @@ export class AddEditDocumentComponent implements OnInit {
         : currentDossier;
     const phaseValue =
       currentPhase && typeof currentPhase === 'object'
-        ? currentPhase.id ?? null
-        : currentPhase ?? null;
+        ? currentPhase.id ?? this.defaultPhaseId
+        : currentPhase ?? this.defaultPhaseId;
 
     this.form.patchValue({
       ...doc,
       dossier: dossierValue != null ? String(dossierValue) : null,
       calendrier: calendrierValue != null ? String(calendrierValue) : null,
-      phase_archive: phaseValue != null ? String(phaseValue) : null
+      phase_archive: String(phaseValue)
     }, { emitEvent: false });
 
     this.onDossierChange(dossierValue != null ? String(dossierValue) : null);
@@ -244,7 +246,9 @@ export class AddEditDocumentComponent implements OnInit {
       auteur: result.auteur,
       date_creation: result.date_creation,
       description: result.description,
-      phase_archive: result.phase_archive,
+      phase_archive: this.isEditMode
+        ? (result.phase_archive || this.form.getRawValue().phase_archive || this.defaultPhaseId)
+        : this.defaultPhaseId,
     };
 
     this.form.patchValue(nextValues, { emitEvent: false });
@@ -297,7 +301,13 @@ export class AddEditDocumentComponent implements OnInit {
       return;
     }
 
-    const formValue = this.form.value;
+    const rawValue = this.form.getRawValue();
+    const formValue = {
+      ...rawValue,
+      phase_archive: this.isEditMode
+        ? (rawValue.phase_archive || this.defaultPhaseId)
+        : this.defaultPhaseId
+    };
     if (this.isEditMode && this.data.document) {
       this.documentService.updateDocument(this.data.document.id, formValue, this.selectedFile || undefined).subscribe({
         next: () => {
