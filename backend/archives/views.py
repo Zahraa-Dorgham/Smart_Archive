@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+from django.http import HttpResponse
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth import get_user_model
@@ -34,6 +35,7 @@ from .permissions import (
     EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable
 )
 from .gemini_service import GeminiDocumentExtractionError, GeminiDocumentExtractionService
+from .pdf_utils import SimplePdfDocument
 
 User = get_user_model()
 
@@ -351,7 +353,7 @@ class TransfertViewSet(viewsets.ModelViewSet):
     ordering_fields = ['date_demande', 'date_execution', 'reference']
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'bordereau_pdf']:
             return [EstLectureAutorisee()]
         return [EstResponsable()]
 
@@ -408,6 +410,132 @@ class TransfertViewSet(viewsets.ModelViewSet):
         transfert.save()
         # Logique métier supplémentaire (changement de phase, etc.)
         return Response({'status': 'validé'})
+
+    @action(detail=True, methods=['get'])
+    def bordereau_pdf(self, request, pk=None):
+        transfert = (
+            Transfert.objects.filter(pk=pk)
+            .prefetch_related('transfert_boitiers__boitier__dossiers__documents')
+            .first()
+        )
+
+        if transfert is None:
+            return Response({'error': 'Transfert introuvable.'}, status=404)
+
+        if transfert.statut != 'VALIDE':
+            return Response({'error': 'Le bordereau ne peut etre genere que pour un transfert valide.'}, status=400)
+
+        tree = self._build_bordereau_tree(transfert)
+        pdf_bytes = self._build_bordereau_pdf(transfert, tree)
+        filename = f"bordereau_transfert_{transfert.reference or transfert.id}.pdf"
+
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{filename}"'
+        return response
+
+    def _build_bordereau_tree(self, transfert):
+        tree = []
+
+        for link in (
+            transfert.transfert_boitiers.select_related('boitier')
+            .prefetch_related('boitier__dossiers__documents')
+            .all()
+        ):
+            boitier = link.boitier
+            dossiers = []
+
+            for dossier in boitier.dossiers.all().order_by('idDossier'):
+                dossiers.append({
+                    'idDossier': dossier.idDossier,
+                    'nomDos': dossier.nomDos,
+                    'documents': list(dossier.documents.all().order_by('idDoc')),
+                })
+
+            tree.append({
+                'id': boitier.id,
+                'idboit': boitier.idboit,
+                'titre': boitier.titre,
+                'dossiers': dossiers,
+            })
+
+        return tree
+
+    def _build_bordereau_pdf(self, transfert, tree):
+        page_width = 595
+        page_height = 842
+        margin_left = 40
+        margin_right = 40
+        top_start = 790
+        bottom_limit = 70
+        line_height = 16
+
+        document = SimplePdfDocument(title=f"Bordereau {transfert.reference or transfert.id}")
+        pages = []
+        current_lines = []
+        y = top_start
+
+        def format_dt(value):
+            if not value:
+                return '-'
+            local_value = timezone.localtime(value) if timezone.is_aware(value) else value
+            return local_value.strftime('%d/%m/%Y %H:%M')
+
+        def truncate(value, limit=95):
+            text = (value or '').strip()
+            if len(text) <= limit:
+                return text
+            return text[: limit - 3] + '...'
+
+        def push_page():
+            nonlocal current_lines, y
+            current_lines.append((margin_left, 40, 'Unite responsable'))
+            current_lines.append((page_width - margin_right - 65, 40, 'Archiviste'))
+            pages.append(current_lines)
+            current_lines = []
+            y = top_start
+
+        def add_line(text, x=margin_left):
+            nonlocal y
+            if y < bottom_limit:
+                push_page()
+            current_lines.append((x, y, text))
+            y -= line_height
+
+        add_line('BORDEREAU DE TRANSFERT')
+        y -= 8
+        add_line(f"Reference : {transfert.reference or f'TR-{transfert.id}'}")
+        add_line(f"Type : {transfert.typeTransfer or '-'}")
+        add_line(f"Date demande : {format_dt(transfert.date_demande)}")
+        add_line(f"Date execution : {format_dt(transfert.date_execution)}")
+        y -= 8
+        add_line('Arborescence du contenu')
+        add_line('-' * 72)
+
+        if not tree:
+            add_line('Aucun boitier lie a ce transfert.')
+        else:
+            for boitier in tree:
+                add_line(f"Boitier : {boitier['idboit']} - {truncate(boitier['titre'], 68)}")
+                if not boitier['dossiers']:
+                    add_line('  Aucun dossier lie.')
+                    continue
+
+                for dossier in boitier['dossiers']:
+                    add_line(f"  Dossier : #{dossier['idDossier']} - {truncate(dossier['nomDos'] or 'Sans nom', 63)}")
+                    if not dossier['documents']:
+                        add_line('    Aucun document lie.')
+                        continue
+
+                    for doc in dossier['documents']:
+                        doc_ref = doc.reference or doc.idDoc or str(doc.pk)
+                        add_line(f"    Document : {truncate(f'{doc_ref} - {doc.titre}', 70)}")
+
+        push_page()
+
+        for page_lines in pages:
+            document.add_page(page_lines, page_width=page_width, page_height=page_height)
+
+        return document.render()
 
 # ========== BORDEREAUX ==========
 class BordereauViewSet(viewsets.ModelViewSet):

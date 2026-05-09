@@ -46,6 +46,10 @@ export class TransfertService {
         return this.api.post<{ status: string }>(`${this.endpoint}${id}/valider/`, {});
     }
 
+    downloadBordereauPdf(id: string): Observable<Blob> {
+        return this.api.getBlob(`${this.endpoint}${id}/bordereau_pdf/`);
+    }
+
     private serializePayload(data: TransfertCreate | TransfertUpdate): Record<string, unknown> {
         const payload: Record<string, unknown> = {};
 

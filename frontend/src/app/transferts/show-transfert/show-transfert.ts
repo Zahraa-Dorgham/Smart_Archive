@@ -175,6 +175,24 @@ export class ShowTransfertComponent implements OnInit {
     });
   }
 
+  generateBordereau(transfert: Transfert): void {
+    if (transfert.statut !== 'VALIDE') {
+      this.snackBar.open('Le bordereau est disponible uniquement pour un transfert valide.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
+    this.transfertService.downloadBordereauPdf(String(transfert.id)).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener');
+        window.setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+      },
+      error: () => {
+        this.snackBar.open('Erreur generation bordereau', 'Fermer', { duration: 3000 });
+      }
+    });
+  }
+
   deleteTransfert(transfert: Transfert): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
