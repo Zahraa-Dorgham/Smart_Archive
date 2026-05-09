@@ -145,6 +145,11 @@ export class ShowTransfertComponent implements OnInit {
   }
 
   openEditDialog(transfert: Transfert): void {
+    if (transfert.statut === 'VALIDE') {
+      this.snackBar.open('Ce transfert est valide et ne peut plus etre modifie.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
     const dialogRef = this.dialog.open(AddEditTransfertComponent, {
       width: '700px',
       maxWidth: '95vw',

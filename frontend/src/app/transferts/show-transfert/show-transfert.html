@@ -77,7 +77,7 @@
                                         <button class="btn btn-sm btn-icon btn-success glow-success mr-1" (click)="validateTransfert(t)" title="Valider" [disabled]="t.statut === 'VALIDE'">
                                             <i class="bx bx-check"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(t)" title="Modifier">
+                                        <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(t)" title="Modifier" [disabled]="t.statut === 'VALIDE'">
                                             <i class="bx bx-edit-alt"></i>
                                         </button>
                                         <button class="btn btn-sm btn-icon btn-light-danger" (click)="deleteTransfert(t)" title="Supprimer">
