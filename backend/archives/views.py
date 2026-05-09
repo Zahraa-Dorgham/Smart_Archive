@@ -1,6 +1,8 @@
 # archives/views.py (version complète)
 
 import json
+from io import BytesIO
+from pathlib import Path
 
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -35,7 +37,9 @@ from .permissions import (
     EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable
 )
 from .gemini_service import GeminiDocumentExtractionError, GeminiDocumentExtractionService
-from .pdf_utils import SimplePdfDocument
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
 
 User = get_user_model()
 
@@ -461,81 +465,137 @@ class TransfertViewSet(viewsets.ModelViewSet):
         return tree
 
     def _build_bordereau_pdf(self, transfert, tree):
-        page_width = 595
-        page_height = 842
-        margin_left = 40
-        margin_right = 40
-        top_start = 790
-        bottom_limit = 70
-        line_height = 16
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        page_width, page_height = A4
+        logo_path = Path(__file__).resolve().parent / 'assets' / 'logo-brord.png'
 
-        document = SimplePdfDocument(title=f"Bordereau {transfert.reference or transfert.id}")
-        pages = []
-        current_lines = []
-        y = top_start
+        left_margin = 25 * mm
+        right_margin = 25 * mm
+        table_left = 25 * mm
+        table_bottom = 55 * mm
+        table_width = page_width - (50 * mm)
+        table_height = 95 * mm
+        table_header_height = 8 * mm
+        content_padding = 4 * mm
 
         def format_dt(value):
             if not value:
-                return '-'
+                return ''
             local_value = timezone.localtime(value) if timezone.is_aware(value) else value
             return local_value.strftime('%d/%m/%Y %H:%M')
 
-        def truncate(value, limit=95):
-            text = (value or '').strip()
-            if len(text) <= limit:
-                return text
-            return text[: limit - 3] + '...'
+        def draw_header():
+            pdf.setFont('Helvetica-Bold', 14)
+            pdf.drawString(left_margin, page_height - 32 * mm, "Entreprise Tunisienne d'Activites")
+            pdf.drawString(left_margin, page_height - 44 * mm, 'Petrolieres')
 
-        def push_page():
-            nonlocal current_lines, y
-            current_lines.append((margin_left, 40, 'Unite responsable'))
-            current_lines.append((page_width - margin_right - 65, 40, 'Archiviste'))
-            pages.append(current_lines)
-            current_lines = []
-            y = top_start
+            if logo_path.exists():
+                pdf.drawImage(
+                    str(logo_path),
+                    page_width - right_margin - (22 * mm),
+                    page_height - 36 * mm,
+                    width=18 * mm,
+                    height=18 * mm,
+                    preserveAspectRatio=True,
+                    mask='auto'
+                )
 
-        def add_line(text, x=margin_left):
-            nonlocal y
-            if y < bottom_limit:
-                push_page()
-            current_lines.append((x, y, text))
-            y -= line_height
+            pdf.setFont('Helvetica-Bold', 24)
+            pdf.drawCentredString(page_width / 2, page_height - 70 * mm, 'BORDEREAU DE TRANSFERT')
 
-        add_line('BORDEREAU DE TRANSFERT')
-        y -= 8
-        add_line(f"Reference : {transfert.reference or f'TR-{transfert.id}'}")
-        add_line(f"Type : {transfert.typeTransfer or '-'}")
-        add_line(f"Date demande : {format_dt(transfert.date_demande)}")
-        add_line(f"Date execution : {format_dt(transfert.date_execution)}")
-        y -= 8
-        add_line('Arborescence du contenu')
-        add_line('-' * 72)
+            pdf.setFont('Helvetica', 16)
+            start_y = page_height - 92 * mm
+            line_gap = 12 * mm
+            pdf.drawString(left_margin, start_y, f"Reference : {transfert.reference or f'TR-{transfert.id}'}")
+            pdf.drawString(left_margin, start_y - line_gap, f"Type : {transfert.typeTransfer or ''}")
+            pdf.drawString(left_margin, start_y - (2 * line_gap), f"Date demande : {format_dt(transfert.date_demande)}")
+            pdf.drawString(left_margin, start_y - (3 * line_gap), f"Date execution : {format_dt(transfert.date_execution)}")
 
+        def draw_footer():
+            pdf.setFont('Helvetica-Bold', 14)
+            pdf.drawString(left_margin, 48 * mm, 'Unite responsable')
+            pdf.drawRightString(page_width - right_margin, 48 * mm, 'Archiviste')
+
+        def draw_table_shell():
+            pdf.rect(table_left, table_bottom, table_width, table_height, stroke=1, fill=0)
+            pdf.line(
+                table_left,
+                table_bottom + table_height - table_header_height,
+                table_left + table_width,
+                table_bottom + table_height - table_header_height
+            )
+            pdf.setFont('Helvetica-Bold', 13)
+            pdf.drawCentredString(
+                table_left + (table_width / 2),
+                table_bottom + table_height - (table_header_height / 2) - 4,
+                'Details du transfert'
+            )
+
+        def wrap_line(text, font_name, font_size, max_width):
+            words = text.split()
+            if not words:
+                return ['']
+
+            lines = []
+            current = words[0]
+            for word in words[1:]:
+                candidate = f'{current} {word}'
+                if pdf.stringWidth(candidate, font_name, font_size) <= max_width:
+                    current = candidate
+                else:
+                    lines.append(current)
+                    current = word
+            lines.append(current)
+            return lines
+
+        content_lines = []
         if not tree:
-            add_line('Aucun boitier lie a ce transfert.')
+            content_lines.append((0, 'Aucun boitier lie a ce transfert.'))
         else:
             for boitier in tree:
-                add_line(f"Boitier : {boitier['idboit']} - {truncate(boitier['titre'], 68)}")
+                content_lines.append((0, f"Boitier : {boitier['idboit']} - {boitier['titre'] or ''}"))
                 if not boitier['dossiers']:
-                    add_line('  Aucun dossier lie.')
+                    content_lines.append((1, 'Aucun dossier lie.'))
                     continue
-
                 for dossier in boitier['dossiers']:
-                    add_line(f"  Dossier : #{dossier['idDossier']} - {truncate(dossier['nomDos'] or 'Sans nom', 63)}")
+                    content_lines.append((1, f"Dossier : #{dossier['idDossier']} - {dossier['nomDos'] or 'Sans nom'}"))
                     if not dossier['documents']:
-                        add_line('    Aucun document lie.')
+                        content_lines.append((2, 'Aucun document lie.'))
                         continue
-
                     for doc in dossier['documents']:
                         doc_ref = doc.reference or doc.idDoc or str(doc.pk)
-                        add_line(f"    Document : {truncate(f'{doc_ref} - {doc.titre}', 70)}")
+                        content_lines.append((2, f"Document : {doc_ref} - {doc.titre}"))
 
-        push_page()
+        pdf.setTitle(f"Bordereau {transfert.reference or transfert.id}")
+        line_height = 6 * mm
+        content_top = table_bottom + table_height - table_header_height - content_padding
+        content_bottom = table_bottom + content_padding
 
-        for page_lines in pages:
-            document.add_page(page_lines, page_width=page_width, page_height=page_height)
+        def start_page():
+            draw_header()
+            draw_table_shell()
+            draw_footer()
+            return content_top
 
-        return document.render()
+        y = start_page()
+        for level, raw_text in content_lines:
+            base_x = table_left + content_padding + (level * 8 * mm)
+            available_width = (table_left + table_width - content_padding) - base_x
+            wrapped = wrap_line(raw_text, 'Helvetica', 11, available_width)
+
+            needed_height = len(wrapped) * line_height
+            if y - needed_height < content_bottom:
+                pdf.showPage()
+                y = start_page()
+
+            pdf.setFont('Helvetica', 11)
+            for line in wrapped:
+                pdf.drawString(base_x, y, line)
+                y -= line_height
+
+        pdf.save()
+        return buffer.getvalue()
 
 # ========== BORDEREAUX ==========
 class BordereauViewSet(viewsets.ModelViewSet):
