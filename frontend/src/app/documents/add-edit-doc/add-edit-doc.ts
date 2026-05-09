@@ -98,7 +98,7 @@ export class AddEditDocumentComponent implements OnInit {
     }).subscribe({
       next: ({ dossiers, phases, calendriers }) => {
         this.dossiers = dossiers.results;
-        this.phases = phases.results;
+        this.phases = phases.results.filter(p => p.nom.toLowerCase().includes('courante'));
         this.calendriers = calendriers.results;
         this.filteredCalendriers = [];
 

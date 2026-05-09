@@ -49,7 +49,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-calendar-event"></i>
                     <select class="form-control" formControlName="calendrier">
-                        <option [value]="null">Aucun calendrier</option>
+                        <!-- <option [value]="null">Aucun calendrier</option> -->
                         <option *ngFor="let c of filteredCalendriers" [value]="c.id.toString()">
                             {{ c.code }} - {{ c.title }}
                         </option>

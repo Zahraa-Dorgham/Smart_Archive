@@ -102,7 +102,7 @@ export class AddEditDossierComponent implements OnInit {
       next: ({ boitiers, calendriers, phases }) => {
         this.boitiers = boitiers.results;
         this.calendriers = calendriers.results;
-        this.phases = phases.results;
+        this.phases = phases.results.filter(p => p.nom.toLowerCase().includes('courante'));
 
         if (this.isEditMode && this.data.dossier) {
           this.patchDossierForm(this.data.dossier);

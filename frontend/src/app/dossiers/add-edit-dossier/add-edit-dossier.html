@@ -28,7 +28,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-box"></i>
                     <select class="form-control" formControlName="boitier">
-                        <option [value]="null">Aucun boîtier</option>
+                        <!-- <option [value]="null">Aucun boîtier</option> -->
                         <option *ngFor="let b of boitiers" [value]="b.id.toString()">{{ b.idboit }}</option>
                     </select>
                 </div>
@@ -39,7 +39,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-calendar-event"></i>
                     <select class="form-control" formControlName="calendrier">
-                        <option [value]="null">Aucun calendrier</option>
+                        <!-- <option [value]="null">Aucun calendrier</option> -->
                         <option *ngFor="let c of calendriers" [value]="c.id.toString()">
                             {{ c.code }} - {{ c.title }}
                         </option>
@@ -52,7 +52,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-git-commit"></i>
                     <select class="form-control" formControlName="phaseArchive">
-                        <option [value]="null">Aucune phase</option>
+                        <!-- <option [value]="null">Aucune phase</option> -->
                         <option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</option>
                     </select>
                 </div>
