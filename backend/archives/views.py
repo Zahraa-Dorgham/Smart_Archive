@@ -45,7 +45,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 # ========== UTILISATEURS ==========
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().select_related('profile', 'profile__direction').prefetch_related('groups', 'user_permissions')
     serializer_class = UserSerializer
     permission_classes = [EstAdministrateur]
 

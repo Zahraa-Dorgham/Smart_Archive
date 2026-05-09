@@ -79,6 +79,7 @@
                     <tr>
                         <th>Utilisateur</th>
                         <th>Email</th>
+                        <th>Direction</th>
                         <th>Rôles</th>
                         <th>Statut</th>
                         <th class="text-right">Actions</th>
@@ -99,6 +100,7 @@
                             </div>
                         </td>
                         <td><small>{{ user.email || '-' }}</small></td>
+                        <td><small class="fw-bold" style="color: #475f7b;">{{ user.direction_nom || 'Non spécifiée' }}</small></td>
                         <td>
                             <div class="d-flex flex-wrap gap-1">
                                 <span *ngFor="let r of user.roles" class="badge" [ngClass]="getRoleBadgeClass(r)">
@@ -155,6 +157,7 @@
                         <p class="text-muted mb-2">{{ selectedUser.email }}</p>
                         <div class="d-flex flex-column small gap-1">
                             <span><strong class="text-muted">Identifiant:</strong> {{ selectedUser.username }}</span>
+                            <span><strong class="text-muted">Direction:</strong> {{ selectedUser.direction_nom || 'Non spécifiée' }}</span>
                             <span><strong class="text-muted">ID Système:</strong> #{{ selectedUser.id }}</span>
                             <div class="mt-2 d-flex flex-wrap gap-1">
                                 <span *ngFor="let r of selectedUser.roles" class="badge" [ngClass]="getRoleBadgeClass(r)">

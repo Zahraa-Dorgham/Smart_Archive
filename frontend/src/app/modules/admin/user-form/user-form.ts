@@ -24,14 +24,17 @@ export class UserFormComponent implements OnInit {
     password: '',
     is_active: true,
     role_id: null as number | null,
+    direction: null as number | null
   };
 
   roles: any[] = [];
+  directions: any[] = [];
 
   constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadRoles();
+    this.loadDirections();
   }
 
   togglePassword(): void {
@@ -46,6 +49,15 @@ export class UserFormComponent implements OnInit {
         this.roles = this.roles.map(r => ({ ...r, nom: r.name || r.nom }));
       },
       error: (err) => console.error('Erreur chargement roles', err)
+    });
+  }
+
+  loadDirections(): void {
+    this.api.get('/directions/').subscribe({
+      next: (data: any) => {
+        this.directions = data.results || data || [];
+      },
+      error: (err) => console.error('Erreur chargement directions', err)
     });
   }
 
@@ -100,6 +112,7 @@ export class UserFormComponent implements OnInit {
       last_name: this.userData.last_name,
       is_active: this.userData.is_active,
       groups: [this.userData.role_id],
+      direction: this.userData.direction,
       password: this.userData.password
     };
 

@@ -3,7 +3,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers
 from .models import (
-    ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, TransfertBoitier, Consultation
+    ArchiveDefinitive, ArchiveIntermediaire, ArchiveCourant, Bordereau, Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive, Transfert, TransfertBoitier, Consultation, UserProfile
     # Retirez Boitier, Dossier, Document, Service s'ils n'existent pas
 )
 
@@ -94,7 +94,7 @@ class ArchiveDefinitiveSerializer(serializers.ModelSerializer):
         
 # archives/serializers.py
 from rest_framework import serializers
-from .models import Boitier, Dossier, Document, Armoire, Etagere, PhaseArchive
+from .models import Boitier, Dossier, Document, Armoire, Etagere, PhaseArchive, UserProfile
 from calendrier.models import Calendrier
 
 
@@ -490,24 +490,63 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     groups_detail = GroupSerializer(source='groups', many=True, read_only=True)
     password = serializers.CharField(write_only=True, required=False)
+    direction = serializers.PrimaryKeyRelatedField(
+        queryset=Direction.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    direction_nom = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'groups', 'groups_detail', 'password', 'user_permissions']
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name', 
+            'is_active', 'groups', 'groups_detail', 'password', 
+            'user_permissions', 'direction', 'direction_nom'
+        ]
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
+    def get_direction_nom(self, obj):
+        try:
+            profile = getattr(obj, 'profile', None)
+            if profile and profile.direction:
+                return profile.direction.nom
+        except Exception:
+            pass
+        return None
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Ensure direction ID is present for frontend dropdowns
+        profile = getattr(instance, 'profile', None)
+        data['direction'] = profile.direction.id if profile and profile.direction else None
+        
+        # Add initials and full_name if missing (for frontend)
+        if 'first_name' in data and 'last_name' in data:
+            data['full_name'] = f"{data['first_name']} {data['last_name']}".strip() or data['username']
+            if data['first_name'] and data['last_name']:
+                data['initials'] = (data['first_name'][0] + data['last_name'][0]).upper()
+            else:
+                data['initials'] = data['username'][:2].upper()
+        
+        return data
+
     def create(self, validated_data):
+        direction = validated_data.pop('direction', None)
         groups_data = validated_data.pop('groups', [])
         permissions_data = validated_data.pop('user_permissions', [])
         password = validated_data.pop('password', None)
         
-        # Use create_user to ensure password hashing and correct initialization
         user = User.objects.create_user(password=password, **validated_data)
         
-        # Automatically set is_staff for users with 'Administrateur' or 'Admin' role
-        # This is often needed for access to certain parts of the system
+        # Ensure profile exists and set direction
+        UserProfile.objects.update_or_create(
+            user=user,
+            defaults={'direction': direction}
+        )
+
         if groups_data:
             user.groups.set(groups_data)
             group_names = [g.name.lower() for g in user.groups.all()]
@@ -521,6 +560,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        direction = validated_data.pop('direction', serializers.empty)
         groups_data = validated_data.pop('groups', None)
         permissions_data = validated_data.pop('user_permissions', None)
         password = validated_data.pop('password', None)
@@ -533,6 +573,15 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
             
         instance.save()
+
+        # Handle profile (direction)
+        if direction is not serializers.empty:
+            profile, _ = UserProfile.objects.update_or_create(
+                user=instance,
+                defaults={'direction': direction}
+            )
+            # Update the in-memory relation
+            instance.profile = profile
         
         if groups_data is not None:
             instance.groups.set(groups_data)
@@ -540,7 +589,6 @@ class UserSerializer(serializers.ModelSerializer):
             if any(name in ['administrateur', 'admin'] for name in group_names):
                 instance.is_staff = True
             else:
-                # If they are not superuser, we might want to unset is_staff
                 if not instance.is_superuser:
                     instance.is_staff = False
             instance.save()

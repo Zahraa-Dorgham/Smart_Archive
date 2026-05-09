@@ -19,9 +19,11 @@ export class UserEditComponent implements OnInit {
         last_name: '',
         email: '',
         is_active: true,
-        password: ''
+        password: '',
+        direction: null as number | null
     };
     allGroups: any[] = [];
+    directions: any[] = [];
     selectedGroupIds: number[] = [];
     submitting = false;
     loading = true;
@@ -42,6 +44,7 @@ export class UserEditComponent implements OnInit {
         }
 
         this.loadGroups();
+        this.loadDirections();
         this.loadUser();
     }
 
@@ -60,6 +63,19 @@ export class UserEditComponent implements OnInit {
         });
     }
 
+    loadDirections(): void {
+        this.api.get('/directions/').subscribe({
+            next: (data: any) => {
+                this.directions = data.results || data || [];
+                this.cd.markForCheck();
+            },
+            error: (err) => {
+                console.error('Erreur chargement directions', err);
+                this.cd.markForCheck();
+            }
+        });
+    }
+
     loadUser(): void {
         this.api.get(`/users/${this.userId}/`).subscribe({
             next: (user: any) => {
@@ -68,7 +84,8 @@ export class UserEditComponent implements OnInit {
                     last_name: user.last_name || '',
                     email: user.email || '',
                     is_active: user.is_active === true,
-                    password: ''
+                    password: '',
+                    direction: user.direction || null
                 };
                 // Use groups_detail if available, or fallback to groups (which may be IDs or names)
                 if (Array.isArray(user.groups_detail)) {
@@ -178,7 +195,8 @@ export class UserEditComponent implements OnInit {
             first_name: this.userData.first_name,
             last_name: this.userData.last_name,
             is_active: this.userData.is_active,
-            groups: this.selectedGroupIds
+            groups: this.selectedGroupIds,
+            direction: this.userData.direction
         };
 
         if (this.userData.password) {

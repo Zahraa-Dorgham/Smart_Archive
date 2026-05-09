@@ -32,6 +32,26 @@ class Role(models.Model):
     def __str__(self):
         return self.nom
 
+# ========== USER PROFILE ==========
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    direction = models.ForeignKey('Direction', on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
+
+    class Meta:
+        verbose_name = "Profil Utilisateur"
+        verbose_name_plural = "Profils Utilisateurs"
+
+    def __str__(self):
+        return f"Profil de {self.user.username}"
+
+# Signal to ensure UserProfile exists for every user
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def handle_user_profile(sender, instance, **kwargs):
+    UserProfile.objects.get_or_create(user=instance)
+
 # ========== BATIMENT ==========
 class Batiment(models.Model):
     nom = models.CharField(max_length=100)
