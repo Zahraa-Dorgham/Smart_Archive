@@ -29,6 +29,10 @@ function isPhaseArchive(obj: unknown): obj is PhaseArchive {
   return !!obj && typeof obj === 'object' && 'id' in obj && 'nom' in obj;
 }
 
+function normalizePhases(phases: PhaseArchive[]): PhaseArchive[] {
+  return [...phases].sort((left, right) => left.nom.localeCompare(right.nom, 'fr', { sensitivity: 'base' }));
+}
+
 export interface DialogData {
   mode: 'add' | 'edit';
   dossier?: Dossier;
@@ -102,7 +106,7 @@ export class AddEditDossierComponent implements OnInit {
       next: ({ boitiers, calendriers, phases }) => {
         this.boitiers = boitiers.results;
         this.calendriers = calendriers.results;
-        this.phases = phases.results.filter(p => p.nom.toLowerCase().includes('courante'));
+        this.phases = normalizePhases(phases.results);
 
         if (this.isEditMode && this.data.dossier) {
           this.patchDossierForm(this.data.dossier);

@@ -21,6 +21,10 @@ import { PaginatedResponse } from '../../core/models/base.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
 import { Calendrier } from '../../core/models/calendrier.model';
 
+function normalizePhases(phases: PhaseArchive[]): PhaseArchive[] {
+  return [...phases].sort((left, right) => left.nom.localeCompare(right.nom, 'fr', { sensitivity: 'base' }));
+}
+
 export interface DialogData {
   mode: 'add' | 'edit';
   document?: Document;
@@ -98,7 +102,7 @@ export class AddEditDocumentComponent implements OnInit {
     }).subscribe({
       next: ({ dossiers, phases, calendriers }) => {
         this.dossiers = dossiers.results;
-        this.phases = phases.results.filter(p => p.nom.toLowerCase().includes('courante'));
+        this.phases = normalizePhases(phases.results);
         this.calendriers = calendriers.results;
         this.filteredCalendriers = [];
 

@@ -35,7 +35,7 @@ export interface DocumentCreate {
     titre: string;
     dossier: string | number;
     calendrier?: string | null;
-    phase_archive?: string;
+    phase_archive?: string | null;
     date_creation?: Date;
     niv_confidentialite: string;
     type_document?: string;

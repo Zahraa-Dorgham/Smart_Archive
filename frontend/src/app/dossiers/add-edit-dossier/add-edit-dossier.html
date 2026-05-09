@@ -52,7 +52,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-git-commit"></i>
                     <select class="form-control" formControlName="phaseArchive">
-                        <!-- <option [value]="null">Aucune phase</option> -->
+                        <option [ngValue]="null">Sélectionner une phase...</option>
                         <option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</option>
                     </select>
                 </div>
