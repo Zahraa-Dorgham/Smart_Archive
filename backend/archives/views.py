@@ -476,8 +476,18 @@ class TransfertViewSet(viewsets.ModelViewSet):
         table_bottom = 55 * mm
         table_width = page_width - (50 * mm)
         table_height = 95 * mm
-        table_header_height = 8 * mm
+        table_title_height = 8 * mm
+        table_column_header_height = 8 * mm
         content_padding = 4 * mm
+        row_padding = 1.5 * mm
+        row_line_height = 5 * mm
+        col_widths = [0.30 * table_width, 0.33 * table_width, 0.37 * table_width]
+        col_x = [
+            table_left,
+            table_left + col_widths[0],
+            table_left + col_widths[0] + col_widths[1],
+            table_left + table_width,
+        ]
 
         def format_dt(value):
             if not value:
@@ -521,16 +531,39 @@ class TransfertViewSet(viewsets.ModelViewSet):
             pdf.rect(table_left, table_bottom, table_width, table_height, stroke=1, fill=0)
             pdf.line(
                 table_left,
-                table_bottom + table_height - table_header_height,
+                table_bottom + table_height - table_title_height,
                 table_left + table_width,
-                table_bottom + table_height - table_header_height
+                table_bottom + table_height - table_title_height
+            )
+            pdf.line(
+                table_left,
+                table_bottom + table_height - table_title_height - table_column_header_height,
+                table_left + table_width,
+                table_bottom + table_height - table_title_height - table_column_header_height
+            )
+            pdf.line(
+                col_x[1],
+                table_bottom,
+                col_x[1],
+                table_bottom + table_height - table_title_height
+            )
+            pdf.line(
+                col_x[2],
+                table_bottom,
+                col_x[2],
+                table_bottom + table_height - table_title_height
             )
             pdf.setFont('Helvetica-Bold', 13)
             pdf.drawCentredString(
                 table_left + (table_width / 2),
-                table_bottom + table_height - (table_header_height / 2) - 4,
+                table_bottom + table_height - (table_title_height / 2) - 4,
                 'Details du transfert'
             )
+            pdf.setFont('Helvetica-Bold', 11)
+            header_y = table_bottom + table_height - table_title_height - (table_column_header_height / 2) - 3
+            pdf.drawCentredString((col_x[0] + col_x[1]) / 2, header_y, 'Boitier')
+            pdf.drawCentredString((col_x[1] + col_x[2]) / 2, header_y, 'Dossier')
+            pdf.drawCentredString((col_x[2] + col_x[3]) / 2, header_y, 'Document')
 
         def wrap_line(text, font_name, font_size, max_width):
             words = text.split()
@@ -549,27 +582,50 @@ class TransfertViewSet(viewsets.ModelViewSet):
             lines.append(current)
             return lines
 
-        content_lines = []
+        data_rows = []
         if not tree:
-            content_lines.append((0, 'Aucun boitier lie a ce transfert.'))
+            data_rows.append({
+                'boitier_key': '__empty__',
+                'dossier_key': '__empty__',
+                'boitier': 'Aucun boitier lie a ce transfert.',
+                'dossier': '',
+                'document': '',
+            })
         else:
             for boitier in tree:
-                content_lines.append((0, f"Boitier : {boitier['idboit']} - {boitier['titre'] or ''}"))
+                boitier_label = f"{boitier['idboit']} - {boitier['titre'] or ''}".strip(' -')
                 if not boitier['dossiers']:
-                    content_lines.append((1, 'Aucun dossier lie.'))
+                    data_rows.append({
+                        'boitier_key': f"b-{boitier['id']}",
+                        'dossier_key': f"b-{boitier['id']}-empty",
+                        'boitier': boitier_label,
+                        'dossier': 'Aucun dossier lie.',
+                        'document': '',
+                    })
                     continue
                 for dossier in boitier['dossiers']:
-                    content_lines.append((1, f"Dossier : #{dossier['idDossier']} - {dossier['nomDos'] or 'Sans nom'}"))
+                    dossier_label = f"#{dossier['idDossier']} - {dossier['nomDos'] or 'Sans nom'}"
                     if not dossier['documents']:
-                        content_lines.append((2, 'Aucun document lie.'))
+                        data_rows.append({
+                            'boitier_key': f"b-{boitier['id']}",
+                            'dossier_key': f"d-{dossier['idDossier']}",
+                            'boitier': boitier_label,
+                            'dossier': dossier_label,
+                            'document': 'Aucun document lie.',
+                        })
                         continue
                     for doc in dossier['documents']:
                         doc_ref = doc.reference or doc.idDoc or str(doc.pk)
-                        content_lines.append((2, f"Document : {doc_ref} - {doc.titre}"))
+                        data_rows.append({
+                            'boitier_key': f"b-{boitier['id']}",
+                            'dossier_key': f"d-{dossier['idDossier']}",
+                            'boitier': boitier_label,
+                            'dossier': dossier_label,
+                            'document': f"{doc_ref} - {doc.titre}",
+                        })
 
         pdf.setTitle(f"Bordereau {transfert.reference or transfert.id}")
-        line_height = 6 * mm
-        content_top = table_bottom + table_height - table_header_height - content_padding
+        content_top = table_bottom + table_height - table_title_height - table_column_header_height - content_padding
         content_bottom = table_bottom + content_padding
 
         def start_page():
@@ -578,21 +634,78 @@ class TransfertViewSet(viewsets.ModelViewSet):
             draw_footer()
             return content_top
 
-        y = start_page()
-        for level, raw_text in content_lines:
-            base_x = table_left + content_padding + (level * 8 * mm)
-            available_width = (table_left + table_width - content_padding) - base_x
-            wrapped = wrap_line(raw_text, 'Helvetica', 11, available_width)
+        font_name = 'Helvetica'
+        font_size = 10.5
+        prepared_rows = []
+        for row in data_rows:
+            boitier_lines = wrap_line(row['boitier'], font_name, font_size, col_widths[0] - (2 * content_padding))
+            dossier_lines = wrap_line(row['dossier'], font_name, font_size, col_widths[1] - (2 * content_padding))
+            document_lines = wrap_line(row['document'], font_name, font_size, col_widths[2] - (2 * content_padding))
+            line_count = max(len(boitier_lines), len(dossier_lines), len(document_lines), 1)
+            prepared_rows.append({
+                **row,
+                'boitier_lines': boitier_lines,
+                'dossier_lines': dossier_lines,
+                'document_lines': document_lines,
+                'height': max((line_count * row_line_height) + row_padding, 7 * mm),
+            })
 
-            needed_height = len(wrapped) * line_height
-            if y - needed_height < content_bottom:
+        page_chunks = []
+        current_chunk = []
+        current_height = 0
+        max_chunk_height = content_top - content_bottom
+        for row in prepared_rows:
+            if current_chunk and current_height + row['height'] > max_chunk_height:
+                page_chunks.append(current_chunk)
+                current_chunk = []
+                current_height = 0
+            current_chunk.append(row)
+            current_height += row['height']
+        if current_chunk:
+            page_chunks.append(current_chunk)
+
+        for page_index, rows_chunk in enumerate(page_chunks):
+            if page_index > 0:
                 pdf.showPage()
-                y = start_page()
 
-            pdf.setFont('Helvetica', 11)
-            for line in wrapped:
-                pdf.drawString(base_x, y, line)
-                y -= line_height
+            y = start_page()
+            pdf.setFont(font_name, font_size)
+
+            for row_index, row in enumerate(rows_chunk):
+                next_row = rows_chunk[row_index + 1] if row_index + 1 < len(rows_chunk) else None
+                row_top = y
+                row_bottom = y - row['height']
+                text_y_start = row_top - row_line_height + 1
+
+                show_boitier = row_index == 0 or rows_chunk[row_index - 1]['boitier_key'] != row['boitier_key']
+                show_dossier = row_index == 0 or rows_chunk[row_index - 1]['dossier_key'] != row['dossier_key']
+
+                if show_boitier:
+                    text_y = text_y_start
+                    for line in row['boitier_lines']:
+                        pdf.drawString(col_x[0] + content_padding, text_y, line)
+                        text_y -= row_line_height
+
+                if show_dossier:
+                    text_y = text_y_start
+                    for line in row['dossier_lines']:
+                        pdf.drawString(col_x[1] + content_padding, text_y, line)
+                        text_y -= row_line_height
+
+                text_y = text_y_start
+                for line in row['document_lines']:
+                    pdf.drawString(col_x[2] + content_padding, text_y, line)
+                    text_y -= row_line_height
+
+                if next_row is not None:
+                    if next_row['boitier_key'] != row['boitier_key']:
+                        pdf.line(table_left, row_bottom, table_left + table_width, row_bottom)
+                    elif next_row['dossier_key'] != row['dossier_key']:
+                        pdf.line(col_x[1], row_bottom, table_left + table_width, row_bottom)
+                    else:
+                        pdf.line(col_x[2], row_bottom, table_left + table_width, row_bottom)
+
+                y = row_bottom
 
         pdf.save()
         return buffer.getvalue()
