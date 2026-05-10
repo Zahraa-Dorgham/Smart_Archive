@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { forkJoin, Observable } from 'rxjs';
+import { finalize, forkJoin, Observable } from 'rxjs';
 
 import { DocumentService } from '../../core/services/document.service';
 import { DossierService } from '../../core/services/dossier.service';
@@ -178,15 +178,17 @@ export class AddEditDocumentComponent implements OnInit {
       dossierId ? String(dossierId) : null,
       this.selectedFile,
       dossierOptions
+    ).pipe(
+      finalize(() => {
+        this.isAnalyzingFile = false;
+      })
     ).subscribe({
       next: (result) => {
         this.applyExtractedMetadata(result);
-        this.isAnalyzingFile = false;
         this.snackBar.open('Champs remplis a partir du fichier.', 'Fermer', { duration: 3000 });
       },
       error: (error) => {
         const message = error?.error?.error || 'Erreur pendant l analyse du fichier';
-        this.isAnalyzingFile = false;
         this.snackBar.open(message, 'Fermer', { duration: 4000 });
       }
     });

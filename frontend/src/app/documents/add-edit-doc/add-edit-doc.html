@@ -8,7 +8,16 @@
     </button>
 </div>
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="document-form">
+    <div *ngIf="isAnalyzingFile" class="analysis-modal-overlay" aria-live="polite" aria-busy="true">
+        <div class="analysis-modal-card">
+            <div class="analysis-spinner" aria-hidden="true">
+                <div class="analysis-spinner-ring"></div>
+            </div>
+            <div class="analysis-loading-title">Analyse du document</div>
+            <div class="analysis-loading-text">Analyse Gemini en cours, veuillez patienter jusqu'a la fin de l'appel API.</div>
+        </div>
+    </div>
     <mat-dialog-content class="px-3 pb-2 pt-1">
         <div class="section-title">Identification du Document</div>
         <div class="row">
@@ -187,7 +196,7 @@
 
     <div class="dialog-actions">
         <button class="btn btn-light-secondary px-3" type="button" mat-dialog-close>Annuler</button>
-        <button class="btn btn-primary glow px-4 shadow-sm" type="submit" [disabled]="form.invalid">
+        <button class="btn btn-primary glow px-4 shadow-sm" type="submit" [disabled]="form.invalid || isAnalyzingFile">
             <i class="bx" [ngClass]="isEditMode ? 'bx-save' : 'bx-check-circle'"></i>
             {{ isEditMode ? 'Enregistrer' : 'Créer' }}
         </button>
