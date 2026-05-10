@@ -348,6 +348,8 @@ class TransfertSerializer(serializers.ModelSerializer):
         next_type = validated_data.get('typeTransfer', instance.typeTransfer)
 
         with transaction.atomic():
+            previous_boitiers = list(instance.transfert_boitiers.values_list('boitier_id', flat=True))
+
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
 
@@ -355,6 +357,9 @@ class TransfertSerializer(serializers.ModelSerializer):
 
             selected_boitiers = boitier_ids
             if boitier_ids is not None:
+                removed_boitiers = [boitier_id for boitier_id in previous_boitiers if boitier_id not in boitier_ids]
+                if removed_boitiers:
+                    self._revert_removed_boitiers(next_type, removed_boitiers)
                 self._sync_boitiers(instance, boitier_ids)
             else:
                 selected_boitiers = list(instance.transfert_boitiers.values_list('boitier_id', flat=True))
@@ -379,6 +384,8 @@ class TransfertSerializer(serializers.ModelSerializer):
                 'phase_field': 'phaseArchive_id',
                 'document_phase_field': 'phase_archive_id',
                 'phase_id': self.PHASE_INTERMEDIAIRE_ID,
+                'rollback_date_field': 'date_pass_intermediaire_real',
+                'rollback_phase_id': 1,
             }
 
         return {
@@ -387,6 +394,8 @@ class TransfertSerializer(serializers.ModelSerializer):
             'phase_field': 'phaseArchive_id',
             'document_phase_field': 'phase_archive_id',
             'phase_id': self.PHASE_FINALE_ID,
+            'rollback_date_field': 'date_pass_final',
+            'rollback_phase_id': self.PHASE_INTERMEDIAIRE_ID,
         }
 
     def _build_blocking_tree(self, transfer_type, boitier_ids):
@@ -449,6 +458,26 @@ class TransfertSerializer(serializers.ModelSerializer):
                 document_updates = {
                     config['real_date_field']: today,
                     config['document_phase_field']: config['phase_id'],
+                }
+                dossier.documents.update(**document_updates)
+
+    def _revert_removed_boitiers(self, transfer_type, boitier_ids):
+        if not boitier_ids:
+            return
+
+        config = self._get_rule_config(transfer_type)
+
+        for boitier in Boitier.objects.filter(id__in=boitier_ids).prefetch_related('dossiers__documents'):
+            for dossier in boitier.dossiers.all():
+                dossier_updates = {
+                    config['rollback_date_field']: None,
+                    config['phase_field']: config['rollback_phase_id'],
+                }
+                type(dossier).objects.filter(pk=dossier.pk).update(**dossier_updates)
+
+                document_updates = {
+                    config['rollback_date_field']: None,
+                    config['document_phase_field']: config['rollback_phase_id'],
                 }
                 dossier.documents.update(**document_updates)
 
