@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
         const roles = (res.user?.roles || []).map((role: string) => role.toLowerCase());
         if (roles.includes('admin') || roles.includes('administrateur')) {
-          this.router.navigate(['/admin/users']);
+          this.router.navigate(['/dashboard']);
         } else if (roles.includes('archiviste')) {
           this.router.navigate(['/dashboard']);
         } else {
