@@ -68,6 +68,18 @@ interface LoginItem {
   is_active: boolean;
 }
 
+interface DocumentEvolutionPoint {
+  period: string;
+  label: string;
+  total: number;
+  cumulative: number;
+}
+
+interface ChartPoint extends DocumentEvolutionPoint {
+  x: number;
+  y: number;
+}
+
 interface DashboardPayload {
   global?: Partial<DashboardGlobalStats>;
   batiments?: BatimentStat[];
@@ -78,6 +90,7 @@ interface DashboardPayload {
     pending?: TransferItem[];
   };
   logins?: LoginItem[];
+  document_evolution?: DocumentEvolutionPoint[];
 }
 
 const DEFAULT_GLOBAL_STATS: DashboardGlobalStats = {
@@ -121,6 +134,7 @@ export class DashboardComponent implements OnInit {
   recentTransfers: TransferItem[] = [];
   pendingTransfers: TransferItem[] = [];
   recentLogins: LoginItem[] = [];
+  documentEvolution: DocumentEvolutionPoint[] = [];
 
   readonly phaseColors = ['#5a8dee', '#39da8a', '#fdac41', '#ff5b5c', '#00cfdd', '#6f42c1'];
 
@@ -171,6 +185,7 @@ export class DashboardComponent implements OnInit {
     this.recentTransfers = Array.isArray(res.transferts?.recent) ? res.transferts!.recent! : this.recentTransfers;
     this.pendingTransfers = Array.isArray(res.transferts?.pending) ? res.transferts!.pending! : this.pendingTransfers;
     this.recentLogins = Array.isArray(res.logins) ? res.logins : this.recentLogins;
+    this.documentEvolution = Array.isArray(res.document_evolution) ? res.document_evolution : this.documentEvolution;
   }
 
   private normalizeBatimentStat(bat: BatimentStat): BatimentStat {
@@ -240,6 +255,45 @@ export class DashboardComponent implements OnInit {
 
   get maxPhaseTotal(): number {
     return Math.max(...this.phaseDistribution.map((phase) => phase.total || 0), 1);
+  }
+
+  get latestDocumentEvolution(): DocumentEvolutionPoint | null {
+    return this.documentEvolution.length ? this.documentEvolution[this.documentEvolution.length - 1] : null;
+  }
+
+  get maxDocumentEvolution(): number {
+    return Math.max(...this.documentEvolution.map((point) => point.cumulative || 0), 1);
+  }
+
+  get documentEvolutionChartPoints(): ChartPoint[] {
+    const width = 720;
+    const height = 220;
+    const paddingLeft = 42;
+    const paddingRight = 18;
+    const paddingTop = 18;
+    const paddingBottom = 34;
+    const plotWidth = width - paddingLeft - paddingRight;
+    const plotHeight = height - paddingTop - paddingBottom;
+    const max = this.maxDocumentEvolution;
+    const lastIndex = Math.max(this.documentEvolution.length - 1, 1);
+
+    return this.documentEvolution.map((point, index) => ({
+      ...point,
+      x: paddingLeft + (plotWidth * index) / lastIndex,
+      y: paddingTop + plotHeight - ((point.cumulative || 0) / max) * plotHeight
+    }));
+  }
+
+  get documentEvolutionPolyline(): string {
+    return this.documentEvolutionChartPoints.map((point) => `${point.x},${point.y}`).join(' ');
+  }
+
+  get documentEvolutionArea(): string {
+    const points = this.documentEvolutionChartPoints;
+    if (!points.length) return '';
+
+    const baseline = 186;
+    return `42,${baseline} ${points.map((point) => `${point.x},${point.y}`).join(' ')} 702,${baseline}`;
   }
 
   get phaseDonutBackground(): string {

@@ -1,6 +1,7 @@
 # archives/views.py (version complète)
 
 import json
+from datetime import date
 from io import BytesIO
 from pathlib import Path
 
@@ -722,6 +723,37 @@ from django.db.models import Count
 class DashboardStatsView(viewsets.ViewSet):
     permission_classes = [EstLectureAutorisee]
 
+    def _add_months(self, value, months):
+        month = value.month - 1 + months
+        year = value.year + month // 12
+        month = month % 12 + 1
+        return date(year, month, 1)
+
+    def _document_evolution(self):
+        today = timezone.localdate()
+        current_month = date(today.year, today.month, 1)
+        first_month = self._add_months(current_month, -11)
+        months = [self._add_months(first_month, index) for index in range(12)]
+        documents_before = Document.objects.filter(date_creation__lt=first_month).count()
+        cumulative = documents_before
+        evolution = []
+
+        for month_start in months:
+            next_month = self._add_months(month_start, 1)
+            total = Document.objects.filter(
+                date_creation__gte=month_start,
+                date_creation__lt=next_month
+            ).count()
+            cumulative += total
+            evolution.append({
+                'period': month_start.isoformat(),
+                'label': month_start.strftime('%m/%Y'),
+                'total': total,
+                'cumulative': cumulative
+            })
+
+        return evolution
+
     def list(self, request):
         total_users = User.objects.count()
         active_users = User.objects.filter(is_active=True).count()
@@ -846,6 +878,8 @@ class DashboardStatsView(viewsets.ViewSet):
             for login in LoginHistory.objects.select_related('user').order_by('-login_at')[:8]
         ]
 
+        document_evolution = self._document_evolution()
+
         global_stats = {
             'total_documents': total_documents,
             'total_dossiers': total_dossiers,
@@ -875,5 +909,6 @@ class DashboardStatsView(viewsets.ViewSet):
                 'recent': recent_transfers,
                 'pending': pending_transfer_list
             },
-            'logins': recent_logins
+            'logins': recent_logins,
+            'document_evolution': document_evolution
         })

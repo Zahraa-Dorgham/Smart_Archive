@@ -13,10 +13,10 @@
         <i class="bx bx-log-in-circle"></i>
         <span>Connexion: {{ loginDate | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
-      <button type="button" class="refresh-button" (click)="loadStats()" [disabled]="loading">
+      <!-- <button type="button" class="refresh-button" (click)="loadStats()" [disabled]="loading">
         <i class="bx bx-refresh" [class.spin]="loading"></i>
         Actualiser
-      </button>
+      </button> -->
     </div>
   </div>
 
@@ -41,6 +41,8 @@
       </div>
     </div>
   </div>
+
+ 
 
   <div class="insight-grid">
     <section class="panel capacity-panel">
@@ -127,7 +129,7 @@
       </div>
     </section>
   </div>
-
+  
   <div class="content-grid">
     <section class="panel distribution-panel">
       <div class="panel-header">
@@ -199,7 +201,46 @@
       </div>
     </section>
   </div>
-
+  <section class="panel evolution-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Evolution</span>
+        <h5>Documents au fil du temps</h5>
+      </div>
+      <div class="evolution-summary" *ngIf="latestDocumentEvolution">
+        <span>Cumul</span>
+        <strong>{{ latestDocumentEvolution.cumulative | number }}</strong>
+        <small>{{ latestDocumentEvolution.total | number }} nouveau(x) ce mois</small>
+      </div>
+    </div>
+  
+    <div class="evolution-chart" *ngIf="documentEvolution.length > 0; else noDocumentEvolution">
+      <svg viewBox="0 0 720 220" preserveAspectRatio="none" role="img" aria-label="Evolution des documents">
+        <line x1="42" y1="18" x2="42" y2="186" class="chart-axis"></line>
+        <line x1="42" y1="186" x2="702" y2="186" class="chart-axis"></line>
+        <line x1="42" y1="130" x2="702" y2="130" class="chart-grid"></line>
+        <line x1="42" y1="74" x2="702" y2="74" class="chart-grid"></line>
+        <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
+        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
+        <g *ngFor="let point of documentEvolutionChartPoints; trackBy: trackById">
+          <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="chart-dot"></circle>
+          <title>{{ point.label }}: {{ point.cumulative }} cumul, {{ point.total }} nouveau(x)</title>
+        </g>
+      </svg>
+  
+      <div class="evolution-labels">
+        <span *ngFor="let point of documentEvolution; let i = index">
+          {{ i === 0 || i === documentEvolution.length - 1 || i === 5 ? point.label : '' }}
+        </span>
+      </div>
+    </div>
+  
+    <ng-template #noDocumentEvolution>
+      <div class="empty-state">
+        Aucune evolution de documents disponible.
+      </div>
+    </ng-template>
+  </section>
   <div class="content-grid bottom-grid">
     <section class="panel building-panel">
       <div class="panel-header">
