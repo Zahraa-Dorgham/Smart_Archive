@@ -44,6 +44,25 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Profil de {self.user.username}"
 
+
+class LoginHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='login_history')
+    login_at = models.DateTimeField(default=timezone.now)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Historique de connexion"
+        verbose_name_plural = "Historiques de connexion"
+        ordering = ['-login_at']
+        indexes = [
+            models.Index(fields=['-login_at']),
+            models.Index(fields=['user', '-login_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.login_at}"
+
 # Signal to ensure UserProfile exists for every user
 from django.db.models.signals import post_save
 from django.dispatch import receiver

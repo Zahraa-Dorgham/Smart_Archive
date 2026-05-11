@@ -19,7 +19,7 @@ from .models import (
     Role, Direction, Batiment, Salle, Armoire, Etagere, PhaseArchive,
     ArchiveCourant, ArchiveIntermediaire, ArchiveDefinitive,
     Boitier, Dossier, Document, Transfert, TransfertBoitier,
-    Consultation, 
+    Consultation, LoginHistory,
     # DemandeConsultation, 
     Bordereau
 )
@@ -725,7 +725,7 @@ class DashboardStatsView(viewsets.ViewSet):
     def list(self, request):
         total_users = User.objects.count()
         active_users = User.objects.filter(is_active=True).count()
-        users_with_login = User.objects.filter(last_login__isnull=False).count()
+        users_with_login = LoginHistory.objects.values('user').distinct().count()
 
         total_documents = Document.objects.count()
         total_dossiers = Dossier.objects.count()
@@ -828,13 +828,16 @@ class DashboardStatsView(viewsets.ViewSet):
 
         recent_logins = [
             {
-                'id': user.id,
-                'username': user.username,
-                'full_name': user.get_full_name() or user.username,
-                'last_login': user.last_login,
-                'is_active': user.is_active
+                'id': login.id,
+                'user_id': login.user_id,
+                'username': login.user.username,
+                'full_name': login.user.get_full_name() or login.user.username,
+                'last_login': login.login_at,
+                'ip_address': login.ip_address,
+                'user_agent': login.user_agent,
+                'is_active': login.user.is_active
             }
-            for user in User.objects.filter(last_login__isnull=False).order_by('-last_login')[:6]
+            for login in LoginHistory.objects.select_related('user').order_by('-login_at')[:8]
         ]
 
         global_stats = {
@@ -853,7 +856,8 @@ class DashboardStatsView(viewsets.ViewSet):
             'pourcentage_emplacements_vides': empty_location_percentage,
             'total_users': total_users,
             'active_users': active_users,
-            'users_with_login': users_with_login
+            'users_with_login': users_with_login,
+            'total_logins': LoginHistory.objects.count()
         }
 
         return Response({

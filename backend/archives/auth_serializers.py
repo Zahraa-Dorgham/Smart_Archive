@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import update_last_login
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from .models import LoginHistory
 from .serializers import UserSerializer
 
 User = get_user_model()
@@ -50,6 +52,25 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def _get_client_ip(self):
+        request = self.context.get("request")
+        if not request:
+            return None
+
+        forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if forwarded_for:
+            return forwarded_for.split(",")[0].strip()
+        return request.META.get("REMOTE_ADDR")
+
+    def _record_login(self):
+        request = self.context.get("request")
+        LoginHistory.objects.create(
+            user=self.user,
+            ip_address=self._get_client_ip(),
+            user_agent=request.META.get("HTTP_USER_AGENT", "") if request else "",
+        )
+        update_last_login(None, self.user)
+
     def validate(self, attrs):
         attrs = attrs.copy()
         identifier = attrs.get(self.username_field)
@@ -62,6 +83,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 pass
 
         data = super().validate(attrs)
+        self._record_login()
         serializer = UserSerializer(self.user)
         data["user"] = {
             **serializer.data,
