@@ -754,6 +754,12 @@ class DashboardStatsView(viewsets.ViewSet):
             capacity = sum(etageres.values_list('capacite_max_boites', flat=True))
             occupied = Boitier.objects.filter(etagere__armoire__salle__batiment=bat).count()
             empty = max(capacity - occupied, 0)
+            archive_items_count = boitier_count + dossier_count + document_count
+
+            if capacity:
+                empty_rate = round((empty / capacity) * 100, 1)
+            else:
+                empty_rate = 100 if archive_items_count == 0 else 0
 
             batiment_stats.append({
                 'id': bat.id,
@@ -764,7 +770,7 @@ class DashboardStatsView(viewsets.ViewSet):
                 'capacite': capacity,
                 'occupes': occupied,
                 'emplacements_vides': empty,
-                'taux_vide': round((empty / capacity) * 100, 1) if capacity else 0,
+                'taux_vide': empty_rate,
                 'boitiers': boitier_count,
                 'dossiers': dossier_count,
                 'documents': document_count

@@ -68,6 +68,37 @@ interface LoginItem {
   is_active: boolean;
 }
 
+interface DashboardPayload {
+  global?: Partial<DashboardGlobalStats>;
+  batiments?: BatimentStat[];
+  phases?: PhaseStat[];
+  transferts?: {
+    status?: TransferStatus[];
+    recent?: TransferItem[];
+    pending?: TransferItem[];
+  };
+  logins?: LoginItem[];
+}
+
+const DEFAULT_GLOBAL_STATS: DashboardGlobalStats = {
+  total_documents: 0,
+  total_dossiers: 0,
+  total_boitiers: 0,
+  total_transferts: 0,
+  transferts_en_attente: 0,
+  total_batiments: 0,
+  total_salles: 0,
+  total_armoires: 0,
+  total_etageres: 0,
+  capacite_emplacements: 0,
+  emplacements_occupes: 0,
+  emplacements_vides: 0,
+  pourcentage_emplacements_vides: 0,
+  total_users: 0,
+  active_users: 0,
+  users_with_login: 0
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -76,29 +107,13 @@ interface LoginItem {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  private readonly cacheKey = 'dashboard_stats_cache_v2';
   user$: any;
   loginDate: Date | null = null;
   loading = true;
   errorMessage = '';
 
-  globalStats: DashboardGlobalStats = {
-    total_documents: 0,
-    total_dossiers: 0,
-    total_boitiers: 0,
-    total_transferts: 0,
-    transferts_en_attente: 0,
-    total_batiments: 0,
-    total_salles: 0,
-    total_armoires: 0,
-    total_etageres: 0,
-    capacite_emplacements: 0,
-    emplacements_occupes: 0,
-    emplacements_vides: 0,
-    pourcentage_emplacements_vides: 0,
-    total_users: 0,
-    active_users: 0,
-    users_with_login: 0
-  };
+  globalStats: DashboardGlobalStats = { ...DEFAULT_GLOBAL_STATS };
 
   batimentStats: BatimentStat[] = [];
   phaseDistribution: PhaseStat[] = [];
@@ -118,6 +133,7 @@ export class DashboardComponent implements OnInit {
     this.user$ = this.authService.currentUser$;
     const ld = localStorage.getItem('login_date');
     this.loginDate = ld ? new Date(ld) : null;
+    this.restoreCachedStats();
     this.loadStats();
   }
 
@@ -125,15 +141,16 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    this.api.get('/stats/').subscribe({
-      next: (res: any) => {
-        this.globalStats = { ...this.globalStats, ...(res.global || {}) };
-        this.batimentStats = res.batiments || [];
-        this.phaseDistribution = res.phases || [];
-        this.transferStatus = res.transferts?.status || [];
-        this.recentTransfers = res.transferts?.recent || [];
-        this.pendingTransfers = res.transferts?.pending || [];
-        this.recentLogins = res.logins || [];
+    this.api.get<DashboardPayload>('/stats/').subscribe({
+      next: (res) => {
+        if (!res || !res.global) {
+          this.errorMessage = 'Les statistiques recues sont incompletes.';
+          this.loading = false;
+          return;
+        }
+
+        this.applyStats(res);
+        this.cacheStats(res);
         this.loading = false;
       },
       error: (err) => {
@@ -142,6 +159,47 @@ export class DashboardComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  private applyStats(res: DashboardPayload): void {
+    this.globalStats = { ...DEFAULT_GLOBAL_STATS, ...this.globalStats, ...(res.global || {}) };
+    this.batimentStats = Array.isArray(res.batiments)
+      ? res.batiments.map((bat) => this.normalizeBatimentStat(bat))
+      : this.batimentStats;
+    this.phaseDistribution = Array.isArray(res.phases) ? res.phases : this.phaseDistribution;
+    this.transferStatus = Array.isArray(res.transferts?.status) ? res.transferts!.status! : this.transferStatus;
+    this.recentTransfers = Array.isArray(res.transferts?.recent) ? res.transferts!.recent! : this.recentTransfers;
+    this.pendingTransfers = Array.isArray(res.transferts?.pending) ? res.transferts!.pending! : this.pendingTransfers;
+    this.recentLogins = Array.isArray(res.logins) ? res.logins : this.recentLogins;
+  }
+
+  private normalizeBatimentStat(bat: BatimentStat): BatimentStat {
+    const archiveItems = (bat.documents || 0) + (bat.dossiers || 0) + (bat.boitiers || 0);
+    const normalizedEmptyRate = archiveItems === 0 ? 100 : Math.min(Number(bat.taux_vide) || 0, 99.9);
+
+    return {
+      ...bat,
+      taux_vide: normalizedEmptyRate
+    };
+  }
+
+  private restoreCachedStats(): void {
+    if (typeof window === 'undefined') return;
+
+    const cached = sessionStorage.getItem(this.cacheKey);
+    if (!cached) return;
+
+    try {
+      this.applyStats(JSON.parse(cached));
+    } catch (e) {
+      console.warn('Dashboard cache invalide', e);
+      sessionStorage.removeItem(this.cacheKey);
+    }
+  }
+
+  private cacheStats(res: DashboardPayload): void {
+    if (typeof window === 'undefined') return;
+    sessionStorage.setItem(this.cacheKey, JSON.stringify(res));
   }
 
   get userName(): string {
