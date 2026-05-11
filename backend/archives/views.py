@@ -723,48 +723,147 @@ class DashboardStatsView(viewsets.ViewSet):
     permission_classes = [EstLectureAutorisee]
 
     def list(self, request):
-        # 1. Total users
         total_users = User.objects.count()
         active_users = User.objects.filter(is_active=True).count()
+        users_with_login = User.objects.filter(last_login__isnull=False).count()
 
-        # 2. Stats per Batiment
+        total_documents = Document.objects.count()
+        total_dossiers = Dossier.objects.count()
+        total_boitiers = Boitier.objects.count()
+        total_salles = Salle.objects.count()
+        total_armoires = Armoire.objects.count()
+        total_etageres = Etagere.objects.count()
+        total_transferts = Transfert.objects.count()
+        pending_transfers = Transfert.objects.filter(statut='EN_ATTENTE').count()
+
+        total_capacity = sum(Etagere.objects.values_list('capacite_max_boites', flat=True))
+        occupied_locations = Boitier.objects.filter(etagere__isnull=False).count()
+        empty_locations = max(total_capacity - occupied_locations, 0)
+        empty_location_percentage = round((empty_locations / total_capacity) * 100, 1) if total_capacity else 0
+
         batiment_stats = []
-        batiments = Batiment.objects.all()
+        batiments = Batiment.objects.all().prefetch_related('salles__armoires__etageres')
 
         for bat in batiments:
-            # We need to count dossiers/documents linked to this batiment
-            # Path: Batiment -> Salle -> Armoire -> Boitier -> Dossier -> Document
-            # Also Boitier -> Dossier
-            
-            # Count boitiers in this batiment
             boitier_count = Boitier.objects.filter(armoire__salle__batiment=bat).count()
-            
-            # Count dossiers in this batiment
             dossier_count = Dossier.objects.filter(boitier__armoire__salle__batiment=bat).count()
-            
-            # Count documents in this batiment
             document_count = Document.objects.filter(dossier__boitier__armoire__salle__batiment=bat).count()
+            salles_count = Salle.objects.filter(batiment=bat).count()
+            armoires_count = Armoire.objects.filter(salle__batiment=bat).count()
+            etageres = Etagere.objects.filter(armoire__salle__batiment=bat)
+            capacity = sum(etageres.values_list('capacite_max_boites', flat=True))
+            occupied = Boitier.objects.filter(etagere__armoire__salle__batiment=bat).count()
+            empty = max(capacity - occupied, 0)
 
             batiment_stats.append({
                 'id': bat.id,
                 'nom': bat.nom,
                 'code': bat.code,
+                'salles': salles_count,
+                'armoires': armoires_count,
+                'capacite': capacity,
+                'occupes': occupied,
+                'emplacements_vides': empty,
+                'taux_vide': round((empty / capacity) * 100, 1) if capacity else 0,
                 'boitiers': boitier_count,
                 'dossiers': dossier_count,
                 'documents': document_count
             })
 
-        # 3. Global totals
+        phase_distribution = []
+        for phase in PhaseArchive.objects.all().order_by('nom'):
+            documents_count = Document.objects.filter(phase_archive=phase).count()
+            dossiers_count = Dossier.objects.filter(phaseArchive=phase).count()
+            phase_distribution.append({
+                'id': phase.id,
+                'nom': phase.nom,
+                'documents': documents_count,
+                'dossiers': dossiers_count,
+                'total': documents_count + dossiers_count
+            })
+
+        unclassified_documents = Document.objects.filter(phase_archive__isnull=True).count()
+        unclassified_dossiers = Dossier.objects.filter(phaseArchive__isnull=True).count()
+        if unclassified_documents or unclassified_dossiers:
+            phase_distribution.append({
+                'id': None,
+                'nom': 'Non classe',
+                'documents': unclassified_documents,
+                'dossiers': unclassified_dossiers,
+                'total': unclassified_documents + unclassified_dossiers
+            })
+
+        transfer_status = [
+            {'statut': item['statut'] or 'NON_RENSEIGNE', 'total': item['total']}
+            for item in Transfert.objects.values('statut').annotate(total=Count('id')).order_by('statut')
+        ]
+
+        recent_transfers = [
+            {
+                'id': transfert.id,
+                'reference': transfert.reference or f'TR-{transfert.id}',
+                'typeTransfer': transfert.typeTransfer,
+                'statut': transfert.statut,
+                'date_demande': transfert.date_demande,
+                'date_execution': transfert.date_execution,
+                'boitiers': transfert.transfert_boitiers.count()
+            }
+            for transfert in Transfert.objects.all()
+                .prefetch_related('transfert_boitiers')
+                .order_by('-date_demande')[:8]
+        ]
+
+        pending_transfer_list = [
+            {
+                'id': transfert.id,
+                'reference': transfert.reference or f'TR-{transfert.id}',
+                'typeTransfer': transfert.typeTransfer,
+                'date_demande': transfert.date_demande,
+                'boitiers': transfert.transfert_boitiers.count()
+            }
+            for transfert in Transfert.objects.filter(statut='EN_ATTENTE')
+                .prefetch_related('transfert_boitiers')
+                .order_by('-date_demande')[:6]
+        ]
+
+        recent_logins = [
+            {
+                'id': user.id,
+                'username': user.username,
+                'full_name': user.get_full_name() or user.username,
+                'last_login': user.last_login,
+                'is_active': user.is_active
+            }
+            for user in User.objects.filter(last_login__isnull=False).order_by('-last_login')[:6]
+        ]
+
         global_stats = {
-            'total_documents': Document.objects.count(),
-            'total_dossiers': Dossier.objects.count(),
-            'total_boitiers': Boitier.objects.count(),
+            'total_documents': total_documents,
+            'total_dossiers': total_dossiers,
+            'total_boitiers': total_boitiers,
+            'total_transferts': total_transferts,
+            'transferts_en_attente': pending_transfers,
             'total_batiments': batiments.count(),
+            'total_salles': total_salles,
+            'total_armoires': total_armoires,
+            'total_etageres': total_etageres,
+            'capacite_emplacements': total_capacity,
+            'emplacements_occupes': occupied_locations,
+            'emplacements_vides': empty_locations,
+            'pourcentage_emplacements_vides': empty_location_percentage,
             'total_users': total_users,
-            'active_users': active_users
+            'active_users': active_users,
+            'users_with_login': users_with_login
         }
 
         return Response({
             'global': global_stats,
-            'batiments': batiment_stats
+            'batiments': batiment_stats,
+            'phases': phase_distribution,
+            'transferts': {
+                'status': transfer_status,
+                'recent': recent_transfers,
+                'pending': pending_transfer_list
+            },
+            'logins': recent_logins
         })
