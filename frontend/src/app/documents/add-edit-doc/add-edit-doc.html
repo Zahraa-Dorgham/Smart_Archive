@@ -19,6 +19,39 @@
         </div>
     </div>
     <mat-dialog-content class="px-3 pb-2 pt-1">
+        <!-- Fichier Joint - En premier pour un accès immédiat -->
+        <div class="section-title section-title-highlight">
+            <i class="bx bx-cloud-upload text-primary mr-50"></i> Fichier Joint & Analyse IA
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="file-upload-zone" (dragover)="$event.preventDefault()" (drop)="$event.preventDefault()">
+                    <div class="upload-icon">
+                        <i class="bx bx-cloud-upload"></i>
+                    </div>
+                    <input type="file" id="fichier" (change)="onFileSelected($event)" class="d-none">
+                    <label for="fichier" class="upload-label">
+                        <span class="upload-label-main" *ngIf="!selectedFile">Cliquez ici pour joindre un fichier</span>
+                        <span class="upload-label-main text-primary" *ngIf="selectedFile">
+                            <i class="bx bx-check-circle"></i> {{ selectedFile.name }}
+                        </span>
+                        <span class="upload-label-hint">Document Numérique...</span>
+                    </label>
+                    <div class="upload-actions mt-2">
+                        <button class="btn btn-primary btn-sm shadow-sm" type="button" (click)="analyzeSelectedFile()"
+                            [disabled]="!selectedFile || isAnalyzingFile">
+                            <i class="bx bx-brain mr-50"></i>
+                            {{ isAnalyzingFile ? 'Analyse en cours...' : 'Analyser avec Gemini' }}
+                        </button>
+                        <small class="text-muted d-block mt-1">Gemini remplit automatiquement les champs à partir du fichier.</small>
+                    </div>
+                </div>
+                <div *ngIf="extractionWarnings.length" class="alert alert-warning mt-2 mb-0">
+                    <div *ngFor="let warning of extractionWarnings">{{ warning }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="section-title">Identification du Document</div>
         <div class="row">
             <div class="col-md-6 mb-1">
@@ -162,33 +195,6 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-comment-detail"></i>
                     <textarea class="form-control" formControlName="sort_final_comment" rows="2" style="padding-left: 38px;" placeholder="Commentaires..."></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-title">Fichier Joint</div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="file-upload-wrapper">
-                    <label class="form-label">Document numérique</label>
-                    <div class="custom-file-input">
-                        <i class="bx bx-cloud-upload"></i>
-                        <input type="file" id="fichier" (change)="onFileSelected($event)" class="d-none">
-                        <label for="fichier" class="btn btn-outline-primary btn-sm mb-0">
-                            {{ selectedFile ? selectedFile.name : 'Choisir un fichier...' }}
-                        </label>
-                        <small class="text-muted ml-1" *ngIf="!selectedFile">PDF, Image, Doc...</small>
-                    </div>
-                </div>
-                <div class="mt-1 d-flex gap-1 align-items-center">
-                    <button class="btn btn-outline-primary btn-sm" type="button" (click)="analyzeSelectedFile()"
-                        [disabled]="!selectedFile || isAnalyzingFile">
-                        {{ isAnalyzingFile ? 'Analyse en cours...' : 'Analyser avec Gemini' }}
-                    </button>
-                    <small class="text-muted">Gemini peut choisir un dossier disponible ou utiliser celui déja selectionné.</small>
-                </div>
-                <div *ngIf="extractionWarnings.length" class="alert alert-warning mt-1 mb-0">
-                    <div *ngFor="let warning of extractionWarnings">{{ warning }}</div>
                 </div>
             </div>
         </div>

@@ -200,25 +200,79 @@ mat-form-field.form-field-style ::ng-deep .mat-mdc-form-field-focus-overlay {
 	box-sizing: border-box;
 }
 
-.file-upload-wrapper {
-	padding: 1rem;
-	border: 1px dashed #dfe3e7;
-	border-radius: 8px;
-	background-color: #f9f9fb;
-	text-align: center;
-}
-
-.custom-file-input {
+/* Highlighted Section Title */
+.section-title-highlight {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 10px;
-	margin-top: 5px;
+	gap: 6px;
+	background: linear-gradient(90deg, rgba(90, 141, 238, 0.08) 0%, transparent 100%);
+	padding: 0.6rem 1rem;
+	border-radius: 6px;
+	border-bottom: 2px solid #5a8dee;
+	margin: 1rem 0 1rem 0;
 }
 
-.custom-file-input i {
-	font-size: 1.5rem;
+/* File Upload Zone */
+.file-upload-zone {
+	padding: 1.5rem;
+	border: 2px dashed #5a8dee;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #f7faff 0%, #eef3ff 100%);
+	text-align: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.file-upload-zone:hover {
+	border-color: #3a6fce;
+	background: linear-gradient(135deg, #eef3ff 0%, #dde8ff 100%);
+	box-shadow: 0 4px 16px rgba(90, 141, 238, 0.15);
+}
+
+.upload-icon {
+	margin-bottom: 0.75rem;
+}
+
+.upload-icon i {
+	font-size: 2.5rem;
 	color: #5a8dee;
+	opacity: 0.7;
+}
+
+.upload-label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	cursor: pointer;
+	margin-bottom: 0;
+}
+
+.upload-label-main {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #475f7b;
+}
+
+.upload-label-main i {
+	font-size: 1.1rem;
+	vertical-align: middle;
+	margin-right: 4px;
+}
+
+.upload-label-hint {
+	font-size: 0.8rem;
+	color: #828d99;
+}
+
+.upload-actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.upload-actions .btn {
+	min-width: 200px;
 }
 
 .gap-1 { gap: 0.25rem; }
