@@ -1,0 +1,52 @@
+/* Sidebar Active State Fix */
+/* .main-menu.menu-dark .navigation > li.active > a {
+    background: #5a8dee !important;  */
+    /* Frest Primary Color */
+    /* color: #fff !important;
+    box-shadow: 0 0 10px 1px rgba(90, 141, 238, 0.3);
+    border-radius: 4px;
+    margin: 0 15px;
+    padding: 10px 15px;
+}
+
+.main-menu.menu-dark .navigation > li.active i {
+    color: #fff !important;
+} */
+
+/* For sub-menu items */
+/* .main-menu.menu-dark .navigation .menu-content li.active > a {
+    color: #5a8eee70 !important;
+    font-weight: 600;
+}
+
+.main-menu.menu-dark .navigation .menu-content li.active i {
+    color: #5a8dee !important; */
+/* } */
+
+/* Ensure the parent menu stays open and highlighted if needed */
+/* .main-menu.menu-dark .navigation > li.open > a {
+    background: rgba(90, 141, 238, 0.05);
+}
+
+.main-menu.menu-dark .navigation > li.nav-item.open > a {
+    color: #5a8dee !important;
+    background: rgba(90, 141, 238, 0.08);
+}
+
+.main-menu.menu-dark .navigation > li.nav-item.open > a i {
+    color: #5a8dee !important;
+}
+
+.main-menu.menu-dark .navigation > li.nav-item > a {
+    transition: all 0.2s ease;
+}
+
+.navigation-main .nav-item a {
+    display: flex;
+    align-items: center;
+}
+
+.navigation-main .nav-item i {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+} */

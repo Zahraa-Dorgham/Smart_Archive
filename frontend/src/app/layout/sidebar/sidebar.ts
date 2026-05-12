@@ -20,6 +20,7 @@ export class Sidebar implements AfterViewInit, OnInit {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.checkActiveRoute(event.urlAfterRedirects);
+      this.refreshMenu(); // Re-initialiser le JS du theme
     });
   }
 
@@ -28,7 +29,7 @@ export class Sidebar implements AfterViewInit, OnInit {
   }
 
   private checkActiveRoute(url: string) {
-    const childRoutes = ['/batiments', '/salles', '/armoires', '/etageres', '/boitiers', '/archiviste/'];
+    const childRoutes = ['/archiviste/batiments', '/archiviste/salles', '/archiviste/armoires', '/archiviste/etageres', '/archiviste/boitiers'];
     if (childRoutes.some(route => url.includes(route))) {
       this.isEmplacementOpen = true;
     } else {
