@@ -14,19 +14,19 @@
         <div class="section-title">Identité & Traçabilité</div>
         <div class="row">
             <div class="col-md-6 mb-1">
-                <label class="form-label">ID Boîtier <span class="text-danger">*</span></label>
+                <label class="form-label">Code Boîtier <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-box"></i>
                     <input type="text" class="form-control" formControlName="idboit" placeholder="BOX-2024-001">
                 </div>
             </div>
-            <div class="col-md-6 mb-1">
+            <!-- <div class="col-md-6 mb-1">
                 <label class="form-label">Code-barres <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-barcode-reader"></i>
                     <input type="text" class="form-control" formControlName="code_barre" placeholder="Scanner tag...">
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <div class="row">
@@ -47,7 +47,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-archive"></i>
                     <select class="form-control" formControlName="armoire">
-                        <option value="">Aucune</option>
+                        <!-- <option value="">Aucune</option> -->
                         <option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</option>
                     </select>
                 </div>
@@ -57,7 +57,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-list-ol"></i>
                     <select class="form-control" formControlName="etagere">
-                        <option value="">Aucune</option>
+                        <!-- <option value="">Aucune</option> -->
                         <option *ngFor="let e of etageres" [value]="e.id">Niveau {{ e.numero }}</option>
                     </select>
                 </div>

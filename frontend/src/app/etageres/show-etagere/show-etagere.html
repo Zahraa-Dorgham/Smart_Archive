@@ -56,7 +56,7 @@
                                 <tr>
                                     <th class="py-2">Indice Étagère</th>
                                     <th class="py-2">Armoire Parente</th>
-                                    <th class="py-2">Identifiant (Code-barres)</th>
+                                    <!-- <th class="py-2">Identifiant (Code-barres)</th> -->
                                     <th class="py-2 text-right px-2">Actions</th>
                                 </tr>
                             </thead>
@@ -72,9 +72,9 @@
                                             <i class="bx bx-archive mr-25"></i> {{getArmoireCode(e)}}
                                         </div>
                                     </td>
-                                    <td class="py-2">
+                                    <!-- <td class="py-2">
                                         <small class="text-muted"><i class="bx bx-barcode-reader mr-25"></i> {{e.code_barres || 'Non défini'}}</small>
-                                    </td>
+                                    </td> -->
                                     <td class="py-2 text-right px-2">
                                         <button class="btn btn-sm btn-icon btn-light-warning mr-1" [routerLink]="['/archiviste/boitiers']" [queryParams]="{etagere: e.id}" title="Voir les boîtiers">
                                             <i class="bx bx-package"></i>

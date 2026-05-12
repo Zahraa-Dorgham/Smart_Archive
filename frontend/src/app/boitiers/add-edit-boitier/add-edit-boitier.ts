@@ -54,7 +54,7 @@ export class AddEditBoitierComponent implements OnInit {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
       idboit: ['', Validators.required],
-      code_barre: ['', Validators.required],
+      code_barre: [''],
       titre: ['', Validators.required],
       capacite: [10, [Validators.required, Validators.min(1)]],
       armoire: [''],
