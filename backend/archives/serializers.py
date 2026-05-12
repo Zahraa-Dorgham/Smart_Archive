@@ -136,7 +136,7 @@ class DossierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dossier
         fields = [
-            'idDossier', 'nomDos', 'date_creation', 'date_cloture',
+            'idDossier', 'code', 'nomDos', 'date_creation', 'date_cloture',
             'boitier', 'boitier_idboit', 'calendrier', 'calendrier_code', 'calendrier_title',
             'phaseArchive', 'phaseArchive_nom',
             'phaseType', 'dureeCourant', 'dureeIntermediaire', 'dureeDefinitive',

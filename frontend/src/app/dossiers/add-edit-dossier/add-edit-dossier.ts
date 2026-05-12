@@ -78,6 +78,7 @@ export class AddEditDossierComponent implements OnInit {
   ) {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
+      code: ['', Validators.required],
       nomDos: ['', Validators.required],
       boitier: [null],
       calendrier: [null],

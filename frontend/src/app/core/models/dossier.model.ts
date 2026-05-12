@@ -5,6 +5,7 @@ import { PhaseArchive } from './phase-archive.model';
 
 export interface Dossier extends BaseModel {
     idDossier: number;
+    code?: string | null;
     nomDos?: string | null;
     boitier?: Boitier | string | null;
     boitier_idboit?: string;
@@ -28,6 +29,7 @@ export interface Dossier extends BaseModel {
 }
 
 export interface DossierCreate {
+    code?: string | null;
     nomDos?: string | null;
     boitier?: string | null;
     calendrier?: string | null;

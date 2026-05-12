@@ -26,7 +26,7 @@
             <div class="col-12 col-sm-6 col-lg-4 d-flex align-items-center">
                 <div [formGroup]="filterForm" class="w-100">
                     <fieldset class="form-group position-relative has-icon-left mb-0">
-                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (ID, Nom)...">
+                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (Code, Nom)...">
                         <div class="form-control-position">
                             <i class="bx bx-search"></i>
                         </div>
@@ -49,7 +49,7 @@
                         <table class="table table-hover mb-0">
                             <thead class="thead-light">
                                 <tr>
-                                    <th class="py-2">ID</th>
+                                    <th class="py-2">Code</th>
                                     <th class="py-2">Nom</th>
                                     <th class="py-2">Calendrier</th>
                                     <th class="py-2">Phase</th>
@@ -61,7 +61,7 @@
                             <tbody>
                                 <tr *ngFor="let d of dataSource.connect() | async">
                                     <td class="py-2">
-                                        <span class="badge badge-light-info text-uppercase font-weight-bold">{{ d.idDossier }}</span>
+                                        <span class="badge badge-light-primary text-uppercase font-weight-bold">{{ d.code || d.idDossier }}</span>
                                     </td>
                                     <td class="py-2">
                                         <h6 class="mb-0 font-weight-bold">{{ d.nomDos || '-' }}</h6>

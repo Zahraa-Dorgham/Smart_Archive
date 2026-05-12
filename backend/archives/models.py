@@ -268,6 +268,7 @@ class Boitier(models.Model):
 # ========== DOSSIER (unique et complet) ==========
 class Dossier(models.Model):
     idDossier = models.AutoField(primary_key=True)
+    code = models.CharField(max_length=50, unique=True, null=True, blank=True)
     nomDos = models.CharField(max_length=255, null=True, blank=True)
     date_creation = models.DateField(null=True, blank=True, default=timezone.now)
     date_cloture = models.DateField(null=True, blank=True)
