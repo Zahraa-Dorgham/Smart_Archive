@@ -129,7 +129,7 @@ mat-form-field.form-field-style ::ng-deep .mdc-notched-outline__trailing {
 
 /* Multiselect consistency */
 .icon-input-wrapper mat-form-field.form-field-style {
-	margin-top: 0;
+	margin-top: 26px;
 }
 
 .icon-input-wrapper mat-form-field.form-field-style ::ng-deep .mdc-text-field--outlined {
@@ -262,6 +262,29 @@ mat-form-field.form-field-style ::ng-deep .mdc-notched-outline__trailing {
 .w-100 {
 	width: 100%;
 	box-sizing: border-box;
+}
+
+.boitier-icon-box {
+    width: 32px;
+    height: 32px;
+    background: #f2f4f4;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-selection-tip {
+    background-color: #f8f9fb;
+    border: 1px solid #dfe3e7;
+    border-radius: 8px;
+    padding: 1rem !important;
+    margin-top: 10px;
+}
+
+.selected-items-label {
+    margin-top: 1rem;
+    display: block;
 }
 
 @media (max-width: 600px) {

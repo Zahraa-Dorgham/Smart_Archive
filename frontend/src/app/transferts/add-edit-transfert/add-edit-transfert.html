@@ -65,30 +65,69 @@
         <div class="section-title">Boitiers liés</div>
         <div class="row">
             <div class="col-md-12 mb-1">
-                <label class="form-label">Boitiers <span class="text-danger">*</span></label>
-                <div class="icon-input-wrapper">
+                <label class="form-label">Sélectionner les Boitiers <span class="text-danger">*</span></label>
+                
+                <!-- Main Selection Input Box -->
+                <div class="icon-input-wrapper mb-2">
                     <i class="bx bx-package"></i>
                     <mat-form-field appearance="outline" class="form-field-style w-100">
-                        <mat-select formControlName="boitier_ids" multiple
-                            placeholder="Choisir un ou plusieurs boitiers">
+                        <mat-select formControlName="boitier_ids" multiple placeholder="Rechercher et choisir les boitiers...">
+                            
+                            <!-- Search Header inside dropdown -->
+                            <div class="select-search-header px-2 py-1 border-bottom">
+                                <div class="icon-input-wrapper">
+                                    <i class="bx bx-search"></i>
+                                    <input type="text" class="form-control form-control-sm" 
+                                           placeholder="Filtrer par code ou titre..."
+                                           (input)="searchTerm = $any($event.target).value"
+                                           (click)="$event.stopPropagation()">
+                                </div>
+                            </div>
+
                             <mat-select-trigger>
                                 <div class="d-flex align-items-center">
-                                    <span class="badge badge-light-primary"
-                                        *ngIf="form.get('boitier_ids')?.value?.length > 0">
+                                    <span class="badge badge-light-primary" *ngIf="form.get('boitier_ids')?.value?.length > 0">
                                         {{ form.get('boitier_ids')?.value?.length }} boitier(s) sélectionné(s)
                                     </span>
-                                    <span *ngIf="!form.get('boitier_ids')?.value?.length" class="text-muted">Choisir les
-                                        boitiers...</span>
+                                    <span *ngIf="!form.get('boitier_ids')?.value?.length" class="text-muted">Cliquez pour choisir...</span>
                                 </div>
                             </mat-select-trigger>
-                            <mat-option *ngFor="let b of boitiers" [value]="b.id.toString()">
-                                <div class="d-flex align-items-center">
-                                    <i class="bx bx-box mr-1 text-primary"></i>
-                                    <span><strong>{{ b.idboit }}</strong> - {{ b.titre }}</span>
+
+                            <mat-option *ngFor="let b of filteredBoitiers" [value]="b.id.toString()">
+                                <div class="d-flex align-items-center py-1">
+                                    <!-- <div class="boitier-icon-box mr-1">
+                                        <i class="bx bx-box text-primary font-medium-3"></i>
+                                    </div> -->
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold text-primary">{{ b.idboit }}</span>
+                                        <small class="text-muted text-truncate" style="max-width: 300px;">{{ b.titre }}</small>
+                                    </div>
                                 </div>
+                            </mat-option>
+
+                            <mat-option *ngIf="filteredBoitiers.length === 0" disabled class="py-2 text-center">
+                                <small class="text-muted">Aucun boîtier trouvé pour "{{searchTerm}}"</small>
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
+                </div>
+
+                <!-- Visual list of selected boitiers (Chips) -->
+                <div class="selected-items-label mb-50" *ngIf="getSelectedBoitiers().length > 0">
+                    <small class="font-weight-bold text-muted">Boitiers sélectionnés :</small>
+                </div>
+                <div class="selected-items-container" *ngIf="getSelectedBoitiers().length > 0">
+                    <div class="selected-tag" *ngFor="let b of getSelectedBoitiers()">
+                        <i class="bx bx-box mr-25"></i>
+                        <span class="mr-50">{{ b.idboit }}</span>
+                        <button type="button" class="btn-remove-tag" (click)="removeBoitier(b.id)" title="Retirer">
+                            <i class="bx bx-x"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="empty-selection-tip p-1 text-center border rounded bg-light" *ngIf="getSelectedBoitiers().length === 0">
+                    <i class="bx bx-info-circle mr-50 text-muted"></i>
+                    <small class="text-muted">Veuillez sélectionner au moins un boîtier disponible pour le transfert.</small>
                 </div>
             </div>
         </div>
