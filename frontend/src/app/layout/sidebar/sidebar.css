@@ -50,3 +50,9 @@
     margin-right: 1rem;
     font-size: 1.2rem;
 } */
+.main-menu .navbar-header .navbar-brand .brand-logo .logo {
+    height: 50px;
+    display: flex;
+
+    
+}
