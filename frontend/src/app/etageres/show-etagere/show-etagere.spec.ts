@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowEtagere } from './show-etagere';
+import { ShowEtagereComponent } from './show-etagere';
 
 describe('ShowEtagere', () => {
-  let component: ShowEtagere;
-  let fixture: ComponentFixture<ShowEtagere>;
+  let component: ShowEtagereComponent;
+  let fixture: ComponentFixture<ShowEtagereComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ShowEtagere],
+      imports: [ShowEtagereComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ShowEtagere);
+    fixture = TestBed.createComponent(ShowEtagereComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

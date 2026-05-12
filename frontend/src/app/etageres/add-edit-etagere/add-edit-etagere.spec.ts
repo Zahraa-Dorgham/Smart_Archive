@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddEditEtagere } from './add-edit-etagere';
+import { AddEditEtagereComponent } from './add-edit-etagere';
 
 describe('AddEditEtagere', () => {
-  let component: AddEditEtagere;
-  let fixture: ComponentFixture<AddEditEtagere>;
+  let component: AddEditEtagereComponent;
+  let fixture: ComponentFixture<AddEditEtagereComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AddEditEtagere],
+      imports: [AddEditEtagereComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AddEditEtagere);
+    fixture = TestBed.createComponent(AddEditEtagereComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
