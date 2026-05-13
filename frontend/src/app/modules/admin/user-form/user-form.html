@@ -28,29 +28,34 @@
                 <!-- STEP 1: BASIC INFO -->
                 <div *ngIf="currentStep === 1" class="animate__animated animate__fadeIn">
                     <div class="section-title">Informations Personnelles</div>
-                    
+
                     <div class="row g-4">
                         <div class="col-md-6">
                             <label class="form-label">Prénom <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" [(ngModel)]="userData.first_name" name="first_name" placeholder="" required>
+                            <input type="text" class="form-control" [(ngModel)]="userData.first_name" name="first_name"
+                                placeholder="" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Nom <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" [(ngModel)]="userData.last_name" name="last_name" placeholder="" required>
+                            <input type="text" class="form-control" [(ngModel)]="userData.last_name" name="last_name"
+                                placeholder="" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email / Identifiant <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bx bx-envelope text-muted"></i></span>
-                                <input type="email" class="form-control border-start-0" [(ngModel)]="userData.email" name="email" 
-                                    autocomplete="new-password" placeholder="email@exemple.com" required>
+                                <span class="input-group-text bg-light border-end-0"><i
+                                        class="bx bx-envelope text-muted"></i></span>
+                                <input type="email" class="form-control border-start-0" [(ngModel)]="userData.email"
+                                    name="email" autocomplete="new-password" placeholder="email@exemple.com" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Direction / Département</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bx bx-buildings text-muted"></i></span>
-                                <select class="form-select border-start-0" [(ngModel)]="userData.direction" name="direction">
+                                <span class="input-group-text bg-light border-end-0"><i
+                                        class="bx bx-buildings text-muted"></i></span>
+                                <select class="form-select border-start-0" [(ngModel)]="userData.direction"
+                                    name="direction">
                                     <option [ngValue]="null">-- Non spécifiée --</option>
                                     <option *ngFor="let dir of directions" [ngValue]="dir.id">
                                         {{ dir.nom }} ({{ dir.code }})
@@ -59,12 +64,33 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label">Numéro de téléphone</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i
+                                        class="bx bx-phone text-muted"></i></span>
+                                <input type="text" class="form-control border-start-0" [(ngModel)]="userData.telephone"
+                                    name="telephone" placeholder="+216 ...">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Adresse</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i
+                                        class="bx bx-map text-muted"></i></span>
+                                <input type="text" class="form-control border-start-0" [(ngModel)]="userData.adresse"
+                                    name="adresse" placeholder="Adresse complète...">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label">Mot de passe <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i class="bx bx-lock-alt text-muted"></i></span>
-                                <input [type]="showPassword ? 'text' : 'password'" class="form-control border-start-0 border-end-0" 
-                                    [(ngModel)]="userData.password" name="password" autocomplete="new-password" placeholder="••••••••" required>
-                                <button type="button" class="input-group-text bg-white border-start-0" (click)="togglePassword()">
+                                <span class="input-group-text bg-light border-end-0"><i
+                                        class="bx bx-lock-alt text-muted"></i></span>
+                                <input [type]="showPassword ? 'text' : 'password'"
+                                    class="form-control border-start-0 border-end-0" [(ngModel)]="userData.password"
+                                    name="password" autocomplete="new-password" placeholder="••••••••" required>
+                                <button type="button" class="input-group-text bg-white border-start-0"
+                                    (click)="togglePassword()">
                                     <i class="bx" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"></i>
                                 </button>
                             </div>
@@ -72,8 +98,10 @@
                         <div class="col-md-6">
                             <label class="form-label">Statut du compte</label>
                             <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" [(ngModel)]="userData.is_active" name="is_active" id="statusSwitch">
-                                <label class="form-check-label fw-bold" for="statusSwitch" [class.text-success]="userData.is_active" [class.text-danger]="!userData.is_active">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="userData.is_active"
+                                    name="is_active" id="statusSwitch">
+                                <label class="form-check-label fw-bold" for="statusSwitch"
+                                    [class.text-success]="userData.is_active" [class.text-danger]="!userData.is_active">
                                     {{ userData.is_active ? 'Actif' : 'Inactif' }}
                                 </label>
                             </div>
@@ -90,22 +118,26 @@
                 <!-- STEP 2: ROLE ASSIGNMENT -->
                 <div *ngIf="currentStep === 2" class="animate__animated animate__fadeIn">
                     <div class="section-title">Attribution de Rôle</div>
-                    
+
                     <div class="row">
                         <div class="col-md-8">
-                            <label class="form-label">Sélectionner le rôle principal <span class="text-danger">*</span></label>
+                            <label class="form-label">Sélectionner le rôle principal <span
+                                    class="text-danger">*</span></label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text bg-light border-end-0">
-                                    <i class="bx" [class.bx-shield-alt-2]="!userData.role_id" [class.bx-check-shield]="userData.role_id" text-muted></i>
+                                    <i class="bx" [class.bx-shield-alt-2]="!userData.role_id"
+                                        [class.bx-check-shield]="userData.role_id" text-muted></i>
                                 </span>
-                                <select class="form-select border-start-0" [(ngModel)]="userData.role_id" name="role_id">
+                                <select class="form-select border-start-0" [(ngModel)]="userData.role_id"
+                                    name="role_id">
                                     <option [ngValue]="null">-- Choisir un rôle --</option>
                                     <option *ngFor="let role of roles" [ngValue]="role.id">
                                         {{ role.nom || role.name }}
                                     </option>
                                 </select>
                             </div>
-                            <small class="text-muted d-block mt-1">Le rôle détermine les permissions de l'utilisateur dans le système.</small>
+                            <small class="text-muted d-block mt-1">Le rôle détermine les permissions de l'utilisateur
+                                dans le système.</small>
                         </div>
                     </div>
 
@@ -114,9 +146,11 @@
                             <i class="bx bx-chevron-left mr-25"></i> Précédent
                         </button>
                         <div>
-                            <button type="button" class="btn btn-link text-muted me-2" (click)="cancel()">Annuler</button>
+                            <button type="button" class="btn btn-link text-muted me-2"
+                                (click)="cancel()">Annuler</button>
                             <button type="submit" class="btn btn-primary glow px-5 shadow-sm" [disabled]="submitting">
-                                <i class="bx bx-save mr-50"></i> {{ submitting ? 'Création...' : 'Créer l\'utilisateur' }}
+                                <i class="bx bx-save mr-50"></i> {{ submitting ? 'Création...' : 'Créer l\'utilisateur'
+                                }}
                             </button>
                         </div>
                     </div>

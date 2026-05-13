@@ -20,7 +20,9 @@ export class UserEditComponent implements OnInit {
         email: '',
         is_active: true,
         password: '',
-        direction: null as number | null
+        direction: null as number | null,
+        telephone: '',
+        adresse: ''
     };
     allGroups: any[] = [];
     directions: any[] = [];
@@ -85,7 +87,9 @@ export class UserEditComponent implements OnInit {
                     email: user.email || '',
                     is_active: user.is_active === true,
                     password: '',
-                    direction: user.direction || null
+                    direction: user.direction || null,
+                    telephone: user.telephone || '',
+                    adresse: user.adresse || ''
                 };
                 // Use groups_detail if available, or fallback to groups (which may be IDs or names)
                 if (Array.isArray(user.groups_detail)) {
@@ -196,7 +200,9 @@ export class UserEditComponent implements OnInit {
             last_name: this.userData.last_name,
             is_active: this.userData.is_active,
             groups: this.selectedGroupIds,
-            direction: this.userData.direction
+            direction: this.userData.direction,
+            telephone: this.userData.telephone,
+            adresse: this.userData.adresse
         };
 
         if (this.userData.password) {

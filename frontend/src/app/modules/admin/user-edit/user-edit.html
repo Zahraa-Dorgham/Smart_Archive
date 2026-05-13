@@ -60,6 +60,20 @@
                         </div>
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label">Numéro de téléphone</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bx bx-phone text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" [(ngModel)]="userData.telephone" name="telephone" placeholder="+212 ...">
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Adresse</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bx bx-map text-muted"></i></span>
+                            <textarea class="form-control border-start-0" [(ngModel)]="userData.adresse" name="adresse" rows="2" placeholder="Adresse complète..."></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label">Statut du compte</label>
                         <div class="form-check form-switch mt-2">
                             <input class="form-check-input" type="checkbox" [(ngModel)]="userData.is_active" name="is_active" 

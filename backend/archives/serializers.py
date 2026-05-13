@@ -525,13 +525,16 @@ class UserSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     direction_nom = serializers.SerializerMethodField()
+    telephone = serializers.CharField(write_only=True, required=False, allow_null=True)
+    adresse = serializers.CharField(write_only=True, required=False, allow_null=True)
     
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 
             'is_active', 'groups', 'groups_detail', 'password', 
-            'user_permissions', 'direction', 'direction_nom'
+            'user_permissions', 'direction', 'direction_nom',
+            'telephone', 'adresse'
         ]
         extra_kwargs = {
             'password': {'write_only': True}
@@ -551,6 +554,8 @@ class UserSerializer(serializers.ModelSerializer):
         # Ensure direction ID is present for frontend dropdowns
         profile = getattr(instance, 'profile', None)
         data['direction'] = profile.direction.id if profile and profile.direction else None
+        data['telephone'] = profile.telephone if profile else None
+        data['adresse'] = profile.adresse if profile else None
         
         # Add initials and full_name if missing (for frontend)
         if 'first_name' in data and 'last_name' in data:
@@ -564,16 +569,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         direction = validated_data.pop('direction', None)
+        telephone = validated_data.pop('telephone', None)
+        adresse = validated_data.pop('adresse', None)
         groups_data = validated_data.pop('groups', [])
         permissions_data = validated_data.pop('user_permissions', [])
         password = validated_data.pop('password', None)
         
         user = User.objects.create_user(password=password, **validated_data)
         
-        # Ensure profile exists and set direction
+        # Ensure profile exists and set direction, telephone, adresse
         UserProfile.objects.update_or_create(
             user=user,
-            defaults={'direction': direction}
+            defaults={
+                'direction': direction,
+                'telephone': telephone,
+                'adresse': adresse
+            }
         )
 
         if groups_data:
@@ -590,6 +601,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         direction = validated_data.pop('direction', serializers.empty)
+        telephone = validated_data.pop('telephone', serializers.empty)
+        adresse = validated_data.pop('adresse', serializers.empty)
         groups_data = validated_data.pop('groups', None)
         permissions_data = validated_data.pop('user_permissions', None)
         password = validated_data.pop('password', None)
@@ -603,11 +616,19 @@ class UserSerializer(serializers.ModelSerializer):
             
         instance.save()
 
-        # Handle profile (direction)
+        # Handle profile (direction, telephone, adresse)
+        profile_defaults = {}
         if direction is not serializers.empty:
+            profile_defaults['direction'] = direction
+        if telephone is not serializers.empty:
+            profile_defaults['telephone'] = telephone
+        if adresse is not serializers.empty:
+            profile_defaults['adresse'] = adresse
+
+        if profile_defaults:
             profile, _ = UserProfile.objects.update_or_create(
                 user=instance,
-                defaults={'direction': direction}
+                defaults=profile_defaults
             )
             # Update the in-memory relation
             instance.profile = profile

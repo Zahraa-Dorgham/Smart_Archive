@@ -104,3 +104,9 @@
         margin-bottom: 0;
     }
 }
+.form-check {
+    position: relative;
+    display: block;
+    left: 30px;
+    top: -15px;
+}

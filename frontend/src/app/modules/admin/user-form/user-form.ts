@@ -24,7 +24,9 @@ export class UserFormComponent implements OnInit {
     password: '',
     is_active: true,
     role_id: null as number | null,
-    direction: null as number | null
+    direction: null as number | null,
+    telephone: '',
+    adresse: ''
   };
 
   roles: any[] = [];
@@ -113,6 +115,8 @@ export class UserFormComponent implements OnInit {
       is_active: this.userData.is_active,
       groups: [this.userData.role_id],
       direction: this.userData.direction,
+      telephone: this.userData.telephone,
+      adresse: this.userData.adresse,
       password: this.userData.password
     };
 
