@@ -143,38 +143,128 @@
         </div>
     </div>
 
-    <!-- User Detail Panel -->
-    <div class="user-detail-panel shadow-sm border-0" *ngIf="selectedUser">
-        <div class="row align-items-start">
-            <div class="col-md-4">
-                <div class="detail-title">Informations de base</div>
-                <div class="d-flex mb-3">
-                    <div class="avatar bg-primary font-large-1 mr-1" style="width: 60px; height: 60px; border-radius: 12px;">
-                        {{ selectedUser.initials }}
+    <!-- Optimized User Detail Panel -->
+    <div class="user-detail-panel animate__animated animate__fadeInUp" *ngIf="selectedUser">
+        <div class="card border-0 shadow-sm overflow-hidden mb-0">
+            <div class="card-body p-0">
+                <div class="row">
+                    <!-- Left Column: Identity -->
+                    <div class="col-md-4 border-end bg-light-section p-4">
+                        <div class="text-center mb-4">
+                            <div class="avatar bg-primary mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" 
+                                 style="width: 80px; height: 80px; border-radius: 20px; font-size: 2rem; color: white;">
+                                {{ selectedUser.initials }}
+                            </div>
+                            <h4 class="fw-bold mb-1" style="color: #475f7b;">{{ selectedUser.full_name }}</h4>
+                            <span class="badge" [class.badge-light-success]="selectedUser.is_active" [class.badge-light-danger]="!selectedUser.is_active">
+                                {{ selectedUser.is_active ? 'Compte Actif' : 'Compte Suspendu' }}
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <h5 class="mb-0 fw-bold">{{ selectedUser.full_name }}</h5>
-                        <p class="text-muted mb-2">{{ selectedUser.email }}</p>
-                        <div class="d-flex flex-column small gap-1">
-                            <span><strong class="text-muted">Identifiant:</strong> {{ selectedUser.username }}</span>
-                            <span><strong class="text-muted">Direction:</strong> {{ selectedUser.direction_nom || 'Non spécifiée' }}</span>
-                            <span><strong class="text-muted">Téléphone:</strong> {{ selectedUser.telephone || '-' }}</span>
-                            <span><strong class="text-muted">Adresse:</strong> {{ selectedUser.adresse || '-' }}</span>
-                            <span><strong class="text-muted">ID Système:</strong> #{{ selectedUser.id }}</span>
-                            <div class="mt-2 d-flex flex-wrap gap-1">
+                    <!-- Right Column: Info Grid & Last Connections -->
+                    <div class="col-md-8 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                            <h5 class="fw-bold mb-0" style="color: #475f7b;">Informations du Profil</h5>
+                            <div class="d-flex gap-2">
                                 <span *ngFor="let r of selectedUser.roles" class="badge" [ngClass]="getRoleBadgeClass(r)">
                                     {{ r }}
                                 </span>
                             </div>
                         </div>
+
+                        <!-- Info Grid 2x2 -->
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="info-icon bg-light-primary rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                                        <i class="bx bx-envelope"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <small class="text-muted d-block uppercase-xs">Email Professionnel</small>
+                                        <span class="fw-bold">{{ selectedUser.email }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="info-icon bg-light-warning rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                                        <i class="bx bx-buildings"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <small class="text-muted d-block uppercase-xs">Direction / Département</small>
+                                        <span class="fw-bold">{{ selectedUser.direction_nom || 'Non spécifiée' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="info-icon bg-light-success rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                                        <i class="bx bx-phone"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <small class="text-muted d-block uppercase-xs">Téléphone</small>
+                                        <span class="fw-bold">{{ selectedUser.telephone || '-' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="info-icon bg-light-danger rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                                        <i class="bx bx-map"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <small class="text-muted d-block uppercase-xs">Adresse</small>
+                                        <span class="fw-bold">{{ selectedUser.adresse || '-' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Last Connections Section -->
+                        <!-- <div class="last-connections">
+                            <div class="detail-title mb-3">Dernières Connexions</div>
+                            <div class="table-responsive" style="max-height: 200px;">
+                                <table class="table table-sm table-borderless align-middle mb-0">
+                                    <thead class="bg-light sticky-top">
+                                        <tr>
+                                            <th class="small text-muted font-weight-bold">Date & Heure</th>
+                                            
+                                            <th class="small text-muted font-weight-bold">Appareil / Navigateur</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let login of selectedUser.login_history" class="border-bottom-faint">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bx bx-time-five text-muted mr-1"></i>
+                                                    <small class="fw-medium">{{ login.login_at | date:'dd/MM/yyyy HH:mm' }}</small>
+                                                </div>
+                                            </td>
+                                            <td><code class="small">{{ login.ip_address || 'Localhost' }}</code></td>
+                                            <td class="text-truncate" style="max-width: 200px;">
+                                                <small class="text-muted" [title]="login.user_agent">{{ login.user_agent || 'Inconnu' }}</small>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="!selectedUser.login_history?.length">
+                                            <td colspan="3" class="text-center py-4 text-muted small italic">
+                                                Aucune donnée de connexion disponible pour cet utilisateur.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> -->
+
+                        <!-- Actions Footer -->
+                        <!-- <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                            <button class="btn btn-sm btn-light-primary px-3 me-2" (click)="edit(selectedUser)">
+                                <i class="bx bx-edit-alt mr-50"></i> Modifier le profil
+                            </button>
+                            <button class="btn btn-sm btn-light-danger px-3" (click)="delete(selectedUser.id)">
+                                <i class="bx bx-trash mr-50"></i> Supprimer
+                            </button>
+                        </div> -->
                     </div>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="detail-title">Résumé de l'Accès</div>
-                <p class="text-muted small mt-2">Cet utilisateur dispose des accès définis par ses rôles assignés ci-contre. Pour modifier ses permissions, veuillez ajuster la configuration des rôles correspondants dans le module "Gestion des Rôles".</p>
-                <div class="alert alert-light-primary mt-3 border-0">
-                    <i class="bx bx-info-circle mr-50"></i> Les permissions sont désormais gérées exclusivement au niveau des rôles pour plus de simplicité.
                 </div>
             </div>
         </div>

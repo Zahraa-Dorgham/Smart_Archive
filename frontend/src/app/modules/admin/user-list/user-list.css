@@ -103,19 +103,14 @@
 .badge-light-warning { background-color: #fff6e7; color: #fdac41; }
 .badge-light-info { background-color: #e0f9fc; color: #00cfdd; }
 
-/* User Detail Panel */
+/* Optimized User Detail Panel Styles */
 .user-detail-panel {
-    background: #fff;
-    border: 1px solid #dfe3e7;
-    border-radius: 8px;
-    padding: 1.5rem;
     margin-top: 2rem;
-    animation: slideUp 0.4s ease-out;
+    animation: fadeInUp 0.5s ease-out;
 }
 
-@keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.bg-light-section {
+    background-color: #f9fbfd;
 }
 
 .detail-title {
@@ -127,17 +122,6 @@
     margin-bottom: 1rem;
     border-bottom: 1px solid #dfe3e7;
     padding-bottom: 5px;
-}
-
-.permission-badge {
-    background: #f2f4f4;
-    color: #475f7b;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 0.7rem;
-    margin: 2px;
-    display: inline-block;
-    border: 1px solid #dfe3e7;
 }
 
 .btn-icon-custom {
@@ -153,4 +137,75 @@
 
 .btn-icon-custom:hover {
     transform: scale(1.1);
+}
+
+.shadow-xs {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.rounded-3 {
+    border-radius: 12px !important;
+}
+
+.x-small {
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.role-explanation-card {
+    transition: transform 0.3s ease;
+}
+
+.role-explanation-card:hover {
+    transform: translateX(5px);
+}
+
+.info-icon {
+    flex-shrink: 0;
+}
+
+.bg-light-primary { background-color: #e7edf3 !important; color: #5a8dee !important; }
+.bg-light-success { background-color: #e2f8f0 !important; color: #39da8a !important; }
+.bg-light-danger { background-color: #ffeded !important; color: #ff5b5c !important; }
+.bg-light-warning { background-color: #fff6e7 !important; color: #fdac41 !important; }
+.bg-light-info { background-color: #e0f9fc !important; color: #00cfdd !important; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom-paginator {
+    background: transparent !important;
+}
+
+.uppercase-xs {
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+.border-bottom-faint {
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.last-connections {
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.last-connections .table th {
+    padding: 10px;
+    background-color: #f8f9fb;
+}
+
+.last-connections .table td {
+    padding: 10px;
 }

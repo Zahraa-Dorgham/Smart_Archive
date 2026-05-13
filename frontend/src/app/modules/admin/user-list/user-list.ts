@@ -105,6 +105,27 @@ export class UserListComponent implements OnInit {
     return 'badge-light-secondary';
   }
 
+  getRoleDescription(roles: string[]): string {
+    if (!roles || roles.length === 0) return "Cet utilisateur n'a aucun rôle assigné.";
+    
+    const rolesStr = roles.join(', ').toLowerCase();
+    
+    if (rolesStr.includes('admin')) {
+        return "Administrateur système avec un contrôle total sur les utilisateurs, les configurations et l'ensemble du cycle de vie des archives.";
+    }
+    if (rolesStr.includes('archiviste')) {
+        return "Responsable technique de la gestion physique et numérique des archives, incluant la création de l'arborescence et le suivi des boîtiers.";
+    }
+    if (rolesStr.includes('responsable')) {
+        return "Superviseur de direction ayant la capacité de valider les transferts, de consulter les statistiques et de gérer les documents de son unité.";
+    }
+    if (rolesStr.includes('employe') || rolesStr.includes('employé')) {
+        return "Utilisateur standard autorisé à consulter les documents accessibles et à initier des procédures de versement/transfert.";
+    }
+    
+    return "Utilisateur avec des accès personnalisés selon les rôles spécifiques qui lui ont été attribués.";
+  }
+
   computeStats(): void {
     this.totalUsers = this.users.length;
     this.activeUsers = this.users.filter((user) => user.is_active).length;
