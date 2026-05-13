@@ -53,18 +53,23 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let c of dataSource.connect() | async">
-                                    <td class="py-2">
-                                        <span class="badge badge-light-info text-uppercase font-weight-bold">{{c.code}}</span>
+                                <tr *ngFor="let c of dataSource.connect() | async" [ngClass]="{'bg-light': (c.level || 0) > 0}">
+                                    <td class="py-2" [style.padding-left.px]="(c.level || 0) * 30 + 15">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx mr-50 font-medium-2" 
+                                               [ngClass]="c.is_dossier ? 'bx-folder text-warning' : 'bx-file text-primary'"></i>
+                                            <span class="badge badge-light-info text-uppercase font-weight-bold">{{c.code}}</span>
+                                        </div>
                                     </td>
                                     <td class="py-2">
-                                        <h6 class="mb-0 font-weight-bold">{{c.title}}</h6>
+                                        <h6 class="mb-0 font-weight-bold" [ngClass]="{'text-muted': (c.level || 0) > 0}">{{c.title}}</h6>
                                         <small class="text-muted">{{c.unit_responsable || '-'}}</small>
                                     </td>
                                     <td class="py-2">
-                                        <div class="d-flex align-items-center text-primary">
+                                        <div class="d-flex align-items-center text-primary" *ngIf="(c.level || 0) === 0">
                                             <i class="bx bx-sitemap mr-50"></i> {{c.direction_detail?.nom || c.direction || '-'}}
                                         </div>
+                                        <span class="text-muted small" *ngIf="(c.level || 0) > 0">Hérité du parent</span>
                                     </td>
                                     <td class="py-2 text-center">
                                         <span class="badge badge-light-success">{{ c.conservation_active_period || 0 }} ans</span>

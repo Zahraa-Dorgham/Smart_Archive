@@ -95,9 +95,13 @@ export class ShowCalendrierComponent implements OnInit {
 
   loadCalendriers(): void {
     this.loadingService.show();
-    this.calendrierService.getCalendriers().subscribe({
+    // Fetch a larger number of items to build the hierarchy correctly in frontend
+    this.calendrierService.getCalendriers({ page_size: 200 }).subscribe({
       next: (response: PaginatedResponse<Calendrier>) => {
-        this.dataSource.data = response.results;
+        const flatData = response.results;
+        const hierarchicalData = this.buildHierarchy(flatData);
+        
+        this.dataSource.data = hierarchicalData;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.loadingService.hide();
@@ -108,6 +112,32 @@ export class ShowCalendrierComponent implements OnInit {
         this.loadingService.hide();
       }
     });
+  }
+
+  private buildHierarchy(items: Calendrier[]): any[] {
+    const rootItems = items.filter(i => !i.parent);
+    const result: any[] = [];
+
+    rootItems.forEach(root => {
+      root.level = 0;
+      result.push(root);
+      
+      const children = items.filter(i => i.parent === root.id);
+      children.forEach(child => {
+        child.level = 1;
+        result.push(child);
+      });
+    });
+
+    // Add any orphans (items with parents not in the list)
+    items.forEach(item => {
+      if (!result.find(r => r.id === item.id)) {
+        item.level = 0;
+        result.push(item);
+      }
+    });
+
+    return result;
   }
 
   applyFilter(): void {

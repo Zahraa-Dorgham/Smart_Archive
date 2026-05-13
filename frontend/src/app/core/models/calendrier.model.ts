@@ -21,6 +21,7 @@ export interface Calendrier extends BaseModel {
     remarques?: string | null;
     validation_archive?: boolean;
     is_active?: boolean;
+    level?: number;
     created_at?: string;
     updated_at?: string;
 }
