@@ -13,6 +13,7 @@ export interface Boitier extends BaseModel {
     description?: string;
     localisation?: string;
     taux_remplissage?: number;
+    nombre_dossiers?: number;
 }
 
 export interface BoitierCreate {

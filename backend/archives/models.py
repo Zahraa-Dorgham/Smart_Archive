@@ -200,7 +200,7 @@ class Boitier(models.Model):
         ('EN_PREPARATION', 'En préparation'),
     ]
     idboit = models.CharField(max_length=50, unique=True)
-    code_barre = models.CharField(max_length=100, unique=True)
+    code_barre = models.CharField(max_length=100, unique=True, null=True, blank=True)
     titre = models.CharField(max_length=200)
     capacite = models.IntegerField()
     armoire = models.ForeignKey(Armoire, on_delete=models.SET_NULL, null=True, blank=True, related_name='boitiers')
@@ -264,6 +264,9 @@ class Boitier(models.Model):
         if not parts:
             return "Non localisé"
         return " > ".join(parts)
+
+    def nombre_dossiers(self):
+        return self.dossiers.count()
 
 # ========== DOSSIER (unique et complet) ==========
 class Dossier(models.Model):
@@ -400,8 +403,7 @@ class Document(models.Model):
 
     def _calculer_hash(self, fichier):
         sha256 = hashlib.sha256()
-        for chunk in fichier.chunks():
-            sha256.update(chunk)
+        sha256.update(fichier.read())
         return sha256.hexdigest()
 
     def changer_phase(self, nouvelle_phase, utilisateur=None, commentaire=""):

@@ -58,6 +58,7 @@
                                     <th class="py-2">Titre</th>
                                     <th class="py-2">Localisation</th>
                                     <th class="py-2">Capacité</th>
+                                    <th class="py-2">Dossiers</th>
                                     <th class="py-2 text-right px-2">Actions</th>
                                 </tr>
                             </thead>
@@ -80,6 +81,9 @@
                                     </td>
                                     <td class="py-2">
                                         <i class="bx bx-archive mr-25"></i> {{b.capacite}}
+                                    </td>
+                                    <td class="py-2 text-center">
+                                        <span class="badge badge-light-info">{{b.nombre_dossiers || 0}}</span>
                                     </td>
                                     <td class="py-2 text-right px-2">
                                         <button class="btn btn-sm btn-icon btn-light-success mr-1" [routerLink]="['/archiviste/dossiers']" [queryParams]="{boitier: b.id}" title="Voir les Dossiers">

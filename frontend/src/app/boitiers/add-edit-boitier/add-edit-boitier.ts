@@ -126,6 +126,7 @@ export class AddEditBoitierComponent implements OnInit {
     if (formValue.armoire === '') formValue.armoire = null;
     if (formValue.etagere === '') formValue.etagere = null;
     if (formValue.description === '') formValue.description = null;
+    if (formValue.code_barre === '') formValue.code_barre = null;
     
     if (this.isEditMode && this.data.boitier) {
       this.boitierService.updateBoitier(this.data.boitier.id, formValue).subscribe({

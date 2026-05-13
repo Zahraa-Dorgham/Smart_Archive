@@ -116,7 +116,7 @@ class BoitierSerializer(serializers.ModelSerializer):
             'id', 'idboit', 'code_barre', 'titre', 'capacite',
             'armoire', 'armoire_nom', 'etagere', 'etagere_numero',
             'statut', 'date_creation', 'date_modification',
-            'localisation', 'taux_remplissage'
+            'localisation', 'taux_remplissage', 'nombre_dossiers'
         ]
 
     def get_localisation(self, obj):
