@@ -50,7 +50,7 @@
                                                         [class.border-danger]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
                                                         (click)="hidePassword = !hidePassword">
                                                         <i class="bx"
-                                                            [ngClass]="hidePassword ? 'bx-show' : 'bx-hide'"></i>
+                                                            [ngClass]="!hidePassword ? 'bx-show' : 'bx-hide'"></i>
                                                     </span>
                                                 </div>
                                             </div>
@@ -75,10 +75,10 @@
                                         </button>
                                     </form>
                                     
-                                    <div class="text-center mt-2">
+                                    <!-- <div class="text-center mt-2">
                                         <small>Vous n'avez pas encore de compte ? </small>
                                         <a routerLink="/register"><small>Créer un compte</small></a>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
 
