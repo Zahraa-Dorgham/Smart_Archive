@@ -45,7 +45,6 @@ export class AddEditTransfertComponent implements OnInit {
   boitiers: Boitier[] = [];
 
   readonly typeOptions = ['INTERMEDIAIRE', 'FINAL'];
-  statusOptions = ['EN_ATTENTE', 'VALIDE', 'ANNULE'];
   searchTerm: string = '';
 
   constructor(
@@ -60,9 +59,7 @@ export class AddEditTransfertComponent implements OnInit {
     this.form = this.fb.group({
       reference: [''],
       typeTransfer: ['INTERMEDIAIRE', Validators.required],
-      statut: ['EN_ATTENTE', Validators.required],
       date_demande: [this.formatDate(new Date()), Validators.required],
-      date_execution: [''],
       boitier_ids: [[], Validators.required]
     });
   }
@@ -82,9 +79,7 @@ export class AddEditTransfertComponent implements OnInit {
       this.form.patchValue({
         reference: this.data.transfert.reference ?? '',
         typeTransfer: this.data.transfert.typeTransfer ?? 'INTERMEDIAIRE',
-        statut: this.data.transfert.statut ?? 'EN_ATTENTE',
         date_demande: this.formatDate(this.data.transfert.date_demande),
-        date_execution: this.formatDate(this.data.transfert.date_execution),
         boitier_ids: (this.data.transfert.boitier_ids ?? []).map(id => String(id))
       });
     }

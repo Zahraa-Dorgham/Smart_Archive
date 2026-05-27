@@ -48,6 +48,10 @@ export interface Transfert extends BaseModel {
     statut: string;
     boitier_ids: number[];
     boitiers_detail?: TransfertBoitierDetail[];
+    archiviste?: number | null;
+    archiviste_nom?: string | null;
+    responsable?: number | null;
+    responsable_nom?: string | null;
 }
 
 export interface TransfertCreate {
@@ -56,7 +60,7 @@ export interface TransfertCreate {
     typeTransfer: string;
     date_demande?: string | Date | null;
     date_execution?: string | Date | null;
-    statut: string;
+    statut?: string;
     boitier_ids: number[];
 }
 

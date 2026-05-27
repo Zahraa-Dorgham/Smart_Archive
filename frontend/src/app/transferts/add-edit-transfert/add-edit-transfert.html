@@ -21,9 +21,9 @@
             </div>
         </div>
 
-        <div class="section-title">Classification & Statut</div>
+        <div class="section-title">Classification</div>
         <div class="row">
-            <div class="col-md-6 mb-1">
+            <div class="col-md-12 mb-1">
                 <label class="form-label">Type de transfert <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-shuffle"></i>
@@ -32,32 +32,15 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-6 mb-1">
-                <label class="form-label">Statut <span class="text-danger">*</span></label>
-                <div class="icon-input-wrapper">
-                    <i class="bx bx-flag"></i>
-                    <select class="form-control" formControlName="statut">
-                        <option *ngFor="let option of statusOptions" [ngValue]="option">{{ option }}</option>
-                    </select>
-                </div>
-            </div>
         </div>
 
         <div class="section-title">Dates</div>
         <div class="row">
-            <div class="col-md-6 mb-1">
+            <div class="col-md-12 mb-1">
                 <label class="form-label">Date demande <span class="text-danger">*</span></label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-calendar"></i>
                     <input type="date" class="form-control" formControlName="date_demande">
-                </div>
-            </div>
-
-            <div class="col-md-6 mb-1">
-                <label class="form-label">Date execution</label>
-                <div class="icon-input-wrapper">
-                    <i class="bx bx-calendar-check"></i>
-                    <input type="date" class="form-control" formControlName="date_execution">
                 </div>
             </div>
         </div>

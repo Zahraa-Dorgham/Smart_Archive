@@ -64,6 +64,7 @@ export const routes: Routes = [
         canActivate: [() => roleGuard(['Responsable', 'Archiviste', 'Admin', 'Administrateur'])()],
         children: [
           { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), data: { dashboardRole: 'responsable' } },
+          { path: 'transferts', loadComponent: () => import('./transferts/show-transfert/show-transfert').then(m => m.ShowTransfertComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
       },

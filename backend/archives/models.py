@@ -471,6 +471,20 @@ class Transfert(models.Model):
     date_demande = models.DateTimeField(default=timezone.now)
     date_execution = models.DateTimeField(null=True, blank=True)
     statut = models.CharField(max_length=20, default='EN_ATTENTE')
+    archiviste = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='transferts_initialises'
+    )
+    responsable = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='transferts_valides'
+    )
 
     class Meta:
         verbose_name = "Transfert"

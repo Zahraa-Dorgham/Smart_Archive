@@ -24,6 +24,13 @@
                 <a [routerLink]="dashboardLink"><i class="bx bx-home-alt"></i><span class="menu-title">Dashboard</span></a>
             </li>
 
+            <ng-container *ngIf="authService.hasRole('Responsable')">
+                <li class="navigation-header"><span>Responsable</span></li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/responsable/transferts"><i class="bx bx-transfer"></i><span class="menu-title">Transferts</span></a>
+                </li>
+            </ng-container>
+
             <!-- Section Administrateur visible par Archiviste et Administrateur -->
             <ng-container *ngIf="authService.hasRole(['Archiviste', 'Administrateur'])">
                 <li class="navigation-header"><span>Administrateur</span></li>

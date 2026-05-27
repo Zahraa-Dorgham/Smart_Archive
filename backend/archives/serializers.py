@@ -257,14 +257,30 @@ class TransfertSerializer(serializers.ModelSerializer):
         required=False
     )
     boitiers_detail = serializers.SerializerMethodField()
+    archiviste_nom = serializers.SerializerMethodField()
+    responsable_nom = serializers.SerializerMethodField()
 
     class Meta:
         model = Transfert
         fields = [
             'id', 'reference', 'bordereauxReference', 'typeTransfer',
             'date_demande', 'date_execution', 'statut',
-            'boitier_ids', 'boitiers_detail'
+            'boitier_ids', 'boitiers_detail',
+            'archiviste', 'archiviste_nom', 'responsable', 'responsable_nom'
         ]
+        read_only_fields = ['statut', 'date_execution', 'archiviste', 'responsable']
+
+    def get_archiviste_nom(self, obj):
+        return self._format_user_name(obj.archiviste)
+
+    def get_responsable_nom(self, obj):
+        return self._format_user_name(obj.responsable)
+
+    def _format_user_name(self, user):
+        if not user:
+            return None
+        full_name = user.get_full_name().strip()
+        return full_name or user.username
 
     def get_boitiers_detail(self, obj):
         return [

@@ -55,6 +55,13 @@ class EstResponsable(permissions.BasePermission):
         return user_has_any_role(request.user, ["admin", "archiviste", "responsable"])
 
 
+class EstResponsableValidateur(permissions.BasePermission):
+    message = "Vous devez etre responsable pour valider un transfert."
+
+    def has_permission(self, request, view):
+        return user_has_any_role(request.user, ["admin", "responsable"])
+
+
 class EstEmploye(permissions.BasePermission):
     def has_permission(self, request, view):
         return user_has_any_role(request.user, ["admin", "archiviste", "responsable", "employe"])

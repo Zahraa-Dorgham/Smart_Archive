@@ -20,7 +20,7 @@
             <div class="col-12 col-lg-4 d-flex align-items-center mb-1 mb-lg-0">
                 <div [formGroup]="filterForm" class="w-100">
                     <fieldset class="form-group position-relative has-icon-left mb-0">
-                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (reference, boitier)...">
+                        <input type="text" class="form-control" formControlName="search" placeholder="Rechercher (reference, boitier, archiviste)...">
                         <div class="form-control-position">
                             <i class="bx bx-search"></i>
                         </div>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="col-12 col-lg-8 d-flex align-items-center justify-content-end">
-                <button class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
+                <button *ngIf="canManageTransferts" class="btn btn-primary glow shadow px-2" (click)="openAddDialog()">
                     <i class="bx bx-plus-circle mr-50"></i> Nouveau Transfert
                 </button>
             </div>
@@ -47,6 +47,7 @@
                                     <!-- <th class="py-2">Bordereau</th> -->
                                     <th class="py-2">Type</th>
                                     <th class="py-2">Boitiers</th>
+                                    <th *ngIf="showArchivisteColumn" class="py-2">Archiviste</th>
                                     <th class="py-2">Date demande</th>
                                     <th class="py-2">Statut</th>
                                     <th class="py-2 text-right px-2">Actions</th>
@@ -67,6 +68,9 @@
                                     <td class="py-2">
                                         <small class="text-muted">{{ getBoitiersLabel(t) }}</small>
                                     </td>
+                                    <td *ngIf="showArchivisteColumn" class="py-2">
+                                        <small class="text-muted">{{ getArchivisteLabel(t) }}</small>
+                                    </td>
                                     <td class="py-2">
                                         <small class="text-muted">{{ t.date_demande | date:'shortDate' }}</small>
                                     </td>
@@ -77,13 +81,13 @@
                                         <button *ngIf="t.statut === 'VALIDE'" class="btn btn-sm btn-outline-info mr-1" (click)="generateBordereau(t)" title="Generer bordereau">
                                             <i class="bx bx-file mr-50"></i> Generer bordereau
                                         </button>
-                                        <button class="btn btn-sm btn-icon btn-success glow-success mr-1" (click)="validateTransfert(t)" title="Valider" [disabled]="t.statut === 'VALIDE'">
+                                        <button *ngIf="canValidateTransferts" class="btn btn-sm btn-icon btn-success glow-success mr-1" (click)="validateTransfert(t)" title="Valider" [disabled]="t.statut === 'VALIDE'">
                                             <i class="bx bx-check"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(t)" title="Modifier" [disabled]="t.statut === 'VALIDE'">
+                                        <button *ngIf="canManageTransferts" class="btn btn-sm btn-icon btn-light-primary mr-1" (click)="openEditDialog(t)" title="Modifier" [disabled]="t.statut === 'VALIDE'">
                                             <i class="bx bx-edit-alt"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-icon btn-light-danger" (click)="deleteTransfert(t)" title="Supprimer">
+                                        <button *ngIf="canManageTransferts" class="btn btn-sm btn-icon btn-light-danger" (click)="deleteTransfert(t)" title="Supprimer" [disabled]="t.statut === 'VALIDE'">
                                             <i class="bx bx-trash-alt"></i>
                                         </button>
                                     </td>

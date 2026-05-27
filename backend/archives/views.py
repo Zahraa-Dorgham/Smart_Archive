@@ -35,7 +35,7 @@ from .serializers import (
     GroupSerializer, UserSerializer
 )
 from .permissions import (
-    EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable,
+    EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsableValidateur,
     user_has_any_role
 )
 from .gemini_service import GeminiDocumentExtractionError, GeminiDocumentExtractionService
@@ -351,7 +351,7 @@ class ConsultationViewSet(viewsets.ModelViewSet):
 
 # ========== TRANSFERTS ==========
 class TransfertViewSet(viewsets.ModelViewSet):
-    queryset = Transfert.objects.all().prefetch_related('transfert_boitiers__boitier')
+    queryset = Transfert.objects.all().select_related('archiviste', 'responsable').prefetch_related('transfert_boitiers__boitier')
     serializer_class = TransfertSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['statut', 'typeTransfer']
@@ -361,13 +361,15 @@ class TransfertViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'bordereau_pdf']:
             return [EstLectureAutorisee()]
-        return [EstResponsable()]
+        if self.action == 'valider':
+            return [EstResponsableValidateur()]
+        return [EstArchiviste()]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response({'errors': serializer.errors}, status=400)
-        serializer.save()
+        serializer.save(archiviste=request.user)
         return Response(serializer.data, status=201)
 
     def update(self, request, *args, **kwargs):
@@ -378,6 +380,12 @@ class TransfertViewSet(viewsets.ModelViewSet):
             return Response({'errors': serializer.errors}, status=400)
         serializer.save()
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.statut == 'VALIDE':
+            return Response({'error': 'Un transfert valide ne peut pas etre supprime.'}, status=400)
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
     def available_boitiers(self, request):
@@ -410,8 +418,7 @@ class TransfertViewSet(viewsets.ModelViewSet):
     def valider(self, request, pk=None):
         transfert = self.get_object()
         transfert.statut = 'VALIDE'
-        # Si vous avez un champ 'validateur', décommentez :
-        # transfert.validateur = request.user
+        transfert.responsable = request.user
         transfert.date_execution = timezone.now()
         transfert.save()
         # Logique métier supplémentaire (changement de phase, etc.)

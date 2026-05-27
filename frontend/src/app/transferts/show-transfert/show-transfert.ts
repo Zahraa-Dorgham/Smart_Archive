@@ -14,6 +14,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 
 import { PaginatedResponse } from '../../core/models/base.model';
 import { Transfert } from '../../core/models/transfert.model';
+import { AuthService } from '../../core/services/auth.service';
 import { LoadingService } from '../../core/services/loading.service';
 import { TransfertService } from '../../core/services/transfert.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
@@ -63,6 +64,7 @@ export class ShowTransfertComponent implements OnInit {
 
   constructor(
     private transfertService: TransfertService,
+    public authService: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private loadingService: LoadingService,
@@ -78,6 +80,18 @@ export class ShowTransfertComponent implements OnInit {
   ngOnInit(): void {
     this.loadTransferts();
     this.filterForm.valueChanges.subscribe(() => this.applyFilter());
+  }
+
+  get canManageTransferts(): boolean {
+    return this.authService.hasRole(['Admin', 'Administrateur', 'Archiviste']);
+  }
+
+  get canValidateTransferts(): boolean {
+    return this.authService.hasRole(['Admin', 'Administrateur', 'Responsable']);
+  }
+
+  get showArchivisteColumn(): boolean {
+    return this.authService.hasRole(['Admin', 'Administrateur', 'Responsable']);
   }
 
   loadTransferts(): void {
@@ -102,10 +116,12 @@ export class ShowTransfertComponent implements OnInit {
       const statutMatch = !filter.statut || data.statut === filter.statut;
       const typeMatch = !filter.typeTransfer || data.typeTransfer === filter.typeTransfer;
       const boitiers = this.getBoitiersLabel(data).toLowerCase();
+      const archiviste = (data.archiviste_nom || '').toLowerCase();
       const searchMatch = !searchTerm ||
         (data.reference || '').toLowerCase().includes(searchTerm) ||
         (data.bordereauxReference || '').toLowerCase().includes(searchTerm) ||
-        boitiers.includes(searchTerm);
+        boitiers.includes(searchTerm) ||
+        archiviste.includes(searchTerm);
 
       return searchMatch && statutMatch && typeMatch;
     };
@@ -115,6 +131,10 @@ export class ShowTransfertComponent implements OnInit {
 
   getBoitiersLabel(transfert: Transfert): string {
     return (transfert.boitiers_detail || []).map(item => item.idboit).join(', ') || 'Aucun';
+  }
+
+  getArchivisteLabel(transfert: Transfert): string {
+    return transfert.archiviste_nom || 'Non renseigne';
   }
 
   getStatusBadgeClass(statut: string): string {
@@ -131,6 +151,11 @@ export class ShowTransfertComponent implements OnInit {
   }
 
   openAddDialog(): void {
+    if (!this.canManageTransferts) {
+      this.snackBar.open('Vous ne pouvez pas initialiser un transfert.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
     const dialogRef = this.dialog.open(AddEditTransfertComponent, {
       width: '700px',
       maxWidth: '95vw',
@@ -145,6 +170,11 @@ export class ShowTransfertComponent implements OnInit {
   }
 
   openEditDialog(transfert: Transfert): void {
+    if (!this.canManageTransferts) {
+      this.snackBar.open('Vous ne pouvez pas modifier ce transfert.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
     if (transfert.statut === 'VALIDE') {
       this.snackBar.open('Ce transfert est valide et ne peut plus etre modifie.', 'Fermer', { duration: 3000 });
       return;
@@ -164,6 +194,11 @@ export class ShowTransfertComponent implements OnInit {
   }
 
   validateTransfert(transfert: Transfert): void {
+    if (!this.canValidateTransferts) {
+      this.snackBar.open('Vous ne pouvez pas valider un transfert.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
     this.transfertService.validateTransfert(String(transfert.id)).subscribe({
       next: () => {
         this.snackBar.open('Transfert valide', 'Fermer', { duration: 3000 });
@@ -194,6 +229,16 @@ export class ShowTransfertComponent implements OnInit {
   }
 
   deleteTransfert(transfert: Transfert): void {
+    if (!this.canManageTransferts) {
+      this.snackBar.open('Vous ne pouvez pas supprimer ce transfert.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
+    if (transfert.statut === 'VALIDE') {
+      this.snackBar.open('Ce transfert est valide et ne peut plus etre supprime.', 'Fermer', { duration: 3000 });
+      return;
+    }
+
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
