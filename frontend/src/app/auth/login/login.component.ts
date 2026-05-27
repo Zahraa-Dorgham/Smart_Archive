@@ -67,14 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             // Store login timestamp for display in the topnav
             localStorage.setItem('login_date', new Date().toISOString());
 
-        const roles = (res.user?.roles || []).map((role: string) => role.toLowerCase());
-        if (roles.includes('admin') || roles.includes('administrateur')) {
-          this.router.navigate(['/dashboard']);
-        } else if (roles.includes('archiviste')) {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
+        this.router.navigateByUrl(this.authService.getDashboardUrl());
       },
       error: (err) => {
         this.loading = false;

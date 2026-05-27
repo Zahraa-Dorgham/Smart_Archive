@@ -14,3 +14,14 @@ export const roleGuard = (allowedRoles: string[]) => {
         return router.parseUrl('/');
     };
 };
+
+export const dashboardRedirectGuard = () => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
+
+    if (authService.hasRole(['Admin', 'Administrateur'])) {
+        return true;
+    }
+
+    return router.parseUrl(authService.getDashboardUrl());
+};

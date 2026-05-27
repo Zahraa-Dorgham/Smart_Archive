@@ -1,7 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { ApiService } from '../core/services/api.service';
+
+type DashboardRole = 'admin' | 'archiviste' | 'responsable' | 'employe';
+
+interface DashboardConfig {
+  eyebrow: string;
+  title: string;
+  description: string;
+  showCapacity: boolean;
+  showLocations: boolean;
+  showTransfers: boolean;
+  showPhases: boolean;
+  showHistory: boolean;
+  showEvolution: boolean;
+  showBuildings: boolean;
+  showLogins: boolean;
+}
 
 interface DashboardGlobalStats {
   total_documents: number;
@@ -81,6 +98,7 @@ interface ChartPoint extends DocumentEvolutionPoint {
 }
 
 interface DashboardPayload {
+  scope?: DashboardRole;
   global?: Partial<DashboardGlobalStats>;
   batiments?: BatimentStat[];
   phases?: PhaseStat[];
@@ -112,6 +130,61 @@ const DEFAULT_GLOBAL_STATS: DashboardGlobalStats = {
   users_with_login: 0
 };
 
+const DASHBOARD_CONFIGS: Record<DashboardRole, DashboardConfig> = {
+  admin: {
+    eyebrow: 'Tableau de bord admin',
+    title: "Vue d'ensemble",
+    description: 'Suivi global des utilisateurs, documents, dossiers, boitiers, transferts et emplacements.',
+    showCapacity: true,
+    showLocations: true,
+    showTransfers: true,
+    showPhases: true,
+    showHistory: true,
+    showEvolution: true,
+    showBuildings: true,
+    showLogins: true
+  },
+  archiviste: {
+    eyebrow: 'Tableau de bord archiviste',
+    title: 'Pilotage des archives',
+    description: 'Suivi des documents, dossiers, boitiers, phases et emplacements a traiter.',
+    showCapacity: true,
+    showLocations: true,
+    showTransfers: true,
+    showPhases: true,
+    showHistory: true,
+    showEvolution: true,
+    showBuildings: true,
+    showLogins: false
+  },
+  responsable: {
+    eyebrow: 'Tableau de bord responsable',
+    title: 'Suivi des transferts',
+    description: 'Vue concentree sur les transferts, les boitiers concernes et les demandes en attente.',
+    showCapacity: false,
+    showLocations: false,
+    showTransfers: true,
+    showPhases: false,
+    showHistory: true,
+    showEvolution: false,
+    showBuildings: false,
+    showLogins: false
+  },
+  employe: {
+    eyebrow: 'Tableau de bord employe',
+    title: 'Espace de consultation',
+    description: 'Vue simplifiee des documents, dossiers et phases disponibles en lecture.',
+    showCapacity: false,
+    showLocations: false,
+    showTransfers: false,
+    showPhases: true,
+    showHistory: false,
+    showEvolution: true,
+    showBuildings: false,
+    showLogins: false
+  }
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -120,7 +193,7 @@ const DEFAULT_GLOBAL_STATS: DashboardGlobalStats = {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private readonly cacheKey = 'dashboard_stats_cache_v2';
+  dashboardRole: DashboardRole = 'admin';
   user$: any;
   loginDate: Date | null = null;
   loading = true;
@@ -138,12 +211,18 @@ export class DashboardComponent implements OnInit {
 
   readonly phaseColors = ['#5a8dee', '#39da8a', '#fdac41', '#ff5b5c', '#00cfdd', '#6f42c1'];
 
+  private get cacheKey(): string {
+    return `dashboard_stats_cache_v2_${this.dashboardRole}`;
+  }
+
   constructor(
     public authService: AuthService,
-    private api: ApiService
+    private api: ApiService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.dashboardRole = this.resolveDashboardRole();
     this.user$ = this.authService.currentUser$;
     const ld = localStorage.getItem('login_date');
     this.loginDate = ld ? new Date(ld) : null;
@@ -227,13 +306,53 @@ export class DashboardComponent implements OnInit {
     return this.authService.getUserRoles();
   }
 
+  get dashboardConfig(): DashboardConfig {
+    return DASHBOARD_CONFIGS[this.dashboardRole];
+  }
+
   get kpiCards() {
-    return [
-      { label: 'Documents', value: this.globalStats.total_documents, icon: 'bx-file', tone: 'primary', hint: 'Pieces archivees' },
-      { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'warning', hint: 'Dossiers suivis' },
-      { label: 'Boitiers', value: this.globalStats.total_boitiers, icon: 'bx-box', tone: 'success', hint: 'Contenants actifs' },
-      { label: 'Transferts', value: this.globalStats.total_transferts, icon: 'bx-transfer', tone: 'info', hint: `${this.globalStats.transferts_en_attente} en attente` }
-    ];
+    const cardsByRole: Record<DashboardRole, Array<{ label: string; value: number; icon: string; tone: string; hint: string }>> = {
+      admin: [
+        { label: 'Documents', value: this.globalStats.total_documents, icon: 'bx-file', tone: 'primary', hint: 'Pieces archivees' },
+        { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'warning', hint: 'Dossiers suivis' },
+        { label: 'Boitiers', value: this.globalStats.total_boitiers, icon: 'bx-box', tone: 'success', hint: 'Contenants actifs' },
+        { label: 'Transferts', value: this.globalStats.total_transferts, icon: 'bx-transfer', tone: 'info', hint: `${this.globalStats.transferts_en_attente} en attente` }
+      ],
+      archiviste: [
+        { label: 'Documents', value: this.globalStats.total_documents, icon: 'bx-file', tone: 'primary', hint: 'A classer et suivre' },
+        { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'warning', hint: 'Dossiers archives' },
+        { label: 'Boitiers', value: this.globalStats.total_boitiers, icon: 'bx-box', tone: 'success', hint: 'Contenants geres' },
+        { label: 'Emplacements', value: this.globalStats.emplacements_vides, icon: 'bx-map', tone: 'info', hint: 'Places disponibles' }
+      ],
+      responsable: [
+        { label: 'Transferts', value: this.globalStats.total_transferts, icon: 'bx-transfer', tone: 'info', hint: 'Demandes suivies' },
+        { label: 'En attente', value: this.globalStats.transferts_en_attente, icon: 'bx-time-five', tone: 'warning', hint: 'A valider' },
+        { label: 'Boitiers', value: this.globalStats.total_boitiers, icon: 'bx-box', tone: 'success', hint: 'Boitiers concernes' },
+        { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'primary', hint: 'Dossiers relies' }
+      ],
+      employe: [
+        { label: 'Documents', value: this.globalStats.total_documents, icon: 'bx-file', tone: 'primary', hint: 'Consultables' },
+        { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'warning', hint: 'Dossiers disponibles' },
+        { label: 'Boitiers', value: this.globalStats.total_boitiers, icon: 'bx-box', tone: 'success', hint: 'Contenants references' },
+        { label: 'Phases', value: this.phaseDistribution.length, icon: 'bx-layer', tone: 'info', hint: 'Archivage' }
+      ]
+    };
+
+    return cardsByRole[this.dashboardRole];
+  }
+
+  private resolveDashboardRole(): DashboardRole {
+    const routeRole = this.route.snapshot.data['dashboardRole'];
+    if (this.isDashboardRole(routeRole)) {
+      return routeRole;
+    }
+
+    const userRole = this.authService.getPrimaryRole();
+    return this.isDashboardRole(userRole) ? userRole : 'employe';
+  }
+
+  private isDashboardRole(role: unknown): role is DashboardRole {
+    return role === 'admin' || role === 'archiviste' || role === 'responsable' || role === 'employe';
   }
 
   get locationCards() {

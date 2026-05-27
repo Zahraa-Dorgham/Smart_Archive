@@ -20,6 +20,7 @@ export class UserListComponent implements OnInit {
   
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
     this.dataSource.paginator = mp;
+    this.refreshVisibleUsers();
   }
   
   @ViewChild(MatSort) set matSort(ms: MatSort) {
@@ -27,6 +28,7 @@ export class UserListComponent implements OnInit {
   }
 
   users: any[] = [];
+  visibleUsers: any[] = [];
   selectedUser: any = null;
 
   totalUsers = 0;
@@ -141,14 +143,30 @@ export class UserListComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+
+    this.refreshVisibleUsers();
     
     // Update selected user based on filtered results
-    const filteredData = this.dataSource.filteredData;
+    const filteredData = this.visibleUsers.length ? this.visibleUsers : this.dataSource.filteredData;
     if (filteredData.length > 0) {
         this.selectedUser = filteredData[0];
     } else {
         this.selectedUser = null;
     }
+  }
+
+  refreshVisibleUsers(): void {
+    const filteredData = this.dataSource.filteredData || [];
+    const paginator = this.dataSource.paginator;
+
+    if (!paginator) {
+      this.visibleUsers = filteredData;
+      return;
+    }
+
+    const start = paginator.pageIndex * paginator.pageSize;
+    const end = start + paginator.pageSize;
+    this.visibleUsers = filteredData.slice(start, end);
   }
 
   selectUser(user: any): void {

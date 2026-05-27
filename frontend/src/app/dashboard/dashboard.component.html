@@ -1,10 +1,10 @@
 <div class="dashboard-page animate__animated animate__fadeIn">
   <div class="dashboard-hero">
     <div>
-      <span class="eyebrow">Tableau de bord admin</span>
-      <h2>Vue d'ensemble</h2>
+      <span class="eyebrow">{{ dashboardConfig.eyebrow }}</span>
+      <h2>{{ dashboardConfig.title }}</h2>
       <p>
-        Suivi des documents, dossiers, boitiers, transferts et emplacements.
+        {{ dashboardConfig.description }}
       </p>
     </div>
 
@@ -44,8 +44,8 @@
 
  
 
-  <div class="insight-grid">
-    <section class="panel capacity-panel">
+  <div class="insight-grid" *ngIf="dashboardConfig.showCapacity || dashboardConfig.showLocations || dashboardConfig.showTransfers">
+    <section class="panel capacity-panel" *ngIf="dashboardConfig.showCapacity">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Capacite</span>
@@ -79,7 +79,7 @@
       </div>
     </section>
 
-    <section class="panel locations-panel">
+    <section class="panel locations-panel" *ngIf="dashboardConfig.showLocations">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Infrastructure</span>
@@ -96,7 +96,7 @@
       </div>
     </section>
 
-    <section class="panel transfers-panel">
+    <section class="panel transfers-panel" *ngIf="dashboardConfig.showTransfers">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Workflow</span>
@@ -130,8 +130,8 @@
     </section>
   </div>
   
-  <div class="content-grid">
-    <section class="panel distribution-panel">
+  <div class="content-grid" *ngIf="dashboardConfig.showPhases || dashboardConfig.showHistory">
+    <section class="panel distribution-panel" *ngIf="dashboardConfig.showPhases">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Archives</span>
@@ -170,7 +170,7 @@
       </div>
     </section>
 
-    <section class="panel history-panel">
+    <section class="panel history-panel" *ngIf="dashboardConfig.showHistory">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Historique</span>
@@ -201,7 +201,7 @@
       </div>
     </section>
   </div>
-  <section class="panel evolution-panel">
+  <section class="panel evolution-panel" *ngIf="dashboardConfig.showEvolution">
     <div class="panel-header">
       <div>
         <span class="eyebrow">Evolution</span>
@@ -241,8 +241,8 @@
       </div>
     </ng-template>
   </section>
-  <div class="content-grid bottom-grid">
-    <section class="panel building-panel">
+  <div class="content-grid bottom-grid" *ngIf="dashboardConfig.showBuildings || dashboardConfig.showLogins">
+    <section class="panel building-panel" *ngIf="dashboardConfig.showBuildings">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Repartition</span>
@@ -281,7 +281,7 @@
       </div>
     </section>
 
-    <section class="panel login-panel">
+    <section class="panel login-panel" *ngIf="dashboardConfig.showLogins">
       <div class="panel-header">
         <div>
           <span class="eyebrow">Acces</span>

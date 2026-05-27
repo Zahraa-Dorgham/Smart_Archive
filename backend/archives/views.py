@@ -35,7 +35,8 @@ from .serializers import (
     GroupSerializer, UserSerializer
 )
 from .permissions import (
-    EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable
+    EstAdministrateur, EstArchiviste, EstEmploye, EstLectureAutorisee, EstResponsable,
+    user_has_any_role
 )
 from .gemini_service import GeminiDocumentExtractionError, GeminiDocumentExtractionService
 from reportlab.lib.pagesizes import A4
@@ -52,7 +53,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 # ========== UTILISATEURS ==========
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().select_related('profile', 'profile__direction').prefetch_related('groups', 'user_permissions')
+    queryset = User.objects.all().select_related('profile', 'profile__direction').prefetch_related('groups', 'user_permissions').order_by('id')
     serializer_class = UserSerializer
     permission_classes = [EstAdministrateur]
 
@@ -754,7 +755,16 @@ class DashboardStatsView(viewsets.ViewSet):
 
         return evolution
 
+    def _dashboard_scope(self, user):
+        for scope in ['admin', 'archiviste', 'responsable', 'employe']:
+            if user_has_any_role(user, [scope]):
+                return scope
+        return 'employe'
+
     def list(self, request):
+        scope = self._dashboard_scope(request.user)
+        is_admin_dashboard = scope == 'admin'
+
         total_users = User.objects.count()
         active_users = User.objects.filter(is_active=True).count()
         users_with_login = LoginHistory.objects.values('user').distinct().count()
@@ -864,19 +874,21 @@ class DashboardStatsView(viewsets.ViewSet):
                 .order_by('-date_demande')[:6]
         ]
 
-        recent_logins = [
-            {
-                'id': login.id,
-                'user_id': login.user_id,
-                'username': login.user.username,
-                'full_name': login.user.get_full_name() or login.user.username,
-                'last_login': login.login_at,
-                'ip_address': login.ip_address,
-                'user_agent': login.user_agent,
-                'is_active': login.user.is_active
-            }
-            for login in LoginHistory.objects.select_related('user').order_by('-login_at')[:8]
-        ]
+        recent_logins = []
+        if is_admin_dashboard:
+            recent_logins = [
+                {
+                    'id': login.id,
+                    'user_id': login.user_id,
+                    'username': login.user.username,
+                    'full_name': login.user.get_full_name() or login.user.username,
+                    'last_login': login.login_at,
+                    'ip_address': login.ip_address,
+                    'user_agent': login.user_agent,
+                    'is_active': login.user.is_active
+                }
+                for login in LoginHistory.objects.select_related('user').order_by('-login_at')[:8]
+            ]
 
         document_evolution = self._document_evolution()
 
@@ -894,13 +906,14 @@ class DashboardStatsView(viewsets.ViewSet):
             'emplacements_occupes': occupied_locations,
             'emplacements_vides': empty_locations,
             'pourcentage_emplacements_vides': empty_location_percentage,
-            'total_users': total_users,
-            'active_users': active_users,
-            'users_with_login': users_with_login,
-            'total_logins': LoginHistory.objects.count()
+            'total_users': total_users if is_admin_dashboard else 0,
+            'active_users': active_users if is_admin_dashboard else 0,
+            'users_with_login': users_with_login if is_admin_dashboard else 0,
+            'total_logins': LoginHistory.objects.count() if is_admin_dashboard else 0
         }
 
         return Response({
+            'scope': scope,
             'global': global_stats,
             'batiments': batiment_stats,
             'phases': phase_distribution,

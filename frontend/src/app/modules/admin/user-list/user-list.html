@@ -86,7 +86,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let user of dataSource.connect() | async" [class.table-active]="selectedUser?.id === user.id"
+                    <tr *ngFor="let user of visibleUsers" [class.table-active]="selectedUser?.id === user.id"
                         (click)="selectUser(user)">
                         <td>
                             <div class="d-flex align-items-center">
@@ -139,7 +139,7 @@
 
         <div class="p-2 d-flex justify-content-between align-items-center border-top mt-3" [hidden]="dataSource.data.length === 0">
             <small class="text-muted">Total: {{dataSource.filteredData.length}}</small>
-            <mat-paginator [pageSizeOptions]="[5, 10, 25]" class="custom-paginator"></mat-paginator>
+            <mat-paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25]" class="custom-paginator" (page)="refreshVisibleUsers()"></mat-paginator>
         </div>
     </div>
 

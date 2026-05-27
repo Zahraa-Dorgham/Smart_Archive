@@ -28,6 +28,10 @@ export class Sidebar implements AfterViewInit, OnInit {
     this.checkActiveRoute(this.router.url);
   }
 
+  get dashboardLink(): string {
+    return this.authService.getDashboardUrl();
+  }
+
   private checkActiveRoute(url: string) {
     const childRoutes = ['/archiviste/batiments', '/archiviste/salles', '/archiviste/armoires', '/archiviste/etageres', '/archiviste/boitiers'];
     if (childRoutes.some(route => url.includes(route))) {

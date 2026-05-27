@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { roleGuard } from './core/guards/role.guard';
+import { dashboardRedirectGuard, roleGuard } from './core/guards/role.guard';
 import { LayoutPublicComponent } from './layout/layout-public/layout-public';
 import { LayoutComponent } from './layout/layout-authentifie/layout-authentifie';
 import { LoginComponent } from './auth/login/login.component';
@@ -34,12 +34,15 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+        canActivate: [dashboardRedirectGuard],
+        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+        data: { dashboardRole: 'admin' }
       },
       {
         path: 'archiviste',
         canActivate: [() => roleGuard(['Archiviste', 'Admin', 'Administrateur'])()],
         children: [
+          { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), data: { dashboardRole: 'archiviste' } },
           { path: 'batiments', loadComponent: () => import('./batiment/show-batiment/show-batiment').then(m => m.ShowBatimentComponent) },
           // Calendrier module (new)
           { path: 'calendrier', loadComponent: () => import('./calendrier/show-calendrier/show-calendrier').then(m => m.ShowCalendrierComponent) },
@@ -53,18 +56,24 @@ export const routes: Routes = [
           { path: 'dossiers', loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent) },
           { path: 'documents', loadComponent: () => import('./documents/show-doc/show-doc').then(m => m.ShowDocumentComponent) },
           { path: 'transferts', loadComponent: () => import('./transferts/show-transfert/show-transfert').then(m => m.ShowTransfertComponent) },
-          { path: '', redirectTo: 'batiments', pathMatch: 'full' }
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
       },
       {
         path: 'responsable',
         canActivate: [() => roleGuard(['Responsable', 'Archiviste', 'Admin', 'Administrateur'])()],
-        children: []
+        children: [
+          { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), data: { dashboardRole: 'responsable' } },
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+        ]
       },
       {
         path: 'employe',
         canActivate: [() => roleGuard(['Employe', 'Employé'])()],
-        children: []
+        children: [
+          { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), data: { dashboardRole: 'employe' } },
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+        ]
       },
       { path: 'batiments', redirectTo: '/archiviste/batiments' },
       { path: 'salles', redirectTo: '/archiviste/salles' },

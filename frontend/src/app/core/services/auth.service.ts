@@ -127,6 +127,23 @@ export class AuthService {
         return normalizedAllowedRoles.some(role => userRoles.includes(role));
     }
 
+    getPrimaryRole(): string {
+        const roles = this.getUserRoles();
+        const priority = ['admin', 'archiviste', 'responsable', 'employe'];
+
+        return priority.find(role => roles.includes(role)) || 'employe';
+    }
+
+    getDashboardUrl(): string {
+        const role = this.getPrimaryRole();
+
+        if (role === 'admin') {
+            return '/dashboard';
+        }
+
+        return `/${role}/dashboard`;
+    }
+
     private normalizeRole(role: string): string {
         const normalized = (role || '').trim().toLowerCase();
         if (normalized === 'administrateur' || normalized === 'admin') {
@@ -137,6 +154,9 @@ export class AuthService {
         }
         if (normalized === 'responsable') {
             return 'responsable';
+        }
+        if (normalized.startsWith('employ')) {
+            return 'employe';
         }
         if (normalized === 'employe' || normalized === 'employé') {
             return 'employe';

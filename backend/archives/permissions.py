@@ -1,11 +1,19 @@
+import unicodedata
+
 from rest_framework import permissions
 
 ROLE_ALIASES = {
-    "admin": {"Admin", "Administrateur"},
-    "archiviste": {"Archiviste"},
-    "responsable": {"Responsable"},
+    "admin": {"admin", "administrateur"},
+    "archiviste": {"archiviste"},
+    "responsable": {"responsable"},
     "employe": {"Employe", "Employe", "Employé"},
 }
+
+
+def normalize_role_name(role):
+    value = (role or "").strip().lower()
+    value = unicodedata.normalize("NFKD", value)
+    return "".join(char for char in value if not unicodedata.combining(char))
 
 
 def user_has_any_role(user, aliases):
@@ -17,8 +25,13 @@ def user_has_any_role(user, aliases):
     allowed_names = set()
     for alias in aliases:
         allowed_names.update(ROLE_ALIASES.get(alias, {alias}))
+    normalized_allowed_names = {normalize_role_name(name) for name in allowed_names}
+    user_role_names = {
+        normalize_role_name(name)
+        for name in user.groups.values_list("name", flat=True)
+    }
 
-    return user.groups.filter(name__in=allowed_names).exists()
+    return bool(user_role_names.intersection(normalized_allowed_names))
 
 
 class EstAdministrateur(permissions.BasePermission):
