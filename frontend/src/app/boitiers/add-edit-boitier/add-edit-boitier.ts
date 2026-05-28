@@ -11,6 +11,7 @@ import { BoitierService } from '../../core/services/boitier.service';
 import { ArmoireService } from '../../core/services/armoire.service';
 import { EtagereService } from '../../core/services/etagere.service';
 import { Boitier } from '../../core/models/boitier.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -136,7 +137,7 @@ export class AddEditBoitierComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
+          this.snackBar.open(getApiErrorMessage(err, 'Erreur modification'), 'Fermer', { duration: 5000 });
         }
       });
     } else {
@@ -147,7 +148,7 @@ export class AddEditBoitierComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
+          this.snackBar.open(getApiErrorMessage(err, 'Erreur creation'), 'Fermer', { duration: 5000 });
         }
       });
     }

@@ -10,6 +10,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 import { SalleService } from '../../core/services/salle.service';
 import { Salle } from '../../core/models/salle.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -81,7 +82,7 @@ export class AddEditSalleComponent implements OnInit {
           this.snackBar.open('Salle modifiée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur', 'Fermer', { duration: 3000 })
+        error: (error) => this.snackBar.open(getApiErrorMessage(error, 'Erreur modification'), 'Fermer', { duration: 5000 })
       });
     } else {
       this.salleService.createSalle(formValue).subscribe({
@@ -89,7 +90,7 @@ export class AddEditSalleComponent implements OnInit {
           this.snackBar.open('Salle créée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur', 'Fermer', { duration: 3000 })
+        error: (error) => this.snackBar.open(getApiErrorMessage(error, 'Erreur creation'), 'Fermer', { duration: 5000 })
       });
     }
   }

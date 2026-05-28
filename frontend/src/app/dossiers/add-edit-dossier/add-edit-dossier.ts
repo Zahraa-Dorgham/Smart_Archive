@@ -20,6 +20,7 @@ import { Dossier } from '../../core/models/dossier.model';
 import { Boitier } from '../../core/models/boitier.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
 import { PaginatedResponse } from '../../core/models/base.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 function isBoitier(obj: unknown): obj is Boitier {
   return !!obj && typeof obj === 'object' && 'id' in obj && 'idboit' in obj;
@@ -205,7 +206,7 @@ export class AddEditDossierComponent implements OnInit {
           this.snackBar.open('Dossier modifie', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 })
+        error: (error) => this.snackBar.open(getApiErrorMessage(error, 'Erreur modification'), 'Fermer', { duration: 5000 })
       });
       return;
     }
@@ -215,7 +216,7 @@ export class AddEditDossierComponent implements OnInit {
         this.snackBar.open('Dossier cree', 'Fermer', { duration: 3000 });
         this.dialogRef.close(true);
       },
-      error: () => this.snackBar.open('Erreur creation', 'Fermer', { duration: 3000 })
+      error: (error) => this.snackBar.open(getApiErrorMessage(error, 'Erreur creation'), 'Fermer', { duration: 5000 })
     });
   }
 }

@@ -9,6 +9,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 import { DirectionService } from '../../../app/core/services/direction.service';
 import { Direction, DirectionCreate } from '../../core/models/direction.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -64,8 +65,8 @@ export class AddEditDirectionComponent implements OnInit {
           this.snackBar.open('Direction modifiée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
-          this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(getApiErrorMessage(error, 'Erreur modification'), 'Fermer', { duration: 5000 });
         }
       });
     } else {
@@ -74,8 +75,8 @@ export class AddEditDirectionComponent implements OnInit {
           this.snackBar.open('Direction créée', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
-          this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(getApiErrorMessage(error, 'Erreur creation'), 'Fermer', { duration: 5000 });
         }
       });
     }

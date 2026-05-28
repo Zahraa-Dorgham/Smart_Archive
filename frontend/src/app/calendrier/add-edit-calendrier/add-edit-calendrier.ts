@@ -13,6 +13,7 @@ import { forkJoin } from 'rxjs';
 import { CalendrierService } from '../../core/services/calendrier.service';
 import { DirectionService } from '../../core/services/direction.service';
 import { Calendrier } from '../../core/models/calendrier.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -124,8 +125,8 @@ export class AddEditCalendrierComponent implements OnInit {
           this.snackBar.open('Calendrier modifié', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
-          this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(getApiErrorMessage(error, 'Erreur modification'), 'Fermer', { duration: 5000 });
         }
       });
     } else {
@@ -134,8 +135,8 @@ export class AddEditCalendrierComponent implements OnInit {
           this.snackBar.open('Calendrier créé', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
-          this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(getApiErrorMessage(error, 'Erreur creation'), 'Fermer', { duration: 5000 });
         }
       });
     }

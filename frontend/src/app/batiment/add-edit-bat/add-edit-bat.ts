@@ -9,6 +9,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 import { BatimentService } from '../../core/services/batiment.service';
 import { Batiment } from '../../core/models/batiment.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -72,8 +73,8 @@ export class AddEditBatComponent implements OnInit {
           this.snackBar.open('Bâtiment modifié', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
-          this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(getApiErrorMessage(error, 'Erreur modification'), 'Fermer', { duration: 5000 });
         }
       });
     } else {
@@ -82,8 +83,8 @@ export class AddEditBatComponent implements OnInit {
           this.snackBar.open('Bâtiment créé', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => {
-          this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(getApiErrorMessage(error, 'Erreur creation'), 'Fermer', { duration: 5000 });
         }
       });
     }

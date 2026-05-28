@@ -11,6 +11,7 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { EtagereService } from '../../core/services/etagere.service';
 import { ArmoireService } from '../../core/services/armoire.service';
 import { Etagere } from '../../core/models/etagere.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
   mode: 'add' | 'edit';
@@ -97,7 +98,7 @@ export class AddEditEtagereComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 });
+          this.snackBar.open(getApiErrorMessage(err, 'Erreur modification'), 'Fermer', { duration: 5000 });
         }
       });
     } else {
@@ -108,7 +109,7 @@ export class AddEditEtagereComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 });
+          this.snackBar.open(getApiErrorMessage(err, 'Erreur creation'), 'Fermer', { duration: 5000 });
         }
       });
     }

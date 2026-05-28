@@ -20,6 +20,7 @@ import { Dossier } from '../../core/models/dossier.model';
 import { PaginatedResponse } from '../../core/models/base.model';
 import { PhaseArchive } from '../../core/models/phase-archive.model';
 import { Calendrier } from '../../core/models/calendrier.model';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 function normalizePhases(phases: PhaseArchive[]): PhaseArchive[] {
   return [...phases].sort((left, right) => left.nom.localeCompare(right.nom, 'fr', { sensitivity: 'base' }));
@@ -316,7 +317,7 @@ export class AddEditDocumentComponent implements OnInit {
           this.snackBar.open('Document modifié', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur modification', 'Fermer', { duration: 3000 })
+        error: (error) => this.snackBar.open(getApiErrorMessage(error, 'Erreur modification'), 'Fermer', { duration: 5000 })
       });
     } else {
       this.documentService.createDocument(formValue, this.selectedFile || undefined).subscribe({
@@ -324,7 +325,7 @@ export class AddEditDocumentComponent implements OnInit {
           this.snackBar.open('Document créé', 'Fermer', { duration: 3000 });
           this.dialogRef.close(true);
         },
-        error: () => this.snackBar.open('Erreur création', 'Fermer', { duration: 3000 })
+        error: (error) => this.snackBar.open(getApiErrorMessage(error, 'Erreur creation'), 'Fermer', { duration: 5000 })
       });
     }
   }
