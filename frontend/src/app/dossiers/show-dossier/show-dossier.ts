@@ -27,6 +27,7 @@ import { PaginatedResponse } from '../../core/models/base.model';
 import { AddEditDossierComponent } from '../add-edit-dossier/add-edit-dossier';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { LoadingService } from '../../core/services/loading.service';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 function isPhaseArchive(obj: unknown): obj is PhaseArchive {
   return !!obj && typeof obj === 'object' && 'id' in obj && 'nom' in obj;
@@ -250,8 +251,8 @@ export class ShowDossierComponent implements OnInit {
             this.snackBar.open('Dossier supprime', 'Fermer', { duration: 3000 });
             this.loadDossiers();
           },
-          error: () => {
-            this.snackBar.open('Erreur suppression', 'Fermer', { duration: 3000 });
+          error: (error) => {
+            this.snackBar.open(getApiErrorMessage(error, 'Erreur suppression'), 'Fermer', { duration: 5000 });
             this.loadingService.hide();
           }
         });

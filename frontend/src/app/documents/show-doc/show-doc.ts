@@ -21,6 +21,7 @@ import { PaginatedResponse } from '../../core/models/base.model';
 import { AddEditDocumentComponent } from '../add-edit-doc/add-edit-doc';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { LoadingService } from '../../core/services/loading.service';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 @Component({
   selector: 'app-show-document',
@@ -179,8 +180,8 @@ export class ShowDocumentComponent implements OnInit {
             this.snackBar.open('Document supprimé', 'Fermer', { duration: 3000 });
             this.loadDocuments();
           },
-          error: (err) => {
-            this.snackBar.open('Erreur suppression', 'Fermer', { duration: 3000 });
+          error: (error) => {
+            this.snackBar.open(getApiErrorMessage(error, 'Erreur suppression'), 'Fermer', { duration: 5000 });
             this.loadingService.hide();
           }
         });

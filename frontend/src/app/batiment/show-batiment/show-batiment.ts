@@ -18,6 +18,7 @@ import { Batiment, PaginatedResponse } from '../../core/models/batiment.model';
 import { AddEditBatComponent } from '../add-edit-bat/add-edit-bat';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { LoadingService } from '../../core/services/loading.service';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
  
 @Component({
   selector: 'app-show-batiment',
@@ -151,8 +152,8 @@ export class ShowBatimentComponent implements OnInit {
             this.snackBar.open('Bâtiment supprimé', 'Fermer', { duration: 3000 });
             this.loadBatiments();
           },
-          error: (err) => {
-            this.snackBar.open('Erreur lors de la suppression. Assurez-vous que l\'emplacement est vide.', 'Fermer', { duration: 5000 });
+          error: (error) => {
+            this.snackBar.open(getApiErrorMessage(error, 'Erreur suppression'), 'Fermer', { duration: 5000 });
             this.loadingService.hide();
           }
         });

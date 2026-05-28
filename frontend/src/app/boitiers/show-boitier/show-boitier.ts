@@ -28,6 +28,7 @@ import { PaginatedResponse } from '../../core/models/base.model';
 import { AddEditBoitierComponent } from '../add-edit-boitier/add-edit-boitier';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 import { LoadingService } from '../../core/services/loading.service';
+import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 // Type guards pour vérifier si un objet est une instance d'Armoire ou d'Etagere
 function isArmoire(obj: any): obj is Armoire {
@@ -234,8 +235,8 @@ export class ShowBoitierComponent implements OnInit {
                         this.snackBar.open('Boîtier supprimé', 'Fermer', { duration: 3000 });
                         this.loadBoitiers();
                     },
-                    error: (err) => {
-                        this.snackBar.open('Erreur suppression', 'Fermer', { duration: 3000 });
+                    error: (error) => {
+                        this.snackBar.open(getApiErrorMessage(error, 'Erreur suppression'), 'Fermer', { duration: 5000 });
                         this.loadingService.hide();
                     }
                 });

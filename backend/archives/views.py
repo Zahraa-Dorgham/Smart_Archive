@@ -5,7 +5,7 @@ from datetime import date
 from io import BytesIO
 from pathlib import Path
 
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -186,6 +186,15 @@ class BoitierViewSet(viewsets.ModelViewSet):
             return [EstLectureAutorisee()]
         return [EstEmploye()]
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.dossiers.exists():
+            return Response(
+                {"error": "Suppression impossible car ce boîtier contient des dossiers."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=True, methods=['post'])
     def ajouter_dossier(self, request, pk=None):
         boitier = self.get_object()
@@ -254,6 +263,15 @@ class DossierViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
         return [EstEmploye()]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.documents.exists():
+            return Response(
+                {"error": "Suppression impossible car ce dossier contient des documents."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         try:
