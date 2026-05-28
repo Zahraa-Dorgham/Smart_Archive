@@ -12,9 +12,18 @@
                                         <p class="text-center text-muted font-small-3">Connectez-vous pour accéder à votre espace ETAP.</p>
                                     </div>
 
-                                    <div *ngIf="errorMessage" class="alert alert-danger font-small-3 mb-2 d-flex align-items-center" role="alert" style="display: flex !important;">
-                                        <i class="bx bx-error-circle mr-50" style="font-size: 1.2rem;"></i> 
-                                        <span>{{ errorMessage }}</span>
+                                    <div *ngIf="errorMessage" class="alert alert-danger font-small-3 mb-2" role="alert" style="display: block !important;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx bx-error-circle mr-50" style="font-size: 1.2rem;"></i> 
+                                            <span [innerHTML]="errorMessage"></span>
+                                        </div>
+                                        <div *ngIf="showResend" class="mt-1">
+                                            <button type="button" class="btn btn-warning btn-sm glow" (click)="resendVerification()" [disabled]="resending">
+                                                <i class="bx bx-mail-send mr-25"></i>
+                                                <span *ngIf="!resending">Renvoyer le lien de vérification</span>
+                                                <span *ngIf="resending" class="spinner-border spinner-border-sm"></span>
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">

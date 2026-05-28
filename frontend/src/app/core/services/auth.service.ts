@@ -88,6 +88,15 @@ export class AuthService {
             })
         );
     }
+
+    verifyEmail(token: string): Observable<any> {
+        return this.http.get(`${this.apiUrl}/auth/verify-email/`, { params: { token } });
+    }
+
+    resendVerification(email: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/auth/resend-verification/`, { email });
+    }
+
     getToken(): string | null {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('access_token');

@@ -72,24 +72,42 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         update_last_login(None, self.user)
 
     def validate(self, attrs):
-        attrs = attrs.copy()
+        # 1. Normalisation de l'identifiant (email ou username)
         identifier = attrs.get(self.username_field)
-
         if identifier:
             try:
-                user = User.objects.get(email__iexact=identifier)
-                attrs[self.username_field] = user.get_username()
+                user_obj = User.objects.get(email__iexact=identifier)
+                attrs[self.username_field] = user_obj.get_username()
             except User.DoesNotExist:
                 pass
 
+        # 2. Authentification manuelle pour vérifier le statut AVANT de générer les tokens
+        from django.contrib.auth import authenticate
+        user = authenticate(request=self.context.get('request'), **attrs)
+        
+        if user:
+            profile = getattr(user, 'profile', None)
+            is_verified = profile.is_verified if profile else True
+            print(f"DEBUG LOGIN STRICT: User={user.username}, Verified={is_verified}")
+            
+            if not is_verified:
+                print("DEBUG LOGIN STRICT: BLOCAGE DECLENCHE")
+                raise serializers.ValidationError(
+                    {"detail": "Votre email n'est pas verifie. Veuillez verifier votre boite de reception."}
+                )
+        
+        # 3. Procéder au login normal si tout est OK
         data = super().validate(attrs)
         self._record_login()
+        
+        profile = getattr(self.user, 'profile', None)
         serializer = UserSerializer(self.user)
         data["user"] = {
             **serializer.data,
             "roles": [group.name for group in self.user.groups.all()],
             "is_staff": self.user.is_staff,
             "is_superuser": self.user.is_superuser,
+            "is_verified": profile.is_verified if profile else True,
         }
         return data
 

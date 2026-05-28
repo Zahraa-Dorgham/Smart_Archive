@@ -38,6 +38,8 @@ class UserProfile(models.Model):
     direction = models.ForeignKey('Direction', on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
     telephone = models.CharField(max_length=20, blank=True, null=True)
     adresse = models.TextField(blank=True, null=True)
+    is_verified = models.BooleanField(default=False)
+    verification_token = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name = "Profil Utilisateur"

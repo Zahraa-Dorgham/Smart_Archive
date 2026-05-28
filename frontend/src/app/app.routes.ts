@@ -11,7 +11,8 @@ export const routes: Routes = [
     component: LayoutPublicComponent,
     children: [
       { path: '', component: LoginComponent },
-      { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) }
+      { path: 'login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
+      { path: 'verify-email', loadComponent: () => import('./auth/verify-email/verify-email').then(m => m.VerifyEmailComponent) }
     ]
   },
   {

@@ -58,8 +58,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
          
-
-         
     ),
     # 'DEFAULT_PERMISSION_CLASSES': (
     #     'rest_framework.permissions.IsAuthenticated',  # Par défaut, toutes les vues nécessitent auth
@@ -198,7 +196,23 @@ FRONTEND_BUILD_PATH = Path(BASE_DIR).parent / 'frontend' / 'dist' / 'frontend' /
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+
+DEFAULT_FROM_EMAIL = ''
+
+# URL frontend pour le lien de vérification
+FRONTEND_URL = 'http://localhost:4200'
+
 try:
     from .local_settings import *
+    print("DEBUG: local_settings.py loaded successfully")
 except ImportError:
+    print("DEBUG: local_settings.py NOT found")
     pass
