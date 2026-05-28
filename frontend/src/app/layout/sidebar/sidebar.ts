@@ -32,6 +32,16 @@ export class Sidebar implements AfterViewInit, OnInit {
     return this.authService.getDashboardUrl();
   }
 
+  get menuHeader(): string {
+    if (this.authService.hasRole('Administrateur')) {
+      return 'Administrateur';
+    }
+    if (this.authService.hasRole('Archiviste')) {
+      return 'Gestion Archives';
+    }
+    return 'Menu';
+  }
+
   private checkActiveRoute(url: string) {
     const childRoutes = ['/archiviste/batiments', '/archiviste/salles', '/archiviste/armoires', '/archiviste/etageres', '/archiviste/boitiers'];
     if (childRoutes.some(route => url.includes(route))) {

@@ -39,9 +39,9 @@
 
             <!-- Section Administrateur visible par Archiviste et Administrateur -->
             <ng-container *ngIf="authService.hasRole(['Archiviste', 'Administrateur'])">
-                <li class="navigation-header"><span>Administrateur</span></li>
+                <li class="navigation-header"><span>{{ menuHeader }}</span></li>
                 
-                <li class="nav-item" routerLinkActive="active">
+                <li class="nav-item" *ngIf="authService.hasRole('Administrateur')" routerLinkActive="active">
                     <a routerLink="/archiviste/calendrier"><i class="bx bx-calendar"></i><span class="menu-title">Calendrier</span></a>
                 </li>
                 <li class="nav-item" routerLinkActive="active">
@@ -107,6 +107,16 @@
                         <span class="menu-title">Directions</span>
                     </a>
                 </li>
+            </ng-container>
+
+            <ng-container *ngIf="authService.hasRole(['Employe', 'Employé'])">
+                <li class="navigation-header"><span>Espace Employé</span></li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/employe/documents"><i class="bx bx-file"></i><span class="menu-title">Documents Dep.</span></a>
+                </li>
+                <!-- <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/employe/dossiers"><i class="bx bx-folder"></i><span class="menu-title">Dossiers Dep.</span></a>
+                </li> -->
             </ng-container>
 
         </ul>

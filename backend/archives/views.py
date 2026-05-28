@@ -66,7 +66,7 @@ class RoleViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 
 # ========== DIRECTIONS ==========
@@ -78,7 +78,7 @@ class DirectionViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 # ========== BÂTIMENTS, SALLES, ARMOIRES, ÉTAGÈRES ==========
 class BatimentViewSet(viewsets.ModelViewSet):
@@ -89,7 +89,7 @@ class BatimentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 class SalleViewSet(viewsets.ModelViewSet):
     queryset = Salle.objects.all()
@@ -100,7 +100,7 @@ class SalleViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 class ArmoireViewSet(viewsets.ModelViewSet):
     queryset = Armoire.objects.all()
@@ -111,7 +111,7 @@ class ArmoireViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 class EtagereViewSet(viewsets.ModelViewSet):
     queryset = Etagere.objects.all()
@@ -122,7 +122,7 @@ class EtagereViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 # ========== PHASES D'ARCHIVAGE (GÉNÉRIQUE + SPÉCIFIQUES) ==========
 class PhaseArchiveViewSet(viewsets.ModelViewSet):
@@ -134,7 +134,7 @@ class PhaseArchiveViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 class ArchiveCourantViewSet(viewsets.ModelViewSet):
     queryset = ArchiveCourant.objects.all()
@@ -184,7 +184,7 @@ class BoitierViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
     @action(detail=True, methods=['post'])
     def ajouter_dossier(self, request, pk=None):
@@ -214,6 +214,15 @@ class BoitierViewSet(viewsets.ModelViewSet):
 
 # ========== DOSSIERS ==========
 class DossierViewSet(viewsets.ModelViewSet):
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user_has_any_role(user, ["responsable", "employe"]) and not user.is_superuser:
+            if hasattr(user, "profile") and user.profile.direction:
+                serializer.save(direction=user.profile.direction)
+            else:
+                serializer.save()
+        else:
+            serializer.save()
     queryset = Dossier.objects.all().select_related('boitier', 'calendrier', 'phaseArchive')
     serializer_class = DossierSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -244,7 +253,7 @@ class DossierViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -288,6 +297,15 @@ class DossierViewSet(viewsets.ModelViewSet):
 
 # ========== DOCUMENTS ==========
 class DocumentViewSet(viewsets.ModelViewSet):
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user_has_any_role(user, ["responsable", "employe"]) and not user.is_superuser:
+            if hasattr(user, "profile") and user.profile.direction:
+                serializer.save(direction=user.profile.direction)
+            else:
+                serializer.save()
+        else:
+            serializer.save()
     queryset = Document.objects.all().select_related('dossier', 'phase_archive', 'calendrier')
     serializer_class = DocumentSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -318,7 +336,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -399,7 +417,7 @@ class ConsultationViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
 # ========== DEMANDES DE CONSULTATION (modèle existant) ==========
 # class DemandeConsultationViewSet(viewsets.ModelViewSet):
@@ -443,7 +461,7 @@ class TransfertViewSet(viewsets.ModelViewSet):
             return [EstLectureAutorisee()]
         if self.action == 'valider':
             return [EstResponsableValidateur()]
-        return [EstArchiviste()]
+        return [EstEmploye()]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -1008,17 +1026,19 @@ class DashboardStatsView(viewsets.ViewSet):
     # ────────────────── RESPONSABLE DASHBOARD ──────────────────
     def _build_responsable_dashboard(self, request):
         direction = self._get_user_direction(request.user)
+        if not direction:
+            return self._build_empty_dashboard('responsable', 'Direction non assignee')
 
-        doc_qs = Document.objects.filter(direction=direction) if direction else Document.objects.none()
-        dos_qs = Dossier.objects.filter(direction=direction) if direction else Dossier.objects.none()
-        boitier_qs = Boitier.objects.filter(dossiers__direction=direction).distinct() if direction else Boitier.objects.none()
-        transfert_qs = Transfert.objects.all()
-        if direction:
-            transfert_qs = transfert_qs.filter(
-                transfert_boitiers__boitier__dossiers__direction=direction
-            ).distinct()
-        else:
-            transfert_qs = Transfert.objects.none()
+        doc_qs = Document.objects.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+        dos_qs = Dossier.objects.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+        boitier_qs = Boitier.objects.filter(
+            Q(dossiers__direction=direction) | Q(dossiers__calendrier__direction=direction)
+        ).distinct()
+        
+        transfert_qs = Transfert.objects.filter(
+            Q(transfert_boitiers__boitier__dossiers__direction=direction) |
+            Q(transfert_boitiers__boitier__dossiers__calendrier__direction=direction)
+        ).distinct()
 
         total_documents = doc_qs.count()
         total_dossiers = dos_qs.count()
@@ -1075,16 +1095,23 @@ class DashboardStatsView(viewsets.ViewSet):
 
     # ────────────────── EMPLOYE DASHBOARD ──────────────────
     def _build_employe_dashboard(self, request):
-        total_documents = Document.objects.count()
-        total_dossiers = Dossier.objects.count()
+        direction = self._get_user_direction(request.user)
+        if not direction:
+            return self._build_empty_dashboard('employe', 'Direction non assignee')
 
-        phase_distribution = self._build_phase_distribution()
-        document_evolution = self._document_evolution()
+        doc_qs = Document.objects.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+        dos_qs = Dossier.objects.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+        
+        total_documents = doc_qs.count()
+        total_dossiers = dos_qs.count()
+
+        phase_distribution = self._build_phase_distribution(doc_qs, dos_qs)
+        document_evolution = self._document_evolution(doc_qs)
 
         global_stats = {
             'total_documents': total_documents,
             'total_dossiers': total_dossiers,
-            'total_boitiers': Boitier.objects.count(),
+            'total_boitiers': Boitier.objects.filter(dossiers__in=dos_qs).distinct().count(),
             'total_transferts': 0,
             'transferts_en_attente': 0,
             'total_batiments': 0,
@@ -1103,12 +1130,32 @@ class DashboardStatsView(viewsets.ViewSet):
 
         return {
             'scope': 'employe',
+            'direction': direction.nom if direction else 'Non assignee',
             'global': global_stats,
             'batiments': [],
             'phases': phase_distribution,
             'transferts': {'status': [], 'recent': [], 'pending': []},
             'logins': [],
             'document_evolution': document_evolution
+        }
+
+    def _build_empty_dashboard(self, scope, direction_name='Non assignee'):
+        return {
+            'scope': scope,
+            'direction': direction_name,
+            'global': {
+                'total_documents': 0, 'total_dossiers': 0, 'total_boitiers': 0,
+                'total_transferts': 0, 'transferts_en_attente': 0,
+                'total_batiments': 0, 'total_salles': 0, 'total_armoires': 0, 'total_etageres': 0,
+                'capacite_emplacements': 0, 'emplacements_occupes': 0, 'emplacements_vides': 0,
+                'pourcentage_emplacements_vides': 0, 'total_users': 0, 'active_users': 0,
+                'users_with_login': 0, 'total_logins': 0
+            },
+            'batiments': [],
+            'phases': [],
+            'transferts': {'status': [], 'recent': [], 'pending': []},
+            'logins': [],
+            'document_evolution': []
         }
 
     # ────────────────── SHARED HELPERS ──────────────────

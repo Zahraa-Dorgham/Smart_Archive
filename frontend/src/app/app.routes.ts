@@ -75,6 +75,8 @@ export const routes: Routes = [
         canActivate: [() => roleGuard(['Employe', 'Employé'])()],
         children: [
           { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), data: { dashboardRole: 'employe' } },
+          { path: 'documents', loadComponent: () => import('./documents/show-doc/show-doc').then(m => m.ShowDocumentComponent) },
+          // { path: 'dossiers', loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
       },
