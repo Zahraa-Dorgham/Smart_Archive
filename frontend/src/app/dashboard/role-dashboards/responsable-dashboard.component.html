@@ -45,7 +45,7 @@
   <!-- Distribution by Phase -->
   <section class="panel distribution-panel">
     <div class="panel-header">
-      <span class="eyebrow">Archives Dept.</span>
+      <span class="eyebrow">Phases Archives.</span>
       <h5>Distribution par phase</h5>
     </div>
     <div class="phase-layout">
@@ -60,23 +60,11 @@
       </div>
     </div>
   </section>
-</div>
-
-<div class="content-grid">
-  <!-- Evolution -->
-  <section class="panel evolution-panel">
-    <div class="panel-header"><h5>Evolution des documents du departement</h5></div>
-    <div class="evolution-chart" *ngIf="documentEvolution.length > 0">
-      <svg viewBox="0 0 720 220" preserveAspectRatio="none">
-        <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
-        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
-      </svg>
-    </div>
-  </section>
-
   <!-- History -->
   <section class="panel history-panel">
-    <div class="panel-header"><h5>Dernieres actions</h5></div>
+    <div class="panel-header">
+      <h5>Dernieres actions</h5>
+    </div>
     <div class="timeline">
       <div class="timeline-item" *ngFor="let item of recentTransfers; trackBy: trackById">
         <div class="timeline-dot" [ngClass]="'dot-' + statusTone(item.statut)"></div>
@@ -87,4 +75,29 @@
       </div>
     </div>
   </section>
+</div>
+
+<div class="content-grid">
+  <!-- Evolution -->
+  <section class="panel evolution-panel">
+    <div class="panel-header"><h5>Evolution des documents du departement</h5></div>
+    <div class="evolution-chart" *ngIf="documentEvolution.length > 0">
+      <svg viewBox="0 0 720 220" preserveAspectRatio="none">
+        <line x1="42" y1="18" x2="42" y2="186" class="chart-axis"></line>
+        <line x1="42" y1="186" x2="702" y2="186" class="chart-axis"></line>
+        <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
+        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
+        <g *ngFor="let point of documentEvolutionChartPoints; trackBy: trackById">
+          <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="chart-dot"></circle>
+        </g>
+      </svg>
+      <div class="evolution-labels">
+        <span *ngFor="let point of documentEvolution; let i = index">
+          {{ i === 0 || i === documentEvolution.length - 1 || i === 5 ? point.label : '' }}
+        </span>
+      </div>
+    </div>
+  </section>
+
+ 
 </div>

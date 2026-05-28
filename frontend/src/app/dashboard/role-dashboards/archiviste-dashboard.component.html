@@ -92,7 +92,15 @@
         <line x1="42" y1="186" x2="702" y2="186" class="chart-axis"></line>
         <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
         <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
+        <g *ngFor="let point of documentEvolutionChartPoints; trackBy: trackById">
+          <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="chart-dot"></circle>
+        </g>
       </svg>
+      <div class="evolution-labels">
+        <span *ngFor="let point of documentEvolution; let i = index">
+          {{ i === 0 || i === documentEvolution.length - 1 || i === 5 ? point.label : '' }}
+        </span>
+      </div>
     </div>
   </section>
 </div>

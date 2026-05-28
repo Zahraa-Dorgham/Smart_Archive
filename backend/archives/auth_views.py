@@ -174,6 +174,9 @@ class Verify2FAView(APIView):
             if not user:
                 return Response({'error': 'Utilisateur non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
 
+            if not user.is_active:
+                return Response({'error': 'Votre compte est désactivé. Veuillez contacter l\'administrateur.'}, status=status.HTTP_403_FORBIDDEN)
+
             profile = user.profile
             print(f"DEBUG 2FA VERIFY: Reçu Code='{code}' pour Email='{identifier}'")
             print(f"DEBUG 2FA VERIFY: Attendu Code='{profile.two_factor_code}'")

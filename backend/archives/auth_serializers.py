@@ -1,11 +1,11 @@
-from .models import UserProfile
+from .models import UserProfile, LoginHistory
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import update_last_login
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import LoginHistory
 from .serializers import UserSerializer
 
 User = get_user_model()
@@ -73,16 +73,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         update_last_login(None, self.user)
 
     def validate(self, attrs):
-        # 1. Normalisation de l'identifiant (email ou username)
+        # 1. Identifier l'utilisateur et normaliser l'identifiant
         identifier = attrs.get(self.username_field)
+        user_obj = None
+        
         if identifier:
-            try:
-                user_obj = User.objects.get(email__iexact=identifier)
+            user_obj = User.objects.filter(Q(email__iexact=identifier) | Q(username__iexact=identifier)).first()
+            if user_obj:
                 attrs[self.username_field] = user_obj.get_username()
-            except User.DoesNotExist:
-                pass
+                # 2. Vérifier si l'utilisateur est inactif
+                if not user_obj.is_active:
+                    raise serializers.ValidationError({
+                        "detail": "Votre compte est désactivé. Veuillez contacter l'administrateur."
+                    })
 
-        # 2. Authentification manuelle pour vérifier le statut AVANT de générer les tokens
+        # 3. Authentification manuelle pour les actifs
         from django.contrib.auth import authenticate
         user = authenticate(request=self.context.get('request'), **attrs)
         
