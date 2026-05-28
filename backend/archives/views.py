@@ -863,8 +863,20 @@ class DashboardStatsView(viewsets.ViewSet):
             doc_qs = Document.objects.all()
         today = timezone.localdate()
         current_month = date(today.year, today.month, 1)
-        first_month = self._add_months(current_month, -11)
-        months = [self._add_months(first_month, index) for index in range(12)]
+        
+        # Commencer par l'année 2026 comme demandé par l'utilisateur
+        start_date = date(2026, 1, 1)
+        
+        if today >= start_date:
+            first_month = start_date
+            # Calculer le nombre de mois entre Janvier 2026 et maintenant
+            num_months = (today.year - start_date.year) * 12 + (today.month - start_date.month) + 1
+        else:
+            # Comportement par défaut si on est avant 2026
+            first_month = self._add_months(current_month, -11)
+            num_months = 12
+
+        months = [self._add_months(first_month, index) for index in range(num_months)]
         documents_before = doc_qs.filter(date_creation__lt=first_month).count()
         cumulative = documents_before
         evolution = []
