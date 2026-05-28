@@ -87,7 +87,7 @@ export class ShowTransfertComponent implements OnInit {
   }
 
   get canValidateTransferts(): boolean {
-    return this.authService.hasRole(['Admin', 'Administrateur', 'Responsable']);
+    return this.authService.hasRole(['Responsable']);
   }
 
   get showArchivisteColumn(): boolean {

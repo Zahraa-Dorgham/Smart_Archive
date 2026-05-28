@@ -467,11 +467,16 @@ class TransfertViewSet(viewsets.ModelViewSet):
         if user_has_any_role(user, ["responsable", "employe"]):
             try:
                 if hasattr(user, 'profile') and user.profile.direction:
-                    return qs.filter(transfert_boitiers__boitier__dossiers__direction=user.profile.direction).distinct()
+                    direction = user.profile.direction
+                    return qs.filter(
+                        Q(transfert_boitiers__boitier__dossiers__direction=direction) |
+                        Q(transfert_boitiers__boitier__dossiers__calendrier__direction=direction) |
+                        Q(responsable=user)
+                    ).distinct()
             except Exception:
                 pass
             return qs.none()
-            
+        
         return qs.none()
 
     def get_permissions(self):
@@ -1055,7 +1060,8 @@ class DashboardStatsView(viewsets.ViewSet):
         
         transfert_qs = Transfert.objects.filter(
             Q(transfert_boitiers__boitier__dossiers__direction=direction) |
-            Q(transfert_boitiers__boitier__dossiers__calendrier__direction=direction)
+            Q(transfert_boitiers__boitier__dossiers__calendrier__direction=direction) |
+            Q(responsable=request.user)
         ).distinct()
 
         total_documents = doc_qs.count()
