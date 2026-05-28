@@ -61,7 +61,7 @@ export class AddEditDossierComponent implements OnInit {
   readonly defaultPhaseId = '1';
   form: FormGroup;
   isEditMode: boolean;
-  boitiers: any[] = [];     // à remplir depuis un service
+  boitiers: any[] = [];
   calendriers: any[] = [];
   phases: PhaseArchive[] = [];
   nomDosInvalid = false;
@@ -90,11 +90,11 @@ export class AddEditDossierComponent implements OnInit {
       dureeCourant: [3, [Validators.required, Validators.min(0)]],
       dureeIntermediaire: [10, [Validators.required, Validators.min(0)]],
       dureeDefinitive: [100, [Validators.required, Validators.min(0)]],
-      conservation_active_period: [null],
-      conservation_semi_active_period: [null],
-      sort_final_type: [''],
-      sort_final_comment: [''],
-      sort_final_security_years: [null]
+      conservation_active_period: [{ value: null, disabled: true }],
+      conservation_semi_active_period: [{ value: null, disabled: true }],
+      sort_final_type: [{ value: '', disabled: true }],
+      sort_final_comment: [{ value: '', disabled: true }],
+      sort_final_security_years: [{ value: null, disabled: true }]
     });
   }
 

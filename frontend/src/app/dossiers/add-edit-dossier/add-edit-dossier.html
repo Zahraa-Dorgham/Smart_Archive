@@ -59,7 +59,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-git-commit"></i>
                     <select class="form-control" formControlName="phaseArchive">
-                        <option [ngValue]="null">Sélectionner une phase...</option>
+                        <!-- <option [ngValue]="null">Sélectionner une phase...</option> -->
                         <option *ngFor="let p of phases" [value]="p.id.toString()">{{ p.nom }}</option>
                     </select>
                 </div>
@@ -91,7 +91,7 @@
                 <label class="form-label">Durée Courante</label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-time-five"></i>
-                    <input type="number" class="form-control" formControlName="conservation_active_period" placeholder="0">
+                    <input type="number" class="form-control " formControlName="conservation_active_period" placeholder="0">
                 </div>
             </div>
 

@@ -75,21 +75,19 @@ export class AddEditDocumentComponent implements OnInit {
     this.isEditMode = data.mode === 'edit';
     this.form = this.fb.group({
       idDoc: ['', Validators.required],
-      // reference: ['', Validators.required],
       titre: ['', Validators.required],
       dossier: ['', Validators.required],
       calendrier: [null],
       phase_archive: [{ value: this.defaultPhaseId, disabled: true }],
       date_creation: [''],
       niv_confidentialite: ['INTERNE', Validators.required],
-      // type_document: ['AUTRE', Validators.required],
       auteur: [''],
       description: [''],
-      conservation_active_period: [null],
-      conservation_semi_active_period: [null],
-      sort_final_type: [''],
-      sort_final_comment: [''],
-      sort_final_security_years: [null]
+      conservation_active_period: [{ value: null, disabled: true }],
+      conservation_semi_active_period: [{ value: null, disabled: true }],
+      sort_final_type: [{ value: '', disabled: true }],
+      sort_final_comment: [{ value: '', disabled: true }],
+      sort_final_security_years: [{ value: null, disabled: true }]
     });
   }
 
@@ -139,12 +137,10 @@ export class AddEditDocumentComponent implements OnInit {
     if (!calendrierId) {
       return;
     }
-
     const calendrier = this.calendriers.find(item => String(item.id) === String(calendrierId));
     if (!calendrier) {
       return;
     }
-
     this.form.patchValue({
       conservation_active_period: calendrier.conservation_active_period ?? null,
       conservation_semi_active_period: calendrier.conservation_semi_active_period ?? null,
@@ -161,20 +157,16 @@ export class AddEditDocumentComponent implements OnInit {
 
   analyzeSelectedFile(): void {
     const dossierId = this.form.get('dossier')?.value;
-
     if (!this.selectedFile) {
       this.snackBar.open('Ajoutez d abord un fichier a analyser.', 'Fermer', { duration: 3000 });
       return;
     }
-
     this.isAnalyzingFile = true;
     this.extractionWarnings = [];
-
     const dossierOptions = this.dossiers.map(item => ({
       idDossier: item.idDossier,
       nomDos: item.nomDos ?? null,
     }));
-
     this.documentService.extractDocumentMetadata(
       dossierId ? String(dossierId) : null,
       this.selectedFile,
@@ -198,14 +190,11 @@ export class AddEditDocumentComponent implements OnInit {
   onDossierChange(dossierId: string | null): void {
     const selectedDossier = this.dossiers.find(item => String(item.idDossier) === String(dossierId));
     const allowedCalendrierIds = this.getAllowedCalendrierIds(selectedDossier);
-
     this.filteredCalendriers = this.calendriers.filter(item => allowedCalendrierIds.has(String(item.id)));
-
     const currentCalendrier = this.form.get('calendrier')?.value;
     if (currentCalendrier && !allowedCalendrierIds.has(String(currentCalendrier))) {
       this.form.patchValue({ calendrier: null }, { emitEvent: false });
     }
-
     if (!currentCalendrier && this.filteredCalendriers.length === 1) {
       this.form.patchValue({ calendrier: String(this.filteredCalendriers[0].id) }, { emitEvent: true });
     }
@@ -215,27 +204,15 @@ export class AddEditDocumentComponent implements OnInit {
     const currentCalendrier = doc.calendrier as { id?: string | number } | string | number | null | undefined;
     const currentDossier = doc.dossier as Dossier | number | string;
     const currentPhase = doc.phase_archive as { id?: string | number } | string | number | null | undefined;
-
-    const calendrierValue =
-      currentCalendrier && typeof currentCalendrier === 'object'
-        ? currentCalendrier.id ?? null
-        : currentCalendrier ?? null;
-    const dossierValue =
-      currentDossier && typeof currentDossier === 'object'
-        ? currentDossier.idDossier
-        : currentDossier;
-    const phaseValue =
-      currentPhase && typeof currentPhase === 'object'
-        ? currentPhase.id ?? this.defaultPhaseId
-        : currentPhase ?? this.defaultPhaseId;
-
+    const calendrierValue = currentCalendrier && typeof currentCalendrier === 'object' ? currentCalendrier.id ?? null : currentCalendrier ?? null;
+    const dossierValue = currentDossier && typeof currentDossier === 'object' ? currentDossier.idDossier : currentDossier;
+    const phaseValue = currentPhase && typeof currentPhase === 'object' ? currentPhase.id ?? this.defaultPhaseId : currentPhase ?? this.defaultPhaseId;
     this.form.patchValue({
       ...doc,
       dossier: dossierValue != null ? String(dossierValue) : null,
       calendrier: calendrierValue != null ? String(calendrierValue) : null,
       phase_archive: String(phaseValue)
     }, { emitEvent: false });
-
     this.onDossierChange(dossierValue != null ? String(dossierValue) : null);
     this.onCalendrierChange(calendrierValue != null ? String(calendrierValue) : null);
   }
@@ -249,52 +226,32 @@ export class AddEditDocumentComponent implements OnInit {
       auteur: result.auteur,
       date_creation: result.date_creation,
       description: result.description,
-      phase_archive: this.isEditMode
-        ? (result.phase_archive || this.form.getRawValue().phase_archive || this.defaultPhaseId)
-        : this.defaultPhaseId,
+      phase_archive: this.isEditMode ? (result.phase_archive || this.form.getRawValue().phase_archive || this.defaultPhaseId) : this.defaultPhaseId,
     };
-
     this.form.patchValue(nextValues, { emitEvent: false });
     this.extractionWarnings = result.warnings || [];
-
     this.onDossierChange(result.dossier);
     this.onCalendrierChange(result.calendrier);
   }
 
   private getAllowedCalendrierIds(dossier?: Dossier): Set<string> {
-    if (!dossier?.calendrier) {
-      return new Set<string>();
-    }
-
-    const rootId =
-      typeof dossier.calendrier === 'object'
-        ? dossier.calendrier.id
-        : dossier.calendrier;
-
-    if (!rootId) {
-      return new Set<string>();
-    }
-
+    if (!dossier?.calendrier) return new Set<string>();
+    const rootId = typeof dossier.calendrier === 'object' ? dossier.calendrier.id : dossier.calendrier;
+    if (!rootId) return new Set<string>();
     const allowedIds = new Set<string>([String(rootId)]);
     const pendingIds = [String(rootId)];
-
     while (pendingIds.length > 0) {
       const currentId = pendingIds.shift();
-      if (!currentId) {
-        continue;
-      }
-
+      if (!currentId) continue;
       const childIds = this.calendriers
         .filter(item => item.parent != null && String(item.parent) === currentId)
         .map(item => String(item.id))
         .filter(id => !allowedIds.has(id));
-
       childIds.forEach(id => {
         allowedIds.add(id);
         pendingIds.push(id);
       });
     }
-
     return allowedIds;
   }
 
@@ -303,13 +260,10 @@ export class AddEditDocumentComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
     const rawValue = this.form.getRawValue();
     const formValue = {
       ...rawValue,
-      phase_archive: this.isEditMode
-        ? (rawValue.phase_archive || this.defaultPhaseId)
-        : this.defaultPhaseId
+      phase_archive: this.isEditMode ? (rawValue.phase_archive || this.defaultPhaseId) : this.defaultPhaseId
     };
     if (this.isEditMode && this.data.document) {
       this.documentService.updateDocument(this.data.document.id, formValue, this.selectedFile || undefined).subscribe({
