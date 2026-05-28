@@ -23,6 +23,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorMessage = '';
   showResend = false;
   resending = false;
+  
+  // 2FA state
+  requires2FA = false;
+  twoFactorCode = '';
+  tempEmail = '';
 
   constructor(
     private fb: FormBuilder,
@@ -64,12 +69,18 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.login(this.credentials).subscribe({
       next: (res) => {
         this.loading = false;
-        localStorage.setItem('access_token', res.access);
-        localStorage.setItem('refresh_token', res.refresh);
-        localStorage.setItem('user', JSON.stringify(res.user));
-        localStorage.setItem('login_date', new Date().toISOString());
-
-        this.router.navigateByUrl(this.authService.getDashboardUrl());
+        if (res.requires_2fa) {
+          this.requires2FA = true;
+          this.tempEmail = res.email || '';
+          this.errorMessage = res.detail || '';
+          this.cdr.detectChanges();
+        } else {
+          localStorage.setItem('access_token', res.access);
+          localStorage.setItem('refresh_token', res.refresh);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          localStorage.setItem('login_date', new Date().toISOString());
+          this.router.navigateByUrl(this.authService.getDashboardUrl());
+        }
       },
       error: (err) => {
         this.loading = false;
@@ -125,5 +136,38 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  onVerify2FA(codeParam?: string) {
+    this.errorMessage = '';
+    const code = (codeParam || this.twoFactorCode || '').trim();
+    
+    console.log("Tentative de vérification 2FA:", { email: this.tempEmail, code: code });
+
+    if (!code || code.length !== 6) {
+      this.errorMessage = "Veuillez entrer le code à 6 chiffres.";
+      return;
+    }
+
+    this.loading = true;
+    this.authService.verify2fa(this.tempEmail, code).subscribe({
+      next: (res) => {
+        console.log("Vérification 2FA réussie !");
+        this.loading = false;
+        this.router.navigateByUrl(this.authService.getDashboardUrl());
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error("Erreur 2FA:", err);
+        this.errorMessage = err.error?.error || "Code invalide ou expiré.";
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cancel2FA() {
+    this.requires2FA = false;
+    this.twoFactorCode = '';
+    this.errorMessage = '';
   }
 }

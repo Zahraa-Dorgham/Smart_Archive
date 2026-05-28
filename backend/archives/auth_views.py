@@ -1,6 +1,6 @@
 # archives/auth_views.py
 import uuid
-
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -27,12 +27,12 @@ def _send_verification_email(user, token):
     frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:4200')
     verification_link = f"{frontend_url}/verify-email?token={token}"
 
-    subject = "Smart Archive - Vérifiez votre adresse email"
+    subject = "InDA-ETAP - Vérifiez votre adresse email"
     html_message = f"""
     <html>
     <body style="font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 30px;">
       <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 40px;">
-        <h2 style="color: #5a8dee; margin-bottom: 10px;">Bienvenue sur Smart Archive</h2>
+        <h2 style="color: #5a8dee; margin-bottom: 10px;">Bienvenue sur InDA-ETAP</h2>
         <p style="color: #333;">Bonjour <strong>{user.first_name or user.username}</strong>,</p>
         <p style="color: #555;">Votre compte a été créé avec succès. Veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous :</p>
         <div style="text-align: center; margin: 30px 0;">
@@ -44,7 +44,7 @@ def _send_verification_email(user, token):
         <p style="color: #888; font-size: 13px;">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
         <p style="color: #5a8dee; font-size: 13px; word-break: break-all;">{verification_link}</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        <p style="color: #aaa; font-size: 12px; text-align: center;">Smart Archive &copy; 2026</p>
+        <p style="color: #aaa; font-size: 12px; text-align: center;">InDA &copy; 2026</p>
       </div>
     </body>
     </html>
@@ -152,6 +152,60 @@ class ResendVerificationView(APIView):
             
         except Exception as e:
             print(f"DEBUG RESEND: ERREUR CRITIQUE : {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class Verify2FAView(APIView):
+    """Vérifie le code 2FA et génère les tokens finaux."""
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        identifier = request.data.get('email')
+        code = request.data.get('code')
+
+        if not identifier or not code:
+            return Response({'error': 'Email et code requis.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            from django.db.models import Q
+            user = User.objects.filter(Q(email__iexact=identifier) | Q(username__iexact=identifier)).first()
+            
+            if not user:
+                return Response({'error': 'Utilisateur non trouvé.'}, status=status.HTTP_404_NOT_FOUND)
+
+            profile = user.profile
+            print(f"DEBUG 2FA VERIFY: Reçu Code='{code}' pour Email='{identifier}'")
+            print(f"DEBUG 2FA VERIFY: Attendu Code='{profile.two_factor_code}'")
+
+            if profile.two_factor_code != code:
+                return Response({'error': 'Code de vérification invalide.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not profile.two_factor_expires_at or profile.two_factor_expires_at < timezone.now():
+                return Response({'error': 'Le code a expiré.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Code valide ! On génère les tokens
+            from rest_framework_simplejwt.tokens import RefreshToken
+            refresh = RefreshToken.for_user(user)
+            
+            # Nettoyer le code utilisé
+            profile.two_factor_code = None
+            profile.two_factor_expires_at = None
+            profile.save()
+
+            from .auth_serializers import UserSerializer
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': {
+                    **UserSerializer(user).data,
+                    'roles': [g.name for g in user.groups.all()],
+                    'is_staff': user.is_staff,
+                    'is_superuser': user.is_superuser
+                }
+            })
+            
+        except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

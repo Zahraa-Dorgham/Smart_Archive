@@ -12,7 +12,9 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
     const token = authService.getToken();
 
     let authReq = req;
-    if (token && !req.url.includes('/auth/login') && !req.url.includes('/auth/refresh')) {
+    const isMalformedToken = token === 'undefined' || token === 'null';
+    
+    if (token && !isMalformedToken && !req.url.includes('/auth/login') && !req.url.includes('/auth/refresh')) {
         authReq = req.clone({
             headers: req.headers.set('Authorization', `Bearer ${token}`)
         });

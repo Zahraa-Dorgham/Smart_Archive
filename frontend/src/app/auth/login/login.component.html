@@ -26,7 +26,7 @@
                                         </div>
                                     </div>
 
-                                    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                                    <form *ngIf="!requires2FA" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                                         <div class="form-group mb-1">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
@@ -83,6 +83,33 @@
                                                 role="status"></span>
                                         </button>
                                     </form>
+
+                                    <!-- Interface 2FA -->
+                                    <div *ngIf="requires2FA" class="form-2fa" style="animation: slideInRight 0.3s ease;">
+                                        <div class="text-center mb-2">
+                                            <i class="bx bx-shield-quarter text-primary" style="font-size: 3.5rem;"></i>
+                                            <h4 class="mt-1 font-weight-bold">Vérification de sécurité</h4>
+                                            <p class="text-muted small">Veuillez saisir le code à 6 chiffres envoyé par email.</p>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <div class="position-relative">
+                                                <input type="text" #codeInput class="form-control text-center font-medium-3" 
+                                                       maxlength="6" placeholder="000000"
+                                                       [(ngModel)]="twoFactorCode" 
+                                                       (keyup.enter)="onVerify2FA(codeInput.value)"
+                                                       style="letter-spacing: 4px; font-weight: bold; height: 50px;">
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-block" 
+                                                [disabled]="loading"
+                                                (click)="onVerify2FA(codeInput.value)">
+                                            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                                            Vérifier et se connecter
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary w-100" (click)="cancel2FA()" [disabled]="loading">
+                                            Retour au login
+                                        </button>
+                                    </div>
                                     
                                     <!-- <div class="text-center mt-2">
                                         <small>Vous n'avez pas encore de compte ? </small>

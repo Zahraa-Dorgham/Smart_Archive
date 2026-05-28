@@ -23,6 +23,9 @@ export interface AuthResponse {
         is_staff: boolean;
         is_superuser: boolean;
     };
+    requires_2fa?: boolean;
+    email?: string;
+    detail?: string;
 }
 
 @Injectable({
@@ -61,12 +64,12 @@ export class AuthService {
     login(credentials: LoginCredentials): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, credentials).pipe(
             tap(response => {
-                if (typeof window !== 'undefined') {
+                if (typeof window !== 'undefined' && response.access && response.refresh) {
                     localStorage.setItem('access_token', response.access);
                     localStorage.setItem('refresh_token', response.refresh);
                     localStorage.setItem('user', JSON.stringify(response.user));
+                    this.currentUserSubject.next(response.user);
                 }
-                this.currentUserSubject.next(response.user);
             })
         );
     }
@@ -95,6 +98,19 @@ export class AuthService {
 
     resendVerification(email: string): Observable<any> {
         return this.http.post(`${this.apiUrl}/auth/resend-verification/`, { email });
+    }
+
+    verify2fa(email: string, code: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/auth/verify-2fa/`, { email, code }).pipe(
+            tap(res => {
+                if (res.access) {
+                    localStorage.setItem('access_token', res.access);
+                    localStorage.setItem('refresh_token', res.refresh);
+                    localStorage.setItem('user', JSON.stringify(res.user));
+                    this.currentUserSubject.next(res.user);
+                }
+            })
+        );
     }
 
     getToken(): string | null {

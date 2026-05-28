@@ -1,3 +1,4 @@
+from .models import UserProfile
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import update_last_login
@@ -86,15 +87,51 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         user = authenticate(request=self.context.get('request'), **attrs)
         
         if user:
-            profile = getattr(user, 'profile', None)
-            is_verified = profile.is_verified if profile else True
-            print(f"DEBUG LOGIN STRICT: User={user.username}, Verified={is_verified}")
+            profile, _ = UserProfile.objects.get_or_create(user=user)
             
-            if not is_verified:
-                print("DEBUG LOGIN STRICT: BLOCAGE DECLENCHE")
-                raise serializers.ValidationError(
-                    {"detail": "Votre email n'est pas verifie. Veuillez verifier votre boite de reception."}
+            # 2FA Spécifique pour Zahraa ou si activé
+            if user.email == 'zahraaadorgham7704@gmail.com':
+                import random
+                import string
+                from django.utils import timezone
+                from django.core.mail import send_mail
+                from django.conf import settings
+                
+                # Générer un code à 6 chiffres
+                code = ''.join(random.choices(string.digits, k=6))
+                profile.two_factor_code = code
+                profile.two_factor_expires_at = timezone.now() + timezone.timedelta(minutes=10)
+                profile.save()
+                
+                # Envoyer le code par email
+                send_mail(
+                    "InDA-ETAP - Votre code de sécurité",
+                    f"Votre code de vérification est : {code}. Ce code expire dans 10 minutes.",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
                 )
+                
+                print(f"DEBUG 2FA: Code {code} envoyé à {user.email}")
+                # On retourne un dictionnaire au lieu de lever une exception
+                return {
+                    "requires_2fa": True,
+                    "email": user.email,
+                    "detail": "Un code de sécurité a été envoyé à votre adresse email."
+                }
+
+            # Vérification d'activation (pour les autres nouveaux comptes)
+            is_verified = profile.is_verified
+            if not is_verified:
+                import uuid
+                from .auth_views import _send_verification_email
+                token = uuid.uuid4().hex
+                profile.verification_token = token
+                profile.save()
+                _send_verification_email(user, token)
+                raise serializers.ValidationError({
+                    "detail": "Votre email n'est pas encore vérifié. Un nouveau lien vient de vous être envoyé."
+                })
         
         # 3. Procéder au login normal si tout est OK
         data = super().validate(attrs)
