@@ -44,7 +44,7 @@
 }
 
 .form-control {
-    border-left: none;
+   
     height: calc(1.5em + 1rem + 2px);
     font-size: 0.9rem;
 }

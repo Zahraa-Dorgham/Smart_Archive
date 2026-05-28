@@ -26,6 +26,13 @@
                                         </div>
                                     </div>
 
+                                    <div *ngIf="successMessage" class="alert alert-success font-small-3 mb-2" role="alert" style="display: block !important;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bx bx-check-circle mr-50" style="font-size: 1.2rem;"></i> 
+                                            <span [innerHTML]="successMessage"></span>
+                                        </div>
+                                    </div>
+
                                     <form *ngIf="!requires2FA" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                                         <div class="form-group mb-1">
                                             <div class="input-group">
@@ -100,7 +107,7 @@
                                                        style="letter-spacing: 4px; font-weight: bold; height: 50px;">
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-primary btn-block" 
+                                        <button type="button" class="btn btn-primary btn-block mb-2" 
                                                 [disabled]="loading"
                                                 (click)="onVerify2FA(codeInput.value)">
                                             <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>

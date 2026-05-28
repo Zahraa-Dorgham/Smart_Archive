@@ -90,7 +90,7 @@ class RegisterView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        response.data['message'] = "Utilisateur cree. Un email de verification a ete envoye."
+        response.data['message'] = "Utilisateur créé. Un email de verification a été envoyé."
         return response
 
 
@@ -109,12 +109,12 @@ class VerifyEmailView(APIView):
             return Response({'error': 'Token invalide ou deja utilise.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if profile.is_verified:
-            return Response({'message': 'Email deja verifie.'})
+            return Response({'message': 'Email déja vérifie.'})
 
         profile.is_verified = True
         profile.verification_token = None  # Invalider le token
         profile.save()
-        return Response({'message': 'Email verifie avec succes. Vous pouvez maintenant vous connecter.'})
+        return Response({'message': 'Email vérifie avec succes. Vous pouvez maintenant vous connecter.'})
 
 
 class ResendVerificationView(APIView):

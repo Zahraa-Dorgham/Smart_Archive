@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   hidePassword = true;
   loading = false;
   errorMessage = '';
+  successMessage = '';
   showResend = false;
   resending = false;
   
@@ -64,6 +65,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     
     this.loading = true;
     this.errorMessage = '';
+    this.successMessage = '';
     this.showResend = false;
 
     this.authService.login(this.credentials).subscribe({
@@ -72,7 +74,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         if (res.requires_2fa) {
           this.requires2FA = true;
           this.tempEmail = res.email || '';
-          this.errorMessage = res.detail || '';
+          this.successMessage = res.detail || '';
           this.cdr.detectChanges();
         } else {
           localStorage.setItem('access_token', res.access);
@@ -140,6 +142,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onVerify2FA(codeParam?: string) {
     this.errorMessage = '';
+    this.successMessage = '';
     const code = (codeParam || this.twoFactorCode || '').trim();
     
     console.log("Tentative de vérification 2FA:", { email: this.tempEmail, code: code });
@@ -169,5 +172,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.requires2FA = false;
     this.twoFactorCode = '';
     this.errorMessage = '';
+    this.successMessage = '';
   }
 }
