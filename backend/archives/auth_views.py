@@ -43,7 +43,7 @@ def _send_verification_email(user, token):
         </div>
         <p style="color: #888; font-size: 13px;">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
         <p style="color: #5a8dee; font-size: 13px; word-break: break-all;">{verification_link}</p>
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0;">
         <p style="color: #aaa; font-size: 12px; text-align: center;">InDA &copy; 2026</p>
       </div>
     </body>
@@ -186,7 +186,24 @@ class Verify2FAView(APIView):
 
             # Code valide ! On génère les tokens
             from rest_framework_simplejwt.tokens import RefreshToken
+            from django.contrib.auth.models import update_last_login
+            from .models import LoginHistory
+            
             refresh = RefreshToken.for_user(user)
+            update_last_login(None, user)  # Mettre à jour la date de connexion
+            
+            # Enregistrer dans l'historique
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                ip = x_forwarded_for.split(',')[0]
+            else:
+                ip = request.META.get('REMOTE_ADDR')
+            
+            LoginHistory.objects.create(
+                user=user,
+                ip_address=ip,
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
             
             # Nettoyer le code utilisé
             profile.two_factor_code = None
