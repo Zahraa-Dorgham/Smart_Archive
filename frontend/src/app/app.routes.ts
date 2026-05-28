@@ -66,7 +66,7 @@ export const routes: Routes = [
           { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent), data: { dashboardRole: 'responsable' } },
           { path: 'transferts', loadComponent: () => import('./transferts/show-transfert/show-transfert').then(m => m.ShowTransfertComponent) },
           { path: 'documents', loadComponent: () => import('./documents/show-doc/show-doc').then(m => m.ShowDocumentComponent) },
-          { path: 'dossiers', loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent) },
+          // { path: 'dossiers', loadComponent: () => import('./dossiers/show-dossier/show-dossier').then(m => m.ShowDossierComponent) },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
         ]
       },
