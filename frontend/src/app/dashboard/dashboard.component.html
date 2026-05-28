@@ -6,306 +6,102 @@
       <p>
         {{ dashboardConfig.description }}
       </p>
-    </div>
-
-    <div class="hero-actions">
-      <div class="login-chip" *ngIf="loginDate">
-        <i class="bx bx-log-in-circle"></i>
-        <span>Connexion: {{ loginDate | date:'dd/MM/yyyy HH:mm' }}</span>
+      <div class="direction-badge" *ngIf="directionName">
+        <i class="bx bx-buildings"></i>
+        <span>Direction : <strong>{{ directionName }}</strong></span>
       </div>
-      <!-- <button type="button" class="refresh-button" (click)="loadStats()" [disabled]="loading">
-        <i class="bx bx-refresh" [class.spin]="loading"></i>
-        Actualiser
-      </button> -->
     </div>
+    <div class="hero-actions"></div>
   </div>
 
-  <div class="alert alert-danger" *ngIf="errorMessage">
+  <!-- <div class="alert alert-danger" *ngIf="errorMessage">
     {{ errorMessage }}
   </div>
 
   <div class="loading-strip" *ngIf="loading">
     <span class="spinner-border spinner-border-sm"></span>
     Chargement des statistiques...
-  </div>
+  </div> -->
 
-  <div class="kpi-grid">
-    <div class="kpi-card" *ngFor="let card of kpiCards; trackBy: trackById" [ngClass]="'tone-' + card.tone">
-      <div class="kpi-icon">
-        <i class="bx" [ngClass]="card.icon"></i>
-      </div>
-      <div>
-        <span>{{ card.label }}</span>
-        <strong>{{ card.value | number }}</strong>
-        <small>{{ card.hint }}</small>
-      </div>
-    </div>
-  </div>
+  <ng-container [ngSwitch]="dashboardRole">
+    <app-admin-dashboard 
+      *ngSwitchCase="'admin'"
+      [globalStats]="globalStats"
+      [kpiCards]="kpiCards"
+      [locationCards]="locationCards"
+      [transferStatus]="transferStatus"
+      [pendingTransfers]="pendingTransfers"
+      [phaseDistribution]="phaseDistribution"
+      [recentTransfers]="recentTransfers"
+      [documentEvolution]="documentEvolution"
+      [batimentStats]="batimentStats"
+      [recentLogins]="recentLogins"
+      [phaseTotal]="phaseTotal"
+      [maxPhaseTotal]="maxPhaseTotal"
+      [phaseColors]="phaseColors"
+      [latestDocumentEvolution]="latestDocumentEvolution"
+      [documentEvolutionArea]="documentEvolutionArea"
+      [documentEvolutionPolyline]="documentEvolutionPolyline"
+      [documentEvolutionChartPoints]="documentEvolutionChartPoints"
+      [phaseDonutBackground]="phaseDonutBackground"
+      [maxBatimentDocuments]="maxBatimentDocuments"
+      [loading]="loading"
+    ></app-admin-dashboard>
 
- 
+    <app-archiviste-dashboard 
+      *ngSwitchCase="'archiviste'"
+      [globalStats]="globalStats"
+      [kpiCards]="kpiCards"
+      [locationCards]="locationCards"
+      [transferStatus]="transferStatus"
+      [pendingTransfers]="pendingTransfers"
+      [phaseDistribution]="phaseDistribution"
+      [recentTransfers]="recentTransfers"
+      [documentEvolution]="documentEvolution"
+      [batimentStats]="batimentStats"
+      [phaseTotal]="phaseTotal"
+      [maxPhaseTotal]="maxPhaseTotal"
+      [phaseColors]="phaseColors"
+      [latestDocumentEvolution]="latestDocumentEvolution"
+      [documentEvolutionArea]="documentEvolutionArea"
+      [documentEvolutionPolyline]="documentEvolutionPolyline"
+      [documentEvolutionChartPoints]="documentEvolutionChartPoints"
+      [phaseDonutBackground]="phaseDonutBackground"
+      [maxBatimentDocuments]="maxBatimentDocuments"
+      [loading]="loading"
+    ></app-archiviste-dashboard>
 
-  <div class="insight-grid" *ngIf="dashboardConfig.showCapacity || dashboardConfig.showLocations || dashboardConfig.showTransfers">
-    <section class="panel capacity-panel" *ngIf="dashboardConfig.showCapacity">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Capacite</span>
-          <h5>Boitiers vides</h5>
-        </div>
-        <strong>{{ globalStats.pourcentage_emplacements_vides }}%</strong>
-      </div>
+    <app-responsable-dashboard 
+      *ngSwitchCase="'responsable'"
+      [globalStats]="globalStats"
+      [kpiCards]="kpiCards"
+      [transferStatus]="transferStatus"
+      [pendingTransfers]="pendingTransfers"
+      [phaseDistribution]="phaseDistribution"
+      [recentTransfers]="recentTransfers"
+      [documentEvolution]="documentEvolution"
+      [phaseTotal]="phaseTotal"
+      [maxPhaseTotal]="maxPhaseTotal"
+      [phaseColors]="phaseColors"
+      [latestDocumentEvolution]="latestDocumentEvolution"
+      [documentEvolutionArea]="documentEvolutionArea"
+      [documentEvolutionPolyline]="documentEvolutionPolyline"
+      [documentEvolutionChartPoints]="documentEvolutionChartPoints"
+      [phaseDonutBackground]="phaseDonutBackground"
+      [loading]="loading"
+    ></app-responsable-dashboard>
 
-      <div class="capacity-meter">
-        <div
-          class="meter-ring"
-          [style.background]="'conic-gradient(#24b47e 0 ' + globalStats.pourcentage_emplacements_vides + '%, #eef1f6 ' + globalStats.pourcentage_emplacements_vides + '% 100%)'"
-        >
-          <span>{{ globalStats.emplacements_vides | number }}</span>
-          <small>vides</small>
-        </div>
-        <div class="meter-details">
-          <div>
-            <span>Capacite totale</span>
-            <strong>{{ globalStats.capacite_emplacements | number }}</strong>
-          </div>
-          <div>
-            <span>Occupes</span>
-            <strong>{{ globalStats.emplacements_occupes | number }}</strong>
-          </div>
-          <div>
-            <span>Disponibles</span>
-            <strong>{{ globalStats.emplacements_vides | number }}</strong>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel locations-panel" *ngIf="dashboardConfig.showLocations">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Infrastructure</span>
-          <h5>Batiments, salles et armoires</h5>
-        </div>
-      </div>
-
-      <div class="location-grid">
-        <div class="location-stat" *ngFor="let item of locationCards; trackBy: trackById">
-          <i class="bx" [ngClass]="item.icon"></i>
-          <span>{{ item.label }}</span>
-          <strong>{{ item.value | number }}</strong>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel transfers-panel" *ngIf="dashboardConfig.showTransfers">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Workflow</span>
-          <h5>Transferts en attente</h5>
-        </div>
-        <strong>{{ globalStats.transferts_en_attente | number }}</strong>
-      </div>
-
-      <div class="status-list">
-        <div class="status-row" *ngFor="let item of transferStatus">
-          <span>{{ statusLabel(item.statut) }}</span>
-          <div class="status-bar">
-            <span [style.width]="barWidth(item.total, globalStats.total_transferts)"></span>
-          </div>
-          <strong>{{ item.total }}</strong>
-        </div>
-        <div class="empty-state" *ngIf="!loading && transferStatus.length === 0">
-          Aucun transfert enregistre.
-        </div>
-      </div>
-
-      <div class="pending-list" *ngIf="pendingTransfers.length > 0">
-        <div class="pending-item" *ngFor="let item of pendingTransfers; trackBy: trackById">
-          <div>
-            <strong>{{ item.reference }}</strong>
-            <small>{{ item.typeTransfer || 'Transfert' }} · {{ item.date_demande | date:'dd/MM/yyyy' }}</small>
-          </div>
-          <span>{{ item.boitiers || 0 }} boitier(s)</span>
-        </div>
-      </div>
-    </section>
-  </div>
-  
-  <div class="content-grid" *ngIf="dashboardConfig.showPhases || dashboardConfig.showHistory">
-    <section class="panel distribution-panel" *ngIf="dashboardConfig.showPhases">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Archives</span>
-          <h5>Distribution par phase</h5>
-        </div>
-        <span class="panel-total">{{ phaseTotal | number }} elements</span>
-      </div>
-
-      <div class="phase-layout">
-        <div class="phase-donut" [style.background]="phaseDonutBackground">
-          <div>
-            <strong>{{ phaseTotal | number }}</strong>
-            <span>Total</span>
-          </div>
-        </div>
-
-        <div class="phase-list">
-          <div class="phase-row" *ngFor="let phase of phaseDistribution; let i = index; trackBy: trackById">
-            <div class="phase-row-head">
-              <span>
-                <i [style.background]="phaseColors[i % phaseColors.length]"></i>
-                {{ phase.nom }}
-              </span>
-              <strong>{{ percent(phase.total, phaseTotal) }}%</strong>
-            </div>
-            <div class="bar-track">
-              <span [style.width]="barWidth(phase.total, maxPhaseTotal)" [style.background]="phaseColors[i % phaseColors.length]"></span>
-            </div>
-            <small>{{ phase.documents | number }} documents · {{ phase.dossiers | number }} dossiers</small>
-          </div>
-
-          <div class="empty-state" *ngIf="!loading && phaseDistribution.length === 0">
-            Aucune phase d'archivage disponible.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel history-panel" *ngIf="dashboardConfig.showHistory">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Historique</span>
-          <h5>Derniers transferts</h5>
-        </div>
-      </div>
-
-      <div class="timeline">
-        <div class="timeline-item" *ngFor="let item of recentTransfers; trackBy: trackById">
-          <div class="timeline-dot" [ngClass]="'dot-' + statusTone(item.statut)"></div>
-          <div>
-            <div class="timeline-title">
-              <strong>{{ item.reference }}</strong>
-              <span class="badge" [ngClass]="'badge-light-' + statusTone(item.statut)">
-                {{ statusLabel(item.statut) }}
-              </span>
-            </div>
-            <small>
-              {{ item.typeTransfer || 'Transfert' }} · {{ item.boitiers || 0 }} boitier(s) ·
-              {{ item.date_demande | date:'dd/MM/yyyy HH:mm' }}
-            </small>
-          </div>
-        </div>
-
-        <div class="empty-state" *ngIf="!loading && recentTransfers.length === 0">
-          Aucun historique de transfert.
-        </div>
-      </div>
-    </section>
-  </div>
-  <section class="panel evolution-panel" *ngIf="dashboardConfig.showEvolution">
-    <div class="panel-header">
-      <div>
-        <span class="eyebrow">Evolution</span>
-        <h5>Documents au fil du temps</h5>
-      </div>
-      <div class="evolution-summary" *ngIf="latestDocumentEvolution">
-        <span>Cumul</span>
-        <strong>{{ latestDocumentEvolution.cumulative | number }}</strong>
-        <small>{{ latestDocumentEvolution.total | number }} nouveau(x) ce mois</small>
-      </div>
-    </div>
-  
-    <div class="evolution-chart" *ngIf="documentEvolution.length > 0; else noDocumentEvolution">
-      <svg viewBox="0 0 720 220" preserveAspectRatio="none" role="img" aria-label="Evolution des documents">
-        <line x1="42" y1="18" x2="42" y2="186" class="chart-axis"></line>
-        <line x1="42" y1="186" x2="702" y2="186" class="chart-axis"></line>
-        <line x1="42" y1="130" x2="702" y2="130" class="chart-grid"></line>
-        <line x1="42" y1="74" x2="702" y2="74" class="chart-grid"></line>
-        <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
-        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
-        <g *ngFor="let point of documentEvolutionChartPoints; trackBy: trackById">
-          <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="chart-dot"></circle>
-          <title>{{ point.label }}: {{ point.cumulative }} cumul, {{ point.total }} nouveau(x)</title>
-        </g>
-      </svg>
-  
-      <div class="evolution-labels">
-        <span *ngFor="let point of documentEvolution; let i = index">
-          {{ i === 0 || i === documentEvolution.length - 1 || i === 5 ? point.label : '' }}
-        </span>
-      </div>
-    </div>
-  
-    <ng-template #noDocumentEvolution>
-      <div class="empty-state">
-        Aucune evolution de documents disponible.
-      </div>
-    </ng-template>
-  </section>
-  <div class="content-grid bottom-grid" *ngIf="dashboardConfig.showBuildings || dashboardConfig.showLogins">
-    <section class="panel building-panel" *ngIf="dashboardConfig.showBuildings">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Repartition</span>
-          <h5>Documents et dossiers par batiment</h5>
-        </div>
-        <span class="panel-total">{{ batimentStats.length }} batiment(s)</span>
-      </div>
-
-      <div class="building-list">
-        <div class="building-row" *ngFor="let bat of batimentStats; trackBy: trackById">
-          <div class="building-main">
-            <div class="building-avatar">
-              <i class="bx bx-building"></i>
-            </div>
-            <div>
-              <strong>{{ bat.nom }}</strong>
-              <small>{{ bat.code || 'Sans code' }} · {{ bat.salles }} salles · {{ bat.armoires }} armoires</small>
-            </div>
-          </div>
-
-          <div class="building-metrics">
-            <span><strong>{{ bat.documents }}</strong> docs</span>
-            <span><strong>{{ bat.dossiers }}</strong> dossiers</span>
-            <span><strong>{{ bat.boitiers }}</strong> boitiers</span>
-            <span><strong>{{ bat.taux_vide }}%</strong> vide</span>
-          </div>
-
-          <div class="bar-track">
-            <span [style.width]="barWidth(bat.documents, maxBatimentDocuments)"></span>
-          </div>
-        </div>
-
-        <div class="empty-state" *ngIf="!loading && batimentStats.length === 0">
-          Aucune donnee disponible pour les batiments.
-        </div>
-      </div>
-    </section>
-
-    <section class="panel login-panel" *ngIf="dashboardConfig.showLogins">
-      <div class="panel-header">
-        <div>
-          <span class="eyebrow">Acces</span>
-          <h5>Derniers logins</h5>
-        </div>
-        <span class="panel-total">{{ globalStats.users_with_login | number }} comptes</span>
-      </div>
-
-      <div class="login-list">
-        <div class="login-row" *ngFor="let login of recentLogins; trackBy: trackById">
-          <div class="login-avatar">{{ login.full_name.slice(0, 2).toUpperCase() }}</div>
-          <div>
-            <strong>{{ login.full_name }}</strong>
-            <small>{{ login.username }} · {{ login.last_login | date:'dd/MM/yyyy HH:mm' }}</small>
-          </div>
-          <span class="badge" [ngClass]="login.is_active ? 'badge-light-success' : 'badge-light-secondary'">
-            {{ login.is_active ? 'Actif' : 'Inactif' }}
-          </span>
-        </div>
-
-        <div class="empty-state" *ngIf="!loading && recentLogins.length === 0">
-          Aucun login recent disponible.
-        </div>
-      </div>
-    </section>
-  </div>
+    <app-employe-dashboard 
+      *ngSwitchCase="'employe'"
+      [globalStats]="globalStats"
+      [kpiCards]="kpiCards"
+      [phaseDistribution]="phaseDistribution"
+      [documentEvolution]="documentEvolution"
+      [phaseTotal]="phaseTotal"
+      [phaseColors]="phaseColors"
+      [documentEvolutionPolyline]="documentEvolutionPolyline"
+      [phaseDonutBackground]="phaseDonutBackground"
+      [loading]="loading"
+    ></app-employe-dashboard>
+  </ng-container>
 </div>

@@ -278,6 +278,7 @@ class Dossier(models.Model):
     date_creation = models.DateField(null=True, blank=True, default=timezone.now)
     date_cloture = models.DateField(null=True, blank=True)
     boitier = models.ForeignKey(Boitier, on_delete=models.SET_NULL, null=True, blank=True, related_name='dossiers')
+    direction = models.ForeignKey(Direction, on_delete=models.SET_NULL, null=True, blank=True, related_name='dossiers')
     calendrier = models.ForeignKey('calendrier.Calendrier', to_field='id', on_delete=models.SET_NULL, null=True, blank=True, related_name='dossiers')
     phaseArchive = models.ForeignKey(PhaseArchive, on_delete=models.SET_NULL, null=True)
     phaseType = models.CharField(max_length=50, default="COURANTE")   # valeur par défaut
@@ -343,6 +344,7 @@ class Document(models.Model):
     reference = models.CharField(max_length=100, null=True, blank=True, unique=False)
     titre = models.CharField(max_length=500)
     dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE, related_name='documents')
+    direction = models.ForeignKey(Direction, on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
     # Foreign key to Calendrier (choice from calendrier app)
     calendrier = models.ForeignKey('calendrier.Calendrier', to_field='id', on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
     phase_archive = models.ForeignKey(PhaseArchive, on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')

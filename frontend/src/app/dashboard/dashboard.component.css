@@ -691,3 +691,26 @@
     align-self: center;
   }
 }
+
+.direction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  background: #f0f2f5;
+  border: 1px solid #dfe5ef;
+  color: #4a5568;
+  font-size: 0.85rem;
+}
+
+.direction-badge i {
+  color: #5a8dee;
+  font-size: 1.1rem;
+}
+
+.direction-badge strong {
+  color: #1a202c;
+  font-weight: 700;
+}

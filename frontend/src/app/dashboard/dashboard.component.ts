@@ -3,132 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { ApiService } from '../core/services/api.service';
-
-type DashboardRole = 'admin' | 'archiviste' | 'responsable' | 'employe';
-
-interface DashboardConfig {
-  eyebrow: string;
-  title: string;
-  description: string;
-  showCapacity: boolean;
-  showLocations: boolean;
-  showTransfers: boolean;
-  showPhases: boolean;
-  showHistory: boolean;
-  showEvolution: boolean;
-  showBuildings: boolean;
-  showLogins: boolean;
-}
-
-interface DashboardGlobalStats {
-  total_documents: number;
-  total_dossiers: number;
-  total_boitiers: number;
-  total_transferts: number;
-  transferts_en_attente: number;
-  total_batiments: number;
-  total_salles: number;
-  total_armoires: number;
-  total_etageres: number;
-  capacite_emplacements: number;
-  emplacements_occupes: number;
-  emplacements_vides: number;
-  pourcentage_emplacements_vides: number;
-  total_users: number;
-  active_users: number;
-  users_with_login: number;
-}
-
-interface BatimentStat {
-  id: number;
-  nom: string;
-  code?: string;
-  salles: number;
-  armoires: number;
-  capacite: number;
-  occupes: number;
-  emplacements_vides: number;
-  taux_vide: number;
-  boitiers: number;
-  dossiers: number;
-  documents: number;
-}
-
-interface PhaseStat {
-  id: number | null;
-  nom: string;
-  documents: number;
-  dossiers: number;
-  total: number;
-}
-
-interface TransferItem {
-  id: number;
-  reference: string;
-  typeTransfer?: string;
-  statut?: string;
-  date_demande?: string;
-  date_execution?: string | null;
-  boitiers?: number;
-}
-
-interface TransferStatus {
-  statut: string;
-  total: number;
-}
-
-interface LoginItem {
-  id: number;
-  username: string;
-  full_name: string;
-  last_login: string;
-  is_active: boolean;
-}
-
-interface DocumentEvolutionPoint {
-  period: string;
-  label: string;
-  total: number;
-  cumulative: number;
-}
-
-interface ChartPoint extends DocumentEvolutionPoint {
-  x: number;
-  y: number;
-}
-
-interface DashboardPayload {
-  scope?: DashboardRole;
-  global?: Partial<DashboardGlobalStats>;
-  batiments?: BatimentStat[];
-  phases?: PhaseStat[];
-  transferts?: {
-    status?: TransferStatus[];
-    recent?: TransferItem[];
-    pending?: TransferItem[];
-  };
-  logins?: LoginItem[];
-  document_evolution?: DocumentEvolutionPoint[];
-}
-
-const DEFAULT_GLOBAL_STATS: DashboardGlobalStats = {
-  total_documents: 0,
-  total_dossiers: 0,
-  total_boitiers: 0,
-  total_transferts: 0,
-  transferts_en_attente: 0,
-  total_batiments: 0,
-  total_salles: 0,
-  total_armoires: 0,
-  total_etageres: 0,
-  capacite_emplacements: 0,
-  emplacements_occupes: 0,
-  emplacements_vides: 0,
-  pourcentage_emplacements_vides: 0,
-  total_users: 0,
-  active_users: 0,
-  users_with_login: 0
-};
+import { 
+  DashboardRole, DashboardConfig, DashboardGlobalStats, BatimentStat, 
+  PhaseStat, TransferItem, TransferStatus, LoginItem, 
+  DocumentEvolutionPoint, ChartPoint, DashboardPayload, DEFAULT_GLOBAL_STATS 
+} from './dashboard.models';
 
 const DASHBOARD_CONFIGS: Record<DashboardRole, DashboardConfig> = {
   admin: {
@@ -185,15 +64,27 @@ const DASHBOARD_CONFIGS: Record<DashboardRole, DashboardConfig> = {
   }
 };
 
+import { AdminDashboardComponent } from './role-dashboards/admin-dashboard.component';
+import { ArchivisteDashboardComponent } from './role-dashboards/archiviste-dashboard.component';
+import { ResponsableDashboardComponent } from './role-dashboards/responsable-dashboard.component';
+import { EmployeDashboardComponent } from './role-dashboards/employe-dashboard.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    AdminDashboardComponent,
+    ArchivisteDashboardComponent,
+    ResponsableDashboardComponent,
+    EmployeDashboardComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
   dashboardRole: DashboardRole = 'admin';
+  directionName = '';
   user$: any;
   loginDate: Date | null = null;
   loading = true;
@@ -212,7 +103,8 @@ export class DashboardComponent implements OnInit {
   readonly phaseColors = ['#5a8dee', '#39da8a', '#fdac41', '#ff5b5c', '#00cfdd', '#6f42c1'];
 
   private get cacheKey(): string {
-    return `dashboard_stats_cache_v2_${this.dashboardRole}`;
+    const userId = this.authService.getCurrentUser()?.id || 'anon';
+    return `dashboard_stats_cache_v3_${this.dashboardRole}_${userId}`;
   }
 
   constructor(
@@ -256,6 +148,7 @@ export class DashboardComponent implements OnInit {
 
   private applyStats(res: DashboardPayload): void {
     this.globalStats = { ...DEFAULT_GLOBAL_STATS, ...this.globalStats, ...(res.global || {}) };
+    this.directionName = res.direction || '';
     this.batimentStats = Array.isArray(res.batiments)
       ? res.batiments.map((bat) => this.normalizeBatimentStat(bat))
       : this.batimentStats;
@@ -325,10 +218,10 @@ export class DashboardComponent implements OnInit {
         { label: 'Emplacements', value: this.globalStats.emplacements_vides, icon: 'bx-map', tone: 'info', hint: 'Places disponibles' }
       ],
       responsable: [
-        { label: 'Transferts', value: this.globalStats.total_transferts, icon: 'bx-transfer', tone: 'info', hint: 'Demandes suivies' },
-        { label: 'En attente', value: this.globalStats.transferts_en_attente, icon: 'bx-time-five', tone: 'warning', hint: 'A valider' },
-        { label: 'Boitiers', value: this.globalStats.total_boitiers, icon: 'bx-box', tone: 'success', hint: 'Boitiers concernes' },
-        { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'primary', hint: 'Dossiers relies' }
+        { label: 'Documents', value: this.globalStats.total_documents, icon: 'bx-file', tone: 'primary', hint: 'Pieces departementales' },
+        { label: 'Dossiers', value: this.globalStats.total_dossiers, icon: 'bx-folder', tone: 'warning', hint: 'Dossiers departementaux' },
+        { label: 'Transferts', value: this.globalStats.total_transferts, icon: 'bx-transfer', tone: 'info', hint: 'Total demandes' },
+        { label: 'En attente', value: this.globalStats.transferts_en_attente, icon: 'bx-time-five', tone: 'success', hint: 'A valider' }
       ],
       employe: [
         { label: 'Documents', value: this.globalStats.total_documents, icon: 'bx-file', tone: 'primary', hint: 'Consultables' },

@@ -12,7 +12,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.http import HttpResponse
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
@@ -160,6 +160,27 @@ class BoitierViewSet(viewsets.ModelViewSet):
     search_fields = ['idboit', 'code_barre', 'titre']
     ordering_fields = ['idboit', 'date_creation', 'capacite']
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if not user.is_authenticated:
+            return qs.none()
+            
+        if user_has_any_role(user, ["admin", "archiviste"]):
+            return qs
+            
+        if user_has_any_role(user, ["responsable", "employe"]):
+            try:
+                if hasattr(user, 'profile') and user.profile.direction:
+                    # Un boîtier est visible si au moins un de ses dossiers appartient à la direction
+                    # OU si le boîtier lui-même est lié à la direction (si on ajoute le champ plus tard)
+                    return qs.filter(dossiers__direction=user.profile.direction).distinct()
+            except Exception:
+                pass
+            return qs.none()
+            
+        return qs.none() # Par défaut, rien si non admin/archiviste/responsable/employe
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
@@ -199,6 +220,26 @@ class DossierViewSet(viewsets.ModelViewSet):
     filterset_fields = ['phaseArchive', 'boitier', 'calendrier']
     search_fields = ['idDossier', 'nomDos']
     ordering_fields = ['date_creation']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if not user.is_authenticated:
+            return qs.none()
+            
+        if user_has_any_role(user, ["admin", "archiviste"]):
+            return qs
+            
+        if user_has_any_role(user, ["responsable", "employe"]):
+            try:
+                if hasattr(user, 'profile') and user.profile.direction:
+                    direction = user.profile.direction
+                    return qs.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+            except Exception:
+                pass
+            return qs.none()
+            
+        return qs.none()
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -253,6 +294,26 @@ class DocumentViewSet(viewsets.ModelViewSet):
     filterset_fields = ['phase_archive', 'dossier', 'type_document', 'niv_confidentialite', 'calendrier']
     search_fields = ['idDoc', 'reference', 'titre', 'auteur']
     ordering_fields = ['date_creation', 'version']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if not user.is_authenticated:
+            return qs.none()
+            
+        if user_has_any_role(user, ["admin", "archiviste"]):
+            return qs
+            
+        if user_has_any_role(user, ["responsable", "employe"]):
+            try:
+                if hasattr(user, 'profile') and user.profile.direction:
+                    direction = user.profile.direction
+                    return qs.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+            except Exception:
+                pass
+            return qs.none()
+            
+        return qs.none()
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -357,6 +418,25 @@ class TransfertViewSet(viewsets.ModelViewSet):
     filterset_fields = ['statut', 'typeTransfer']
     search_fields = ['reference', 'bordereauxReference']
     ordering_fields = ['date_demande', 'date_execution', 'reference']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if not user.is_authenticated:
+            return qs.none()
+            
+        if user_has_any_role(user, ["admin", "archiviste"]):
+            return qs
+            
+        if user_has_any_role(user, ["responsable", "employe"]):
+            try:
+                if hasattr(user, 'profile') and user.profile.direction:
+                    return qs.filter(transfert_boitiers__boitier__dossiers__direction=user.profile.direction).distinct()
+            except Exception:
+                pass
+            return qs.none()
+            
+        return qs.none()
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'bordereau_pdf']:
@@ -737,18 +817,20 @@ class DashboardStatsView(viewsets.ViewSet):
         month = month % 12 + 1
         return date(year, month, 1)
 
-    def _document_evolution(self):
+    def _document_evolution(self, doc_qs=None):
+        if doc_qs is None:
+            doc_qs = Document.objects.all()
         today = timezone.localdate()
         current_month = date(today.year, today.month, 1)
         first_month = self._add_months(current_month, -11)
         months = [self._add_months(first_month, index) for index in range(12)]
-        documents_before = Document.objects.filter(date_creation__lt=first_month).count()
+        documents_before = doc_qs.filter(date_creation__lt=first_month).count()
         cumulative = documents_before
         evolution = []
 
         for month_start in months:
             next_month = self._add_months(month_start, 1)
-            total = Document.objects.filter(
+            total = doc_qs.filter(
                 date_creation__gte=month_start,
                 date_creation__lt=next_month
             ).count()
@@ -768,10 +850,16 @@ class DashboardStatsView(viewsets.ViewSet):
                 return scope
         return 'employe'
 
-    def list(self, request):
-        scope = self._dashboard_scope(request.user)
-        is_admin_dashboard = scope == 'admin'
+    def _get_user_direction(self, user):
+        try:
+            if hasattr(user, 'profile') and user.profile and user.profile.direction:
+                return user.profile.direction
+        except Exception:
+            pass
+        return None
 
+    # ────────────────── ADMIN DASHBOARD ──────────────────
+    def _build_admin_dashboard(self, request):
         total_users = User.objects.count()
         active_users = User.objects.filter(is_active=True).count()
         users_with_login = LoginHistory.objects.values('user').distinct().count()
@@ -790,6 +878,241 @@ class DashboardStatsView(viewsets.ViewSet):
         empty_locations = max(total_capacity - occupied_locations, 0)
         empty_location_percentage = round((empty_locations / total_capacity) * 100, 1) if total_capacity else 0
 
+        batiment_stats = self._build_batiment_stats()
+
+        phase_distribution = self._build_phase_distribution()
+
+        transfer_status = [
+            {'statut': item['statut'] or 'NON_RENSEIGNE', 'total': item['total']}
+            for item in Transfert.objects.values('statut').annotate(total=Count('id')).order_by('statut')
+        ]
+
+        recent_transfers = self._serialize_transfers(Transfert.objects.all(), limit=8)
+        pending_transfer_list = self._serialize_transfers(Transfert.objects.filter(statut='EN_ATTENTE'), limit=6, include_statut=False)
+
+        recent_logins = [
+            {
+                'id': login.id,
+                'user_id': login.user_id,
+                'username': login.user.username,
+                'full_name': login.user.get_full_name() or login.user.username,
+                'last_login': login.login_at,
+                'ip_address': login.ip_address,
+                'user_agent': login.user_agent,
+                'is_active': login.user.is_active
+            }
+            for login in LoginHistory.objects.select_related('user').order_by('-login_at')[:8]
+        ]
+
+        document_evolution = self._document_evolution()
+
+        batiments = Batiment.objects.all()
+        global_stats = {
+            'total_documents': total_documents,
+            'total_dossiers': total_dossiers,
+            'total_boitiers': total_boitiers,
+            'total_transferts': total_transferts,
+            'transferts_en_attente': pending_transfers,
+            'total_batiments': batiments.count(),
+            'total_salles': total_salles,
+            'total_armoires': total_armoires,
+            'total_etageres': total_etageres,
+            'capacite_emplacements': total_capacity,
+            'emplacements_occupes': occupied_locations,
+            'emplacements_vides': empty_locations,
+            'pourcentage_emplacements_vides': empty_location_percentage,
+            'total_users': total_users,
+            'active_users': active_users,
+            'users_with_login': users_with_login,
+            'total_logins': LoginHistory.objects.count()
+        }
+
+        return {
+            'scope': 'admin',
+            'global': global_stats,
+            'batiments': batiment_stats,
+            'phases': phase_distribution,
+            'transferts': {
+                'status': transfer_status,
+                'recent': recent_transfers,
+                'pending': pending_transfer_list
+            },
+            'logins': recent_logins,
+            'document_evolution': document_evolution
+        }
+
+    # ────────────────── ARCHIVISTE DASHBOARD ──────────────────
+    def _build_archiviste_dashboard(self, request):
+        total_documents = Document.objects.count()
+        total_dossiers = Dossier.objects.count()
+        total_boitiers = Boitier.objects.count()
+        total_salles = Salle.objects.count()
+        total_armoires = Armoire.objects.count()
+        total_etageres = Etagere.objects.count()
+        total_transferts = Transfert.objects.count()
+        pending_transfers = Transfert.objects.filter(statut='EN_ATTENTE').count()
+
+        total_capacity = sum(Etagere.objects.values_list('capacite_max_boites', flat=True))
+        occupied_locations = Boitier.objects.filter(etagere__isnull=False).count()
+        empty_locations = max(total_capacity - occupied_locations, 0)
+        empty_location_percentage = round((empty_locations / total_capacity) * 100, 1) if total_capacity else 0
+
+        batiment_stats = self._build_batiment_stats()
+        phase_distribution = self._build_phase_distribution()
+
+        transfer_status = [
+            {'statut': item['statut'] or 'NON_RENSEIGNE', 'total': item['total']}
+            for item in Transfert.objects.values('statut').annotate(total=Count('id')).order_by('statut')
+        ]
+
+        recent_transfers = self._serialize_transfers(Transfert.objects.all(), limit=8)
+        pending_transfer_list = self._serialize_transfers(Transfert.objects.filter(statut='EN_ATTENTE'), limit=6, include_statut=False)
+
+        document_evolution = self._document_evolution()
+
+        batiments = Batiment.objects.all()
+        global_stats = {
+            'total_documents': total_documents,
+            'total_dossiers': total_dossiers,
+            'total_boitiers': total_boitiers,
+            'total_transferts': total_transferts,
+            'transferts_en_attente': pending_transfers,
+            'total_batiments': batiments.count(),
+            'total_salles': total_salles,
+            'total_armoires': total_armoires,
+            'total_etageres': total_etageres,
+            'capacite_emplacements': total_capacity,
+            'emplacements_occupes': occupied_locations,
+            'emplacements_vides': empty_locations,
+            'pourcentage_emplacements_vides': empty_location_percentage,
+            'total_users': 0,
+            'active_users': 0,
+            'users_with_login': 0,
+            'total_logins': 0
+        }
+
+        return {
+            'scope': 'archiviste',
+            'global': global_stats,
+            'batiments': batiment_stats,
+            'phases': phase_distribution,
+            'transferts': {
+                'status': transfer_status,
+                'recent': recent_transfers,
+                'pending': pending_transfer_list
+            },
+            'logins': [],
+            'document_evolution': document_evolution
+        }
+
+    # ────────────────── RESPONSABLE DASHBOARD ──────────────────
+    def _build_responsable_dashboard(self, request):
+        direction = self._get_user_direction(request.user)
+
+        doc_qs = Document.objects.filter(direction=direction) if direction else Document.objects.none()
+        dos_qs = Dossier.objects.filter(direction=direction) if direction else Dossier.objects.none()
+        boitier_qs = Boitier.objects.filter(dossiers__direction=direction).distinct() if direction else Boitier.objects.none()
+        transfert_qs = Transfert.objects.all()
+        if direction:
+            transfert_qs = transfert_qs.filter(
+                transfert_boitiers__boitier__dossiers__direction=direction
+            ).distinct()
+        else:
+            transfert_qs = Transfert.objects.none()
+
+        total_documents = doc_qs.count()
+        total_dossiers = dos_qs.count()
+        total_boitiers = boitier_qs.count()
+        total_transferts = transfert_qs.count()
+        pending_transfers = transfert_qs.filter(statut='EN_ATTENTE').count()
+
+        transfer_status = [
+            {'statut': item['statut'] or 'NON_RENSEIGNE', 'total': item['total']}
+            for item in transfert_qs.values('statut').annotate(total=Count('id')).order_by('statut')
+        ]
+
+        recent_transfers = self._serialize_transfers(transfert_qs, limit=8)
+        pending_transfer_list = self._serialize_transfers(transfert_qs.filter(statut='EN_ATTENTE'), limit=6, include_statut=False)
+
+        phase_distribution = self._build_phase_distribution(doc_qs, dos_qs)
+        document_evolution = self._document_evolution(doc_qs)
+
+        direction_name = direction.nom if direction else 'Non assignee'
+        global_stats = {
+            'total_documents': total_documents,
+            'total_dossiers': total_dossiers,
+            'total_boitiers': total_boitiers,
+            'total_transferts': total_transferts,
+            'transferts_en_attente': pending_transfers,
+            'total_batiments': 0,
+            'total_salles': 0,
+            'total_armoires': 0,
+            'total_etageres': 0,
+            'capacite_emplacements': 0,
+            'emplacements_occupes': 0,
+            'emplacements_vides': 0,
+            'pourcentage_emplacements_vides': 0,
+            'total_users': 0,
+            'active_users': 0,
+            'users_with_login': 0,
+            'total_logins': 0
+        }
+
+        return {
+            'scope': 'responsable',
+            'direction': direction_name,
+            'global': global_stats,
+            'batiments': [],
+            'phases': phase_distribution,
+            'transferts': {
+                'status': transfer_status,
+                'recent': recent_transfers,
+                'pending': pending_transfer_list
+            },
+            'logins': [],
+            'document_evolution': document_evolution
+        }
+
+    # ────────────────── EMPLOYE DASHBOARD ──────────────────
+    def _build_employe_dashboard(self, request):
+        total_documents = Document.objects.count()
+        total_dossiers = Dossier.objects.count()
+
+        phase_distribution = self._build_phase_distribution()
+        document_evolution = self._document_evolution()
+
+        global_stats = {
+            'total_documents': total_documents,
+            'total_dossiers': total_dossiers,
+            'total_boitiers': Boitier.objects.count(),
+            'total_transferts': 0,
+            'transferts_en_attente': 0,
+            'total_batiments': 0,
+            'total_salles': 0,
+            'total_armoires': 0,
+            'total_etageres': 0,
+            'capacite_emplacements': 0,
+            'emplacements_occupes': 0,
+            'emplacements_vides': 0,
+            'pourcentage_emplacements_vides': 0,
+            'total_users': 0,
+            'active_users': 0,
+            'users_with_login': 0,
+            'total_logins': 0
+        }
+
+        return {
+            'scope': 'employe',
+            'global': global_stats,
+            'batiments': [],
+            'phases': phase_distribution,
+            'transferts': {'status': [], 'recent': [], 'pending': []},
+            'logins': [],
+            'document_evolution': document_evolution
+        }
+
+    # ────────────────── SHARED HELPERS ──────────────────
+    def _build_batiment_stats(self):
         batiment_stats = []
         batiments = Batiment.objects.all().prefetch_related('salles__armoires__etageres')
 
@@ -825,10 +1148,18 @@ class DashboardStatsView(viewsets.ViewSet):
                 'documents': document_count
             })
 
+        return batiment_stats
+
+    def _build_phase_distribution(self, doc_qs=None, dos_qs=None):
+        if doc_qs is None:
+            doc_qs = Document.objects.all()
+        if dos_qs is None:
+            dos_qs = Dossier.objects.all()
+
         phase_distribution = []
         for phase in PhaseArchive.objects.all().order_by('nom'):
-            documents_count = Document.objects.filter(phase_archive=phase).count()
-            dossiers_count = Dossier.objects.filter(phaseArchive=phase).count()
+            documents_count = doc_qs.filter(phase_archive=phase).count()
+            dossiers_count = dos_qs.filter(phaseArchive=phase).count()
             phase_distribution.append({
                 'id': phase.id,
                 'nom': phase.nom,
@@ -837,8 +1168,8 @@ class DashboardStatsView(viewsets.ViewSet):
                 'total': documents_count + dossiers_count
             })
 
-        unclassified_documents = Document.objects.filter(phase_archive__isnull=True).count()
-        unclassified_dossiers = Dossier.objects.filter(phaseArchive__isnull=True).count()
+        unclassified_documents = doc_qs.filter(phase_archive__isnull=True).count()
+        unclassified_dossiers = dos_qs.filter(phaseArchive__isnull=True).count()
         if unclassified_documents or unclassified_dossiers:
             phase_distribution.append({
                 'id': None,
@@ -848,87 +1179,41 @@ class DashboardStatsView(viewsets.ViewSet):
                 'total': unclassified_documents + unclassified_dossiers
             })
 
-        transfer_status = [
-            {'statut': item['statut'] or 'NON_RENSEIGNE', 'total': item['total']}
-            for item in Transfert.objects.values('statut').annotate(total=Count('id')).order_by('statut')
-        ]
+        return phase_distribution
 
-        recent_transfers = [
-            {
-                'id': transfert.id,
-                'reference': transfert.reference or f'TR-{transfert.id}',
-                'typeTransfer': transfert.typeTransfer,
-                'statut': transfert.statut,
-                'date_demande': transfert.date_demande,
-                'date_execution': transfert.date_execution,
-                'boitiers': transfert.transfert_boitiers.count()
-            }
-            for transfert in Transfert.objects.all()
-                .prefetch_related('transfert_boitiers')
-                .order_by('-date_demande')[:8]
-        ]
-
-        pending_transfer_list = [
-            {
+    def _serialize_transfers(self, qs, limit=8, include_statut=True):
+        items = []
+        for transfert in qs.prefetch_related('transfert_boitiers').order_by('-date_demande')[:limit]:
+            item = {
                 'id': transfert.id,
                 'reference': transfert.reference or f'TR-{transfert.id}',
                 'typeTransfer': transfert.typeTransfer,
                 'date_demande': transfert.date_demande,
                 'boitiers': transfert.transfert_boitiers.count()
             }
-            for transfert in Transfert.objects.filter(statut='EN_ATTENTE')
-                .prefetch_related('transfert_boitiers')
-                .order_by('-date_demande')[:6]
-        ]
+            if include_statut:
+                item['statut'] = transfert.statut
+                item['date_execution'] = transfert.date_execution
+            items.append(item)
+        return items
 
-        recent_logins = []
-        if is_admin_dashboard:
-            recent_logins = [
-                {
-                    'id': login.id,
-                    'user_id': login.user_id,
-                    'username': login.user.username,
-                    'full_name': login.user.get_full_name() or login.user.username,
-                    'last_login': login.login_at,
-                    'ip_address': login.ip_address,
-                    'user_agent': login.user_agent,
-                    'is_active': login.user.is_active
-                }
-                for login in LoginHistory.objects.select_related('user').order_by('-login_at')[:8]
-            ]
+    # ────────────────── MAIN ENTRY POINT ──────────────────
+    def list(self, request):
+        scope = self._dashboard_scope(request.user)
 
-        document_evolution = self._document_evolution()
-
-        global_stats = {
-            'total_documents': total_documents,
-            'total_dossiers': total_dossiers,
-            'total_boitiers': total_boitiers,
-            'total_transferts': total_transferts,
-            'transferts_en_attente': pending_transfers,
-            'total_batiments': batiments.count(),
-            'total_salles': total_salles,
-            'total_armoires': total_armoires,
-            'total_etageres': total_etageres,
-            'capacite_emplacements': total_capacity,
-            'emplacements_occupes': occupied_locations,
-            'emplacements_vides': empty_locations,
-            'pourcentage_emplacements_vides': empty_location_percentage,
-            'total_users': total_users if is_admin_dashboard else 0,
-            'active_users': active_users if is_admin_dashboard else 0,
-            'users_with_login': users_with_login if is_admin_dashboard else 0,
-            'total_logins': LoginHistory.objects.count() if is_admin_dashboard else 0
+        builders = {
+            'admin': self._build_admin_dashboard,
+            'archiviste': self._build_archiviste_dashboard,
+            'responsable': self._build_responsable_dashboard,
+            'employe': self._build_employe_dashboard,
         }
 
-        return Response({
-            'scope': scope,
-            'global': global_stats,
-            'batiments': batiment_stats,
-            'phases': phase_distribution,
-            'transferts': {
-                'status': transfer_status,
-                'recent': recent_transfers,
-                'pending': pending_transfer_list
-            },
-            'logins': recent_logins,
-            'document_evolution': document_evolution
-        })
+        builder = builders.get(scope, self._build_employe_dashboard)
+        return Response(builder(request))
+
+class ResponsableDashboardStatsView(viewsets.ViewSet):
+    permission_classes = [EstResponsableValidateur]
+
+    def list(self, request):
+        view = DashboardStatsView()
+        return Response(view._build_responsable_dashboard(request))

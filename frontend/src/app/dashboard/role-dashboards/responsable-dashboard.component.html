@@ -1,0 +1,90 @@
+<!-- KPI Grid -->
+<div class="kpi-grid">
+  <div class="kpi-card" *ngFor="let card of kpiCards; trackBy: trackById" [ngClass]="'tone-' + card.tone">
+    <div class="kpi-icon">
+      <i class="bx" [ngClass]="card.icon"></i>
+    </div>
+    <div>
+      <span>{{ card.label }}</span>
+      <strong>{{ card.value | number }}</strong>
+      <small>{{ card.hint }}</small>
+    </div>
+  </div>
+</div>
+
+<div class="insight-grid">
+  <!-- Workflow - Only relevant for department manager -->
+  <section class="panel transfers-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Departement</span>
+        <h5>Transferts sollicites</h5>
+      </div>
+      <strong>{{ globalStats.transferts_en_attente | number }}</strong>
+    </div>
+    <div class="status-list">
+      <div class="status-row" *ngFor="let item of transferStatus">
+        <span>{{ statusLabel(item.statut) }}</span>
+        <div class="status-bar">
+          <span [style.width]="barWidth(item.total, (globalStats.total_transferts || 1))"></span>
+        </div>
+        <strong>{{ item.total }}</strong>
+      </div>
+    </div>
+    <div class="pending-list" *ngIf="pendingTransfers.length > 0">
+      <div class="pending-item" *ngFor="let item of pendingTransfers; trackBy: trackById">
+        <div>
+          <strong>{{ item.reference }}</strong>
+          <small>{{ item.typeTransfer }} · {{ item.date_demande | date:'dd/MM' }}</small>
+        </div>
+        <span>{{ item.boitiers }} boitier(s)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Distribution by Phase -->
+  <section class="panel distribution-panel">
+    <div class="panel-header">
+      <span class="eyebrow">Archives Dept.</span>
+      <h5>Distribution par phase</h5>
+    </div>
+    <div class="phase-layout">
+      <div class="phase-donut" [style.background]="phaseDonutBackground">
+        <div><strong>{{ phaseTotal | number }}</strong></div>
+      </div>
+      <div class="phase-list">
+        <div class="phase-row" *ngFor="let phase of phaseDistribution; let i = index; trackBy: trackById">
+          <div class="phase-row-head"><span>{{ phase.nom }}</span><strong>{{ percent(phase.total, phaseTotal) }}%</strong></div>
+          <div class="bar-track"><span [style.width]="barWidth(phase.total, maxPhaseTotal)" [style.background]="phaseColors[i % phaseColors.length]"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="content-grid">
+  <!-- Evolution -->
+  <section class="panel evolution-panel">
+    <div class="panel-header"><h5>Evolution des documents du departement</h5></div>
+    <div class="evolution-chart" *ngIf="documentEvolution.length > 0">
+      <svg viewBox="0 0 720 220" preserveAspectRatio="none">
+        <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
+        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="panel history-panel">
+    <div class="panel-header"><h5>Dernieres actions</h5></div>
+    <div class="timeline">
+      <div class="timeline-item" *ngFor="let item of recentTransfers; trackBy: trackById">
+        <div class="timeline-dot" [ngClass]="'dot-' + statusTone(item.statut)"></div>
+        <div>
+          <strong>{{ item.reference }}</strong>
+          <small>{{ item.statut }} · {{ item.date_demande | date:'shortDate' }}</small>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,201 @@
+<!-- KPI Grid -->
+<div class="kpi-grid">
+  <div class="kpi-card" *ngFor="let card of kpiCards; trackBy: trackById" [ngClass]="'tone-' + card.tone">
+    <div class="kpi-icon">
+      <i class="bx" [ngClass]="card.icon"></i>
+    </div>
+    <div>
+      <span>{{ card.label }}</span>
+      <strong>{{ card.value | number }}</strong>
+      <small>{{ card.hint }}</small>
+    </div>
+  </div>
+</div>
+
+<div class="insight-grid">
+  <!-- Capacity -->
+  <section class="panel capacity-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Capacite</span>
+        <h5>Boitiers vides</h5>
+      </div>
+      <strong>{{ globalStats.pourcentage_emplacements_vides }}%</strong>
+    </div>
+
+    <div class="capacity-meter">
+      <div
+        class="meter-ring"
+        [style.background]="'conic-gradient(#24b47e 0 ' + globalStats.pourcentage_emplacements_vides + '%, #eef1f6 ' + globalStats.pourcentage_emplacements_vides + '% 100%)'"
+      >
+        <span>{{ globalStats.emplacements_vides | number }}</span>
+        <small>vides</small>
+      </div>
+      <div class="meter-details">
+        <div>
+          <span>Capacite totale</span>
+          <strong>{{ globalStats.capacite_emplacements | number }}</strong>
+        </div>
+        <div>
+          <span>Occupes</span>
+          <strong>{{ globalStats.emplacements_occupes | number }}</strong>
+        </div>
+        <div>
+          <span>Disponibles</span>
+          <strong>{{ globalStats.emplacements_vides | number }}</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Infrastructure -->
+  <section class="panel locations-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Infrastructure</span>
+        <h5>Batiments, salles et armoires</h5>
+      </div>
+    </div>
+    <div class="location-grid">
+      <div class="location-stat" *ngFor="let item of locationCards; trackBy: trackById">
+        <i class="bx" [ngClass]="item.icon"></i>
+        <span>{{ item.label }}</span>
+        <strong>{{ item.value | number }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflow -->
+  <section class="panel transfers-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Workflow</span>
+        <h5>Transferts en attente</h5>
+      </div>
+      <strong>{{ globalStats.transferts_en_attente | number }}</strong>
+    </div>
+    <div class="status-list">
+      <div class="status-row" *ngFor="let item of transferStatus">
+        <span>{{ statusLabel(item.statut) }}</span>
+        <div class="status-bar">
+          <span [style.width]="barWidth(item.total, (globalStats.total_transferts || 1))"></span>
+        </div>
+        <strong>{{ item.total }}</strong>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="content-grid">
+  <!-- Distribution -->
+  <section class="panel distribution-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Archives</span>
+        <h5>Distribution par phase</h5>
+      </div>
+      <span class="panel-total">{{ phaseTotal | number }} elements</span>
+    </div>
+    <div class="phase-layout">
+      <div class="phase-donut" [style.background]="phaseDonutBackground">
+        <div>
+          <strong>{{ phaseTotal | number }}</strong>
+          <span>Total</span>
+        </div>
+      </div>
+      <div class="phase-list">
+        <div class="phase-row" *ngFor="let phase of phaseDistribution; let i = index; trackBy: trackById">
+          <div class="phase-row-head">
+            <span>
+              <i [style.background]="phaseColors[i % phaseColors.length]"></i>
+              {{ phase.nom }}
+            </span>
+            <strong>{{ percent(phase.total, phaseTotal) }}%</strong>
+          </div>
+          <div class="bar-track">
+            <span [style.width]="barWidth(phase.total, maxPhaseTotal)" [style.background]="phaseColors[i % phaseColors.length]"></span>
+          </div>
+          <small>{{ phase.documents | number }} documents · {{ phase.dossiers | number }} dossiers</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Evolution -->
+  <section class="panel evolution-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Evolution</span>
+        <h5>Documents au fil du temps</h5>
+      </div>
+      <div class="evolution-summary" *ngIf="latestDocumentEvolution">
+        <span>Cumul</span>
+        <strong>{{ latestDocumentEvolution.cumulative | number }}</strong>
+        <small>{{ latestDocumentEvolution.total | number }} nouveau(x) ce mois</small>
+      </div>
+    </div>
+    <div class="evolution-chart" *ngIf="documentEvolution.length > 0">
+      <svg viewBox="0 0 720 220" preserveAspectRatio="none">
+        <line x1="42" y1="18" x2="42" y2="186" class="chart-axis"></line>
+        <line x1="42" y1="186" x2="702" y2="186" class="chart-axis"></line>
+        <polygon [attr.points]="documentEvolutionArea" class="chart-area"></polygon>
+        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
+        <g *ngFor="let point of documentEvolutionChartPoints; trackBy: trackById">
+          <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="chart-dot"></circle>
+        </g>
+      </svg>
+      <div class="evolution-labels">
+        <span *ngFor="let point of documentEvolution; let i = index">
+          {{ i === 0 || i === documentEvolution.length - 1 || i === 5 ? point.label : '' }}
+        </span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="content-grid bottom-grid">
+  <!-- Buildings -->
+  <section class="panel building-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Repartition</span>
+        <h5>Documents et dossiers par batiment</h5>
+      </div>
+    </div>
+    <div class="building-list">
+      <div class="building-row" *ngFor="let bat of batimentStats; trackBy: trackById">
+        <div class="building-main">
+          <div class="building-avatar"><i class="bx bx-building"></i></div>
+          <div><strong>{{ bat.nom }}</strong><small>{{ bat.code }} · {{ bat.salles }} salles</small></div>
+        </div>
+        <div class="building-metrics">
+          <span><strong>{{ bat.documents }}</strong> docs</span>
+          <span><strong>{{ bat.dossiers }}</strong> dossiers</span>
+          <span><strong>{{ bat.taux_vide }}%</strong> vide</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logins -->
+  <section class="panel login-panel">
+    <div class="panel-header">
+      <div>
+        <span class="eyebrow">Acces</span>
+        <h5>Derniers logins</h5>
+      </div>
+    </div>
+    <div class="login-list">
+      <div class="login-row" *ngFor="let login of recentLogins; trackBy: trackById">
+        <div class="login-avatar">{{ login.full_name.slice(0, 2).toUpperCase() }}</div>
+        <div>
+          <strong>{{ login.full_name }}</strong>
+          <small>{{ login.username }} · {{ login.last_login | date:'dd/MM/yyyy HH:mm' }}</small>
+        </div>
+        <span class="badge" [ngClass]="login.is_active ? 'badge-light-success' : 'badge-light-secondary'">
+          {{ login.is_active ? 'Actif' : 'Inactif' }}
+        </span>
+      </div>
+    </div>
+  </section>
+</div>

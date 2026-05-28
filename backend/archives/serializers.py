@@ -137,7 +137,7 @@ class DossierSerializer(serializers.ModelSerializer):
         model = Dossier
         fields = [
             'idDossier', 'code', 'nomDos', 'date_creation', 'date_cloture',
-            'boitier', 'boitier_idboit', 'calendrier', 'calendrier_code', 'calendrier_title',
+            'boitier', 'boitier_idboit', 'direction', 'calendrier', 'calendrier_code', 'calendrier_title',
             'phaseArchive', 'phaseArchive_nom',
             'phaseType', 'dureeCourant', 'dureeIntermediaire', 'dureeDefinitive',
             'date_pass_intermediaire', 'date_pass_final',
@@ -164,7 +164,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = [
-            'id', 'idDoc', 'reference', 'titre', 'dossier', 'dossier_reference', 'dossier_nom',
+            'id', 'idDoc', 'reference', 'titre', 'dossier', 'dossier_reference', 'dossier_nom', 'direction',
             'phase_archive', 'phase_archive_nom', 'date_creation',
             'calendrier', 'calendrier_code', 'calendrier_title',
             'niv_confidentialite', 'version', 'type_document', 'auteur',

@@ -1,0 +1,42 @@
+<!-- KPI Grid -->
+<div class="kpi-grid">
+  <div class="kpi-card" *ngFor="let card of kpiCards; trackBy: trackById" [ngClass]="'tone-' + card.tone">
+    <div class="kpi-icon">
+      <i class="bx" [ngClass]="card.icon"></i>
+    </div>
+    <div>
+      <span>{{ card.label }}</span>
+      <strong>{{ card.value | number }}</strong>
+      <small>{{ card.hint }}</small>
+    </div>
+  </div>
+</div>
+
+<div class="content-grid">
+  <!-- Distribution by Phase -->
+  <section class="panel distribution-panel">
+    <div class="panel-header">
+      <span class="eyebrow">Stockage</span>
+      <h5>Phases d'archivage</h5>
+    </div>
+    <div class="phase-layout">
+      <div class="phase-donut" [style.background]="phaseDonutBackground"></div>
+      <div class="phase-list">
+        <div class="phase-row" *ngFor="let phase of phaseDistribution; trackBy: trackById">
+          <div class="phase-row-head"><span>{{ phase.nom }}</span></div>
+          <small>{{ phase.documents | number }} documents disponibles</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Evolution -->
+  <section class="panel evolution-panel">
+    <div class="panel-header"><h5>Volume documentaire</h5></div>
+    <div class="evolution-chart" *ngIf="documentEvolution.length > 0">
+      <svg viewBox="0 0 720 220" preserveAspectRatio="none">
+        <polyline [attr.points]="documentEvolutionPolyline" class="chart-line"></polyline>
+      </svg>
+    </div>
+  </section>
+</div>
