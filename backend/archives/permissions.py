@@ -38,7 +38,12 @@ class EstAdministrateur(permissions.BasePermission):
     message = "Vous devez etre administrateur pour effectuer cette action."
 
     def has_permission(self, request, view):
-        return user_has_any_role(request.user, ["admin"])
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+        if user.is_superuser or user.is_staff:
+            return True
+        return user_has_any_role(user, ["admin"])
 
 
 class EstArchiviste(permissions.BasePermission):

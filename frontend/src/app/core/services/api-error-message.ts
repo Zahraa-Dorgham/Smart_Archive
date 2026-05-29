@@ -2,18 +2,22 @@ const FIELD_LABELS: Record<string, string> = {
   code: 'code',
   code_barre: 'code-barres',
   code_barres: 'code-barres',
+  email: 'email',
   idboit: 'identifiant du boitier',
   idDoc: 'identifiant du document',
-  nom: 'nom'
+  nom: 'nom',
+  username: 'identifiant'
 };
 
 const DUPLICATE_MESSAGES: Record<string, string> = {
   code: 'Ce code existe deja. Veuillez choisir un autre code.',
   code_barre: 'Ce code-barres existe deja. Veuillez choisir un autre code-barres.',
   code_barres: 'Ce code-barres existe deja. Veuillez choisir un autre code-barres.',
+  email: 'Cet email existe deja. Veuillez choisir un autre email.',
   idboit: 'Cet identifiant de boitier existe deja. Veuillez choisir un autre identifiant.',
   idDoc: 'Cet identifiant de document existe deja. Veuillez choisir un autre identifiant.',
-  nom: 'Ce nom existe deja. Veuillez choisir un autre nom.'
+  nom: 'Ce nom existe deja. Veuillez choisir un autre nom.',
+  username: 'Cet identifiant existe deja. Veuillez choisir un autre identifiant.'
 };
 
 function firstMessage(value: unknown): string | null {

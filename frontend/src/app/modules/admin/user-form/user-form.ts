@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ApiService } from '../../../core/services/api.service';
+import { getApiErrorMessage } from '../../../core/services/api-error-message';
 
 @Component({
   selector: 'app-user-form',
@@ -107,6 +108,7 @@ export class UserFormComponent implements OnInit {
     }
 
     this.submitting = true;
+    const optionalText = (value: string) => value?.trim() || null;
     const payload = {
       username: this.userData.email,
       email: this.userData.email,
@@ -115,8 +117,8 @@ export class UserFormComponent implements OnInit {
       is_active: this.userData.is_active,
       groups: [this.userData.role_id],
       direction: this.userData.direction,
-      telephone: this.userData.telephone,
-      adresse: this.userData.adresse,
+      telephone: optionalText(this.userData.telephone),
+      adresse: optionalText(this.userData.adresse),
       password: this.userData.password
     };
 
@@ -137,7 +139,7 @@ export class UserFormComponent implements OnInit {
         console.error('Erreur creation utilisateur', err);
         (window as any).Swal.fire({
           title: 'Erreur',
-          text: 'Une erreur est survenue lors de la création de l\'utilisateur. Vérifiez si l\'email est déjà utilisé.',
+          text: getApiErrorMessage(err, 'Une erreur est survenue lors de la création de l\'utilisateur.'),
           icon: 'error',
           confirmButtonColor: '#5a8dee'
         });

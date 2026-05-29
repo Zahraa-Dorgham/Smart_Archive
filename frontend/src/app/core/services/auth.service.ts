@@ -141,7 +141,12 @@ export class AuthService {
             }
         }
 
-        return roles.map((role: string) => this.normalizeRole(role));
+        const normalizedRoles = roles.map((role: string) => this.normalizeRole(role));
+        if ((user?.is_staff || user?.is_superuser) && !normalizedRoles.includes('admin')) {
+            normalizedRoles.push('admin');
+        }
+
+        return normalizedRoles;
     }
 
     hasRole(roles: string | string[]): boolean {

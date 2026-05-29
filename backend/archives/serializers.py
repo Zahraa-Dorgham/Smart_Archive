@@ -541,8 +541,8 @@ class UserSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     direction_nom = serializers.SerializerMethodField()
-    telephone = serializers.CharField(write_only=True, required=False, allow_null=True)
-    adresse = serializers.CharField(write_only=True, required=False, allow_null=True)
+    telephone = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
+    adresse = serializers.CharField(write_only=True, required=False, allow_null=True, allow_blank=True)
     
     class Meta:
         model = User

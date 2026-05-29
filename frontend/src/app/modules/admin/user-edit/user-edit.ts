@@ -193,6 +193,7 @@ export class UserEditComponent implements OnInit {
         }
 
         this.submitting = true;
+        const optionalText = (value: string) => value?.trim() || null;
         const payload: any = {
             username: this.userData.email,
             email: this.userData.email,
@@ -201,8 +202,8 @@ export class UserEditComponent implements OnInit {
             is_active: this.userData.is_active,
             groups: this.selectedGroupIds,
             direction: this.userData.direction,
-            telephone: this.userData.telephone,
-            adresse: this.userData.adresse
+            telephone: optionalText(this.userData.telephone),
+            adresse: optionalText(this.userData.adresse)
         };
 
         if (this.userData.password) {
