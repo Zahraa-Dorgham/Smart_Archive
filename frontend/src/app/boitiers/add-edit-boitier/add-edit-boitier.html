@@ -48,7 +48,9 @@
                     <i class="bx bx-archive"></i>
                     <select class="form-control" formControlName="armoire">
                         <!-- <option value="">Aucune</option> -->
-                        <option *ngFor="let a of armoires" [value]="a.id">{{ a.code }}</option>
+                        <optgroup *ngFor="let group of armoireGroups" [label]="group.label">
+                            <option *ngFor="let a of group.armoires" [value]="a.id">{{ a.code }}</option>
+                        </optgroup>
                     </select>
                 </div>
             </div>
@@ -66,7 +68,7 @@
 
         <div class="row">
             <div class="col-md-6 mb-1">
-                <label class="form-label">Capacité (Dossiers) <span class="text-danger">*</span></label>
+                <label class="form-label">Capacité (Dossiers) <span class="text-danger"></span></label>
                 <div class="icon-input-wrapper">
                     <i class="bx bx-archive"></i>
                     <input type="number" class="form-control" formControlName="capacite" placeholder="10">

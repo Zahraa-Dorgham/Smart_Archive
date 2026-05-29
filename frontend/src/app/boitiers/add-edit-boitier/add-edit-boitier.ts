@@ -11,6 +11,7 @@ import { BoitierService } from '../../core/services/boitier.service';
 import { ArmoireService } from '../../core/services/armoire.service';
 import { EtagereService } from '../../core/services/etagere.service';
 import { Boitier } from '../../core/models/boitier.model';
+import { Armoire } from '../../core/models/armoire.model';
 import { getApiErrorMessage } from '../../core/services/api-error-message';
 
 export interface DialogData {
@@ -18,6 +19,11 @@ export interface DialogData {
   boitier?: Boitier;
   etageres: any[];
   initialData?: any;
+}
+
+interface ArmoireOptionGroup {
+  label: string;
+  armoires: Armoire[];
 }
 
 @Component({
@@ -39,7 +45,8 @@ export interface DialogData {
 export class AddEditBoitierComponent implements OnInit {
   form: FormGroup;
   isEditMode: boolean;
-  armoires: any[] = [];
+  armoires: Armoire[] = [];
+  armoireGroups: ArmoireOptionGroup[] = [];
   etageres: any[] = [];
 
   constructor(
@@ -104,7 +111,33 @@ export class AddEditBoitierComponent implements OnInit {
   }
 
   loadArmoires(): void {
-    this.armoireService.getArmoires().subscribe(res => this.armoires = res.results);
+    this.armoireService.getArmoires().subscribe(res => {
+      this.armoires = res.results;
+      this.armoireGroups = this.groupArmoiresByLocation(this.armoires);
+    });
+  }
+
+  private groupArmoiresByLocation(armoires: Armoire[]): ArmoireOptionGroup[] {
+    const groups = new Map<string, ArmoireOptionGroup>();
+
+    armoires.forEach(armoire => {
+      const batimentLabel = armoire.batiment_nom || 'Batiment non indique';
+      const salleLabel = [armoire.salle_nom].filter(Boolean).join(' - ') || 'Salle non indiquee';
+      const label = `${batimentLabel} : ${salleLabel}`;
+
+      if (!groups.has(label)) {
+        groups.set(label, { label, armoires: [] });
+      }
+
+      groups.get(label)!.armoires.push(armoire);
+    });
+
+    return Array.from(groups.values())
+      .map(group => ({
+        ...group,
+        armoires: group.armoires.sort((a, b) => a.code.localeCompare(b.code))
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
   }
 
   loadEtageres(armoireId?: string): void {

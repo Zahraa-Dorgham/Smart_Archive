@@ -103,7 +103,7 @@ class SalleViewSet(viewsets.ModelViewSet):
         return [EstEmploye()]
 
 class ArmoireViewSet(viewsets.ModelViewSet):
-    queryset = Armoire.objects.all()
+    queryset = Armoire.objects.select_related('salle__batiment').all()
     serializer_class = ArmoireSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['salle']

@@ -6,7 +6,11 @@ export interface Armoire extends BaseModel {
     code: string;
     // type_armoire: string;
     salle: Salle | string;
-    salle_nom?: Salle;
+    salle_nom?: string;
+    salle_code?: string;
+    batiment_nom?: string;
+    batiment_code?: string;
+    localisation?: string;
     code_barres?: string;
     description?: string;
     date_installation?: Date;

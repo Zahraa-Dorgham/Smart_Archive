@@ -47,15 +47,28 @@ class SalleSerializer(serializers.ModelSerializer):
 # Serializer pour Armoire
 class ArmoireSerializer(serializers.ModelSerializer):
     salle_nom = serializers.CharField(source='salle.nom', read_only=True)
+    salle_code = serializers.CharField(source='salle.code', read_only=True)
+    batiment_nom = serializers.CharField(source='salle.batiment.nom', read_only=True)
+    batiment_code = serializers.CharField(source='salle.batiment.code', read_only=True)
+    localisation = serializers.SerializerMethodField()
     nombre_etageres = serializers.SerializerMethodField()
     
     class Meta:
         model = Armoire
-        fields = ['id', 'code', 'salle', 'salle_nom', 
+        fields = ['id', 'code', 'salle', 'salle_nom', 'salle_code',
+                  'batiment_nom', 'batiment_code', 'localisation',
                   'code_barres', 'nombre_etageres']
 
     def get_nombre_etageres(self, obj):
         return obj.etageres.count()
+
+    def get_localisation(self, obj):
+        parts = [
+            obj.code,
+            getattr(obj.salle, 'nom', None),
+            getattr(getattr(obj.salle, 'batiment', None), 'nom', None),
+        ]
+        return ' - '.join(part for part in parts if part)
 
 # Serializer pour Etagere
 class EtagereSerializer(serializers.ModelSerializer):

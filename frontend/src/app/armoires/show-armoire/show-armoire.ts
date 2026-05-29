@@ -215,6 +215,6 @@ export class ShowArmoireComponent implements OnInit {
     if (typeof armoire.salle === 'object') {
       return armoire.salle.nom;
     }
-    return armoire.salle_nom?.nom || 'N/A';
+    return armoire.salle_nom || 'N/A';
   }
 }
