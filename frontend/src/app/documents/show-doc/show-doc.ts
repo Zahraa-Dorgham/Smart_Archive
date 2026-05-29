@@ -121,6 +121,49 @@ export class ShowDocumentComponent implements OnInit {
     return (doc as any).dossier_nom || (doc as any).dossier_reference || 'N/A';
   }
 
+  openLocationDialog(doc: Document): void {
+    const emplacement = doc.emplacement || 'Non localise';
+    const boitier = doc.boitier_idboit
+      ? `${doc.boitier_idboit}${doc.boitier_titre ? ' - ' + doc.boitier_titre : ''}`
+      : 'Aucun boitier associe';
+
+    (window as any).Swal.fire({
+      title: 'Emplacement du document',
+      html: `
+        <div class="document-location-dialog">
+          <div class="location-row">
+            <span class="location-label">Document</span>
+            <span class="location-value">${this.escapeHtml(doc.idDoc)} - ${this.escapeHtml(doc.titre)}</span>
+          </div>
+          <div class="location-row">
+            <span class="location-label">Dossier</span>
+            <span class="location-value">${this.escapeHtml(this.getDossierReference(doc))}</span>
+          </div>
+          <div class="location-row">
+            <span class="location-label">Boitier</span>
+            <span class="location-value">${this.escapeHtml(boitier)}</span>
+          </div>
+          <div class="location-box">
+            <i class="bx bx-map-pin"></i>
+            <span>${this.escapeHtml(emplacement)}</span>
+          </div>
+        </div>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Fermer',
+      confirmButtonColor: '#5a8dee'
+    });
+  }
+
+  private escapeHtml(value: unknown): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // getPhaseNom(doc: Document): string {
   //   if (typeof doc.phase_archive === 'object') {
   //     return doc.phase_archive.nom;

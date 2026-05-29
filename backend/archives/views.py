@@ -324,7 +324,16 @@ class DocumentViewSet(viewsets.ModelViewSet):
                 serializer.save()
         else:
             serializer.save()
-    queryset = Document.objects.all().select_related('dossier', 'phase_archive', 'calendrier')
+    queryset = Document.objects.all().select_related(
+        'dossier',
+        'dossier__boitier',
+        'dossier__boitier__armoire',
+        'dossier__boitier__armoire__salle',
+        'dossier__boitier__armoire__salle__batiment',
+        'dossier__boitier__etagere',
+        'phase_archive',
+        'calendrier'
+    )
     serializer_class = DocumentSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['phase_archive', 'dossier', 'type_document', 'niv_confidentialite', 'calendrier']

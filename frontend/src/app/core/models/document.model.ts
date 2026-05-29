@@ -7,6 +7,9 @@ export interface Document extends BaseModel {
     // reference: string;
     titre: string;
     dossier: Dossier | number | string;
+    boitier_idboit?: string | null;
+    boitier_titre?: string | null;
+    emplacement?: string | null;
     calendrier?: string | null;
     calendrier_title?: string | null;
     phase_archive?: PhaseArchive | string | number | null;

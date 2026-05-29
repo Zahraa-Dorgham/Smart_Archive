@@ -77,3 +77,46 @@ table {
 .p-0 {
     padding: 6px !important;
 }
+
+::ng-deep .document-location-dialog {
+    text-align: left;
+}
+
+::ng-deep .document-location-dialog .location-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 12px;
+    margin-bottom: 10px;
+    align-items: start;
+}
+
+::ng-deep .document-location-dialog .location-label {
+    color: #828d99;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+::ng-deep .document-location-dialog .location-value {
+    color: #475f7b;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+::ng-deep .document-location-dialog .location-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid #dfe7f3;
+    border-radius: 8px;
+    background: #f8fbff;
+    color: #304156;
+    font-weight: 700;
+}
+
+::ng-deep .document-location-dialog .location-box i {
+    color: #5a8dee;
+    font-size: 1.35rem;
+}

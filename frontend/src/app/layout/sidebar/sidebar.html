@@ -27,7 +27,7 @@
             <ng-container *ngIf="authService.hasRole('Responsable')">
                 <li class="navigation-header"><span>Espace Responsable</span></li>
                 <li class="nav-item" routerLinkActive="active">
-                    <a routerLink="/responsable/transferts"><i class="bx bx-transfer"></i><span class="menu-title">Mes Transferts</span></a>
+                    <a routerLink="/responsable/transferts"><i class="bx bx-transfer"></i><span class="menu-title"> Transferts</span></a>
                 </li>
                 <li class="nav-item" routerLinkActive="active">
                     <a routerLink="/responsable/documents" [queryParams]="{filter: 'direction'}"><i class="bx bx-file"></i><span class="menu-title">Documents Dep.</span></a>
