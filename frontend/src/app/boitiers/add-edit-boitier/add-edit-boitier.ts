@@ -85,7 +85,7 @@ export class AddEditBoitierComponent implements OnInit {
       if (boitier.etagere && typeof boitier.etagere === 'object') {
         patchValue.etagere = (boitier.etagere as any).id;
       }
-      this.form.patchValue(patchValue);
+      this.form.patchValue(patchValue, { emitEvent: false });
       if (boitier.armoire) {
         const armoireId = typeof boitier.armoire === 'object' ? (boitier.armoire as any).id : boitier.armoire;
         this.loadEtageres(armoireId);
@@ -100,7 +100,10 @@ export class AddEditBoitierComponent implements OnInit {
           this.form.patchValue({ etagere: this.data.initialData.etagere });
         });
       } else {
-        this.form.patchValue(this.data.initialData);
+        this.form.patchValue(this.data.initialData, { emitEvent: false });
+        if (this.data.initialData.armoire) {
+          this.loadEtageres(this.data.initialData.armoire);
+        }
       }
     }
 
@@ -140,12 +143,14 @@ export class AddEditBoitierComponent implements OnInit {
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  loadEtageres(armoireId?: string): void {
+  loadEtageres(armoireId?: any): void {
     if (!armoireId) {
       this.etageres = [];
       return;
     }
-    this.etagereService.getEtageres({ armoire: armoireId }).subscribe(res => this.etageres = res.results);
+    this.etagereService.getEtageres({ armoire: armoireId }).subscribe(res => {
+      this.etageres = (res as any).results || (Array.isArray(res) ? res : []);
+    });
   }
 
 

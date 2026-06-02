@@ -303,6 +303,14 @@ class Dossier(models.Model):
         verbose_name = "Dossier"
 
     def save(self, *args, **kwargs):
+        # Synchronisation avec le calendrier si présent
+        if self.calendrier:
+            self.conservation_active_period = self.calendrier.conservation_active_period
+            self.conservation_semi_active_period = self.calendrier.conservation_semi_active_period
+            self.sort_final_type = self.calendrier.sort_final_type
+            self.sort_final_comment = self.calendrier.sort_final_comment
+            self.sort_final_security_years = self.calendrier.sort_final_security_years
+
         if self.date_creation and self.conservation_semi_active_period is not None:
             self.date_pass_intermediaire = add_years_safe(self.date_creation, self.conservation_semi_active_period)
             if self.conservation_active_period is not None:
@@ -382,6 +390,18 @@ class Document(models.Model):
         indexes = [models.Index(fields=['idDoc']), models.Index(fields=['reference']), models.Index(fields=['phase_archive']), models.Index(fields=['calendrier'])]
 
     def save(self, *args, **kwargs):
+        # Synchronisation avec le calendrier si présent (soit direct, soit via le dossier)
+        cal = self.calendrier
+        if not cal and self.dossier:
+            cal = self.dossier.calendrier
+        
+        if cal:
+            self.conservation_active_period = cal.conservation_active_period
+            self.conservation_semi_active_period = cal.conservation_semi_active_period
+            self.sort_final_type = cal.sort_final_type
+            self.sort_final_comment = cal.sort_final_comment
+            self.sort_final_security_years = cal.sort_final_security_years
+
         if self.date_creation and self.conservation_semi_active_period is not None:
             self.date_pass_intermediaire = add_years_safe(self.date_creation, self.conservation_semi_active_period)
             if self.conservation_active_period is not None:

@@ -47,7 +47,7 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-archive"></i>
                     <select class="form-control" formControlName="armoire">
-                        <!-- <option value="">Aucune</option> -->
+                        <option value="">Aucune</option>
                         <optgroup *ngFor="let group of armoireGroups" [label]="group.label">
                             <option *ngFor="let a of group.armoires" [value]="a.id">{{ a.code }}</option>
                         </optgroup>

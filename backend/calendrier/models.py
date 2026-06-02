@@ -29,3 +29,34 @@ class Calendrier(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.title}"
+
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.apps import apps
+
+@receiver(post_save, sender=Calendrier)
+def update_dossiers_on_calendrier_change(sender, instance, **kwargs):
+    """
+    Propagate changes from Calendrier to all linked Dossiers and Documents.
+    """
+    try:
+        # Use apps.get_model to avoid circular imports
+        Dossier = apps.get_model('archives', 'Dossier')
+        Document = apps.get_model('archives', 'Document')
+        
+        # Update linked dossiers
+        linked_dossiers = Dossier.objects.filter(calendrier=instance)
+        for dossier in linked_dossiers:
+            # The sync logic will be in Dossier.save()
+            dossier.save()
+            
+        # Update linked documents
+        linked_documents = Document.objects.filter(calendrier=instance)
+        for document in linked_documents:
+            # The sync logic will be in Document.save()
+            document.save()
+    except (LookupError, Exception):
+        # Handle cases where apps are not yet loaded or other issues
+        pass
+
