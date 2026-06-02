@@ -91,10 +91,14 @@
                 <div class="icon-input-wrapper">
                     <i class="bx bx-calendar-event"></i>
                     <select class="form-control" formControlName="calendrier">
-                        <!-- <option [value]="null">Aucun calendrier</option> -->
-                        <option *ngFor="let c of filteredCalendriers" [value]="c.id.toString()">
-                            {{ c.code }} - {{ c.title }}
+                        <option [ngValue]="null" disabled>
+                            {{ form.get('dossier')?.value ? 'Selectionner un calendrier...' : 'Selectionner un dossier d abord...' }}
                         </option>
+                        <optgroup *ngFor="let group of calendrierGroups" [label]="group.label">
+                            <option *ngFor="let c of group.calendriers" [value]="c.id.toString()">
+                                {{ c.code }} - {{ c.title }}
+                            </option>
+                        </optgroup>
                     </select>
                 </div>
             </div>

@@ -31,6 +31,11 @@ export interface DialogData {
   document?: Document;
 }
 
+interface CalendrierOptionGroup {
+  label: string;
+  calendriers: Calendrier[];
+}
+
 @Component({
   selector: 'app-add-edit-document',
   standalone: true,
@@ -57,6 +62,7 @@ export class AddEditDocumentComponent implements OnInit {
   phases: any[] = [];
   calendriers: Calendrier[] = [];
   filteredCalendriers: Calendrier[] = [];
+  calendrierGroups: CalendrierOptionGroup[] = [];
   selectedFile: File | null = null;
   isAnalyzingFile = false;
   extractionWarnings: string[] = [];
@@ -105,6 +111,7 @@ export class AddEditDocumentComponent implements OnInit {
         this.phases = normalizePhases(phases.results);
         this.calendriers = calendriers.results;
         this.filteredCalendriers = [];
+        this.calendrierGroups = [];
 
         if (this.isEditMode && this.data.document) {
           this.patchDocumentForm(this.data.document);
@@ -191,6 +198,7 @@ export class AddEditDocumentComponent implements OnInit {
     const selectedDossier = this.dossiers.find(item => String(item.idDossier) === String(dossierId));
     const allowedCalendrierIds = this.getAllowedCalendrierIds(selectedDossier);
     this.filteredCalendriers = this.calendriers.filter(item => allowedCalendrierIds.has(String(item.id)));
+    this.calendrierGroups = this.groupCalendriersByUsage(selectedDossier, this.filteredCalendriers);
     const currentCalendrier = this.form.get('calendrier')?.value;
     if (currentCalendrier && !allowedCalendrierIds.has(String(currentCalendrier))) {
       this.form.patchValue({ calendrier: null }, { emitEvent: false });
@@ -198,6 +206,38 @@ export class AddEditDocumentComponent implements OnInit {
     if (!currentCalendrier && this.filteredCalendriers.length === 1) {
       this.form.patchValue({ calendrier: String(this.filteredCalendriers[0].id) }, { emitEvent: true });
     }
+  }
+
+  private groupCalendriersByUsage(dossier: Dossier | undefined, calendriers: Calendrier[]): CalendrierOptionGroup[] {
+    const dossierCalendrierId = this.getDossierCalendrierId(dossier);
+    const dossierCalendriers = calendriers.filter(item => String(item.id) === dossierCalendrierId);
+    const documentCalendriers = calendriers.filter(item => String(item.id) !== dossierCalendrierId);
+    const groups: CalendrierOptionGroup[] = [];
+
+    if (dossierCalendriers.length) {
+      groups.push({
+        label: 'Calendrier du dossier',
+        calendriers: dossierCalendriers
+      });
+    }
+
+    if (documentCalendriers.length) {
+      groups.push({
+        label: 'Calendriers des documents',
+        calendriers: documentCalendriers.sort((a, b) => `${a.code} ${a.title}`.localeCompare(`${b.code} ${b.title}`, 'fr'))
+      });
+    }
+
+    return groups;
+  }
+
+  private getDossierCalendrierId(dossier?: Dossier): string | null {
+    if (!dossier?.calendrier) return null;
+    const calendrier = dossier.calendrier;
+    if (typeof calendrier === 'object') {
+      return calendrier.id != null ? String(calendrier.id) : null;
+    }
+    return String(calendrier);
   }
 
   private patchDocumentForm(doc: Document): void {
