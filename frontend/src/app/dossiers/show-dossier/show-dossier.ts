@@ -208,7 +208,10 @@ export class ShowDossierComponent implements OnInit {
     const dialogRef = this.dialog.open(AddEditDossierComponent, {
       width: '700px',
       maxWidth: '95vw',
-      data: { mode: 'add' }
+      data: { 
+        mode: 'add',
+        boitierId: this.boitierFilter
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

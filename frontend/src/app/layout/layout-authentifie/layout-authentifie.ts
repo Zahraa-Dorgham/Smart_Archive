@@ -16,6 +16,12 @@ import { Footer } from '../footer/footer';
 export class LayoutComponent implements OnInit, OnDestroy {
   constructor(public authService: AuthService, private router: Router, private renderer: Renderer2) { }
 
+  closeMenu(): void {
+    const body = document.body;
+    this.renderer.removeClass(body, 'menu-open');
+    this.renderer.addClass(body, 'menu-hide');
+  }
+
   ngOnInit() {
     this.renderer.addClass(document.body, 'vertical-layout');
     this.renderer.addClass(document.body, 'vertical-menu-modern');

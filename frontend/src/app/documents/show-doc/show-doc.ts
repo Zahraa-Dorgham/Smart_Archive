@@ -186,7 +186,10 @@ export class ShowDocumentComponent implements OnInit {
       width: '90vw',
       maxWidth: '700px',
       maxHeight: '90vh',
-      data: { mode: 'add' }
+      data: { 
+        mode: 'add',
+        dossierId: this.dossierFilter
+      }
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) this.loadDocuments();

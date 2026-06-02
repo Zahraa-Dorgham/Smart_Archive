@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -14,18 +14,25 @@ import { filter } from 'rxjs/operators';
 export class Sidebar implements AfterViewInit, OnInit {
   isEmplacementOpen = false;
 
-  constructor(public authService: AuthService, private router: Router) {
+  constructor(public authService: AuthService, private router: Router, private renderer: Renderer2) {
     // Écouter les changements de route pour garder le menu ouvert si un enfant est actif
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.checkActiveRoute(event.urlAfterRedirects);
       this.refreshMenu(); // Re-initialiser le JS du theme
+      this.closeMenu();
     });
   }
 
   ngOnInit() {
     this.checkActiveRoute(this.router.url);
+  }
+
+  closeMenu() {
+    const body = document.body;
+    this.renderer.removeClass(body, 'menu-open');
+    this.renderer.addClass(body, 'menu-hide');
   }
 
   get dashboardLink(): string {

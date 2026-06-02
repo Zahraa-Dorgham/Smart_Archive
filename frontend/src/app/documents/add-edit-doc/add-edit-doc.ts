@@ -29,6 +29,7 @@ function normalizePhases(phases: PhaseArchive[]): PhaseArchive[] {
 export interface DialogData {
   mode: 'add' | 'edit';
   document?: Document;
+  dossierId?: string;
 }
 
 interface CalendrierOptionGroup {
@@ -116,7 +117,10 @@ export class AddEditDocumentComponent implements OnInit {
         if (this.isEditMode && this.data.document) {
           this.patchDocumentForm(this.data.document);
         } else {
-          this.form.patchValue({ phase_archive: this.defaultPhaseId }, { emitEvent: false });
+          this.form.patchValue({ 
+            phase_archive: this.defaultPhaseId,
+            dossier: this.data.dossierId ? String(this.data.dossierId) : null
+          }, { emitEvent: true });
           this.onDossierChange(this.form.get('dossier')?.value ?? null);
         }
 

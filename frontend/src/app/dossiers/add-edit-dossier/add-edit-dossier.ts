@@ -37,6 +37,7 @@ function normalizePhases(phases: PhaseArchive[]): PhaseArchive[] {
 export interface DialogData {
   mode: 'add' | 'edit';
   dossier?: Dossier;
+  boitierId?: string;
 }
 
 @Component({
@@ -114,7 +115,10 @@ export class AddEditDossierComponent implements OnInit {
         if (this.isEditMode && this.data.dossier) {
           this.patchDossierForm(this.data.dossier);
         } else {
-          this.form.patchValue({ phaseArchive: this.defaultPhaseId }, { emitEvent: false });
+          this.form.patchValue({ 
+            phaseArchive: this.defaultPhaseId,
+            boitier: this.data.boitierId ? String(this.data.boitierId) : null
+          }, { emitEvent: false });
         }
 
         this.cdr.detectChanges();

@@ -1073,7 +1073,11 @@ class DashboardStatsView(viewsets.ViewSet):
         if not direction:
             return self._build_empty_dashboard('responsable', 'Direction non assignee')
 
-        doc_qs = Document.objects.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
+        from django.db.models import Q
+        doc_qs = Document.objects.filter(
+            Q(direction=direction) | Q(calendrier__direction=direction) |
+            Q(dossier__direction=direction) | Q(dossier__calendrier__direction=direction)
+        ).distinct()
         dos_qs = Dossier.objects.filter(Q(direction=direction) | Q(calendrier__direction=direction)).distinct()
         boitier_qs = Boitier.objects.filter(
             Q(dossiers__direction=direction) | Q(dossiers__calendrier__direction=direction)
