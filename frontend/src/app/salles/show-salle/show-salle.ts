@@ -164,7 +164,7 @@ export class ShowSalleComponent implements OnInit {
 
   deleteSalle(salle: Salle): void {
     if (salle.nombre_armoires && salle.nombre_armoires > 0) {
-      this.snackBar.open(`Impossible de supprimer cette salle.`, 'Fermer', {
+      this.snackBar.open(`La salle ne peut pas être supprimée car elle contient des armoires.`, 'Fermer', {
         duration: 5000,
         panelClass: ['snackbar-warning']
       });

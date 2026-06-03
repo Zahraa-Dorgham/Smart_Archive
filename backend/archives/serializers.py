@@ -121,7 +121,9 @@ class BoitierSerializer(serializers.ModelSerializer):
     armoire_nom = serializers.CharField(source='armoire.code', read_only=True)
     etagere_numero = serializers.IntegerField(source='etagere.numero', read_only=True)
     localisation = serializers.SerializerMethodField()
-    taux_remplissage = serializers.FloatField(read_only=True)  # property du modèle
+    taux_remplissage = serializers.FloatField(read_only=True)
+    est_transfere = serializers.SerializerMethodField()
+    types_transfert = serializers.SerializerMethodField()
 
     class Meta:
         model = Boitier
@@ -129,8 +131,25 @@ class BoitierSerializer(serializers.ModelSerializer):
             'id', 'idboit', 'code_barre', 'titre', 'capacite',
             'armoire', 'armoire_nom', 'etagere', 'etagere_numero',
             'statut', 'date_creation', 'date_modification',
-            'localisation', 'taux_remplissage', 'nombre_dossiers'
+            'localisation', 'taux_remplissage', 'nombre_dossiers',
+            'est_transfere', 'types_transfert'
         ]
+
+    def get_est_transfere(self, obj):
+        return obj.transfert_boitiers.exists()
+
+    def get_types_transfert(self, obj):
+        # 1. Collecter les types depuis les enregistrements de transfert explicites
+        types = set(obj.transfert_boitiers.values_list('transfert__typeTransfer', flat=True))
+        
+        # 2. Compléter avec la phase réelle des dossiers contenus pour être sûr de ne rien manquer
+        dossier_phases = set(obj.dossiers.values_list('phaseArchive_id', flat=True))
+        if 3 in dossier_phases:  # Phase Finale
+            types.add('FINAL')
+        if 2 in dossier_phases:  # Phase Intermédiaire
+            types.add('INTERMEDIAIRE')
+            
+        return sorted(list(types))
 
     def get_localisation(self, obj):
         return obj.localisation_complete()
@@ -251,19 +270,6 @@ class DocumentSerializer(serializers.ModelSerializer):
         return allowed_ids
 
 
-
-
-
-# class DemandeConsultationSerializer(serializers.ModelSerializer):
-#     employe_nom = serializers.CharField(source='employe.username', read_only=True)
-#     document_titre = serializers.CharField(source='document.titre', read_only=True)
-
-#     class Meta:
-#         model = DemandeConsultation
-#         fields = '__all__'
-#         read_only_fields = ['date_demande', 'statut']
-
-
 class ConsultationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Consultation
@@ -364,7 +370,7 @@ class TransfertSerializer(serializers.ModelSerializer):
             if blocking_tree:
                 raise serializers.ValidationError({
                     'blocking_transfer': {
-                        'message': "Certains elements ne peuvent pas etre transferes pour le moment.",
+                        'message': "Certains elements ne peuvent pas etre transferes for le moment.",
                         'transfer_type': transfer_type,
                         'date_field': self._get_rule_config(transfer_type)['date_field'],
                         'today': timezone.localdate(),
@@ -527,8 +533,6 @@ class BordereauSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
 from django.contrib.auth.models import Group
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -546,8 +550,6 @@ class PermissionSerializer(serializers.ModelSerializer):
         from django.contrib.auth.models import Permission
         model = Permission
         fields = ['id', 'name', 'codename', 'content_type']
-
-
 
 
 from django.contrib.auth import get_user_model
@@ -686,6 +688,3 @@ class UserSerializer(serializers.ModelSerializer):
             instance.user_permissions.set(permissions_data)
             
         return instance
-		
-		
-		

@@ -91,6 +91,15 @@ class BatimentViewSet(viewsets.ModelViewSet):
             return [EstLectureAutorisee()]
         return [EstEmploye()]
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.salles.exists():
+            return Response(
+                {"error": "Suppression impossible car ce bâtiment contient des salles."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
+
 class SalleViewSet(viewsets.ModelViewSet):
     queryset = Salle.objects.all()
     serializer_class = SalleSerializer
@@ -101,6 +110,15 @@ class SalleViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
         return [EstEmploye()]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.armoires.exists():
+            return Response(
+                {"error": "Suppression impossible car cette salle contient des armoires."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
 
 class ArmoireViewSet(viewsets.ModelViewSet):
     queryset = Armoire.objects.select_related('salle__batiment').all()
@@ -113,6 +131,15 @@ class ArmoireViewSet(viewsets.ModelViewSet):
             return [EstLectureAutorisee()]
         return [EstEmploye()]
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.etageres.exists():
+            return Response(
+                {"error": "Suppression impossible car cette armoire contient des étagères."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
+
 class EtagereViewSet(viewsets.ModelViewSet):
     queryset = Etagere.objects.all()
     serializer_class = EtagereSerializer
@@ -123,6 +150,15 @@ class EtagereViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [EstLectureAutorisee()]
         return [EstEmploye()]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.boitiers.exists():
+            return Response(
+                {"error": "Suppression impossible car cette étagère contient des boîtiers."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
 
 # ========== PHASES D'ARCHIVAGE (GÉNÉRIQUE + SPÉCIFIQUES) ==========
 class PhaseArchiveViewSet(viewsets.ModelViewSet):
@@ -153,7 +189,7 @@ class ArchiveDefinitiveViewSet(viewsets.ModelViewSet):
 
 # ========== BOÎTIERS ==========
 class BoitierViewSet(viewsets.ModelViewSet):
-    queryset = Boitier.objects.all().select_related('armoire', 'etagere')
+    queryset = Boitier.objects.all().select_related('armoire', 'etagere').prefetch_related('transfert_boitiers__transfert', 'dossiers')
     serializer_class = BoitierSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['statut', 'armoire', 'etagere']

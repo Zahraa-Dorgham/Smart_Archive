@@ -178,7 +178,7 @@ export class ShowArmoireComponent implements OnInit {
 
   deleteArmoire(armoire: Armoire): void {
     if (armoire.nombre_etageres && armoire.nombre_etageres > 0) {
-      this.snackBar.open(`Impossible de supprimer cet armoire.`, 'Fermer', {
+      this.snackBar.open(`L'armoire ne peut pas être supprimée car elle contient des étagères.`, 'Fermer', {
         duration: 5000,
         panelClass: ['snackbar-warning']
       });

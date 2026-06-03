@@ -192,7 +192,7 @@ export class ShowEtagereComponent implements OnInit {
 
   deleteEtagere(etagere: Etagere): void {
     if (etagere.occupation_actuelle && etagere.occupation_actuelle > 0) {
-      this.snackBar.open(`Impossible de supprimer cette étagère.`, 'Fermer', {
+      this.snackBar.open(`L'étagère ne peut pas être supprimée car elle contient des boîtiers.`, 'Fermer', {
         duration: 5000,
         panelClass: ['snackbar-warning']
       });

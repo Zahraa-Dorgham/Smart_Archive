@@ -58,6 +58,7 @@
                                     <th class="py-2">Titre</th>
                                     <th class="py-2">Localisation</th>
                                     <th class="py-2">Capacité</th>
+                                    <th class="py-2" style="font-size: 0.8rem;">Transfert</th>
                                     <th class="py-2">Dossiers</th>
                                     <th class="py-2 text-right px-2">Actions</th>
                                 </tr>
@@ -83,6 +84,16 @@
                                         <i class="bx bx-archive mr-25"></i> {{b.capacite}}
                                     </td>
                                     <td class="py-2 text-center">
+                                        <div *ngIf="b.est_transfere">
+                                            <div *ngFor="let t of b.types_transfert" 
+                                                 [ngClass]="{'badge-light-warning': t === 'INTERMEDIAIRE', 'badge-light-danger': t === 'FINAL'}"
+                                                 class="badge mb-25 mr-25" style="font-size: 0.7rem; text-transform: lowercase;">
+                                                <i class="bx bx-transfer-alt mr-25" style="font-size: 0.8rem;"></i> {{t}}
+                                            </div>
+                                        </div>
+                                        <span *ngIf="!b.est_transfere" class="badge badge-light-secondary">Aucun</span>
+                                    </td>
+                                    <td class="py-2 text-center">
                                         <span class="badge badge-light-info">{{b.nombre_dossiers || 0}}</span>
                                     </td>
                                     <td class="py-2 text-right px-2">
@@ -98,7 +109,7 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="dataSource.filteredData.length === 0">
-                                    <td colspan="4" class="text-center py-4 text-muted">Aucun boîtier trouvé.</td>
+                                    <td colspan="7" class="text-center py-4 text-muted">Aucun boîtier trouvé.</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -128,7 +128,7 @@ export class ShowBatimentComponent implements OnInit {
 
   deleteBatiment(batiment: Batiment): void {
     if (batiment.nombre_salles && batiment.nombre_salles > 0) {
-      this.snackBar.open(`Impossible de supprimer ce bâtiment.`, 'Fermer', {
+      this.snackBar.open(`Ce bâtiment ne peut pas être supprimé car il contient des salles.`, 'Fermer', {
         duration: 5000,
         panelClass: ['snackbar-warning']
       });
